@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Now — Augustine Music & Events</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('_gnvsXbH1iYymclUs');</script>
+  <style>
+    @font-face { font-family: 'HeyLovely'; src: url('HeyLovely.ttf') format('truetype'); font-weight: normal; font-style: normal; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --green: #4a5e40; --green-dark: #2e3b28; --cream: #f5f2ec; --white: #fff; --text: #2c2c2c; --muted: #5a5a5a; }
+    body { font-family: 'Lato', sans-serif; color: var(--text); }
+
+    header { background: var(--green-dark); padding: 22px 52px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 20; }
+    .logo { font-family: 'HeyLovely', cursive; color: var(--white); font-size: 1.8rem; text-decoration: none; display: flex; align-items: center; }
+    .nav-links { list-style: none; display: flex; gap: 32px; }
+    .nav-links a { color: var(--white); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; transition: opacity 0.2s; }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; }
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; z-index: 30; }
+    .nav-toggle span { display: block; width: 26px; height: 2px; background: var(--white); }
+
+    .page-hero {
+      background: url('hero 1.jpg') center / cover no-repeat var(--green-dark);
+      position: relative;
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .page-hero::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+
+    .page-hero-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .page-hero h1 { font-family: 'HeyLovely', cursive; font-size: clamp(3.5rem, 8vw, 6rem); color: var(--white); }
+    .hero-contact-info { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+    .hero-contact-info a { color: rgba(255,255,255,0.95); text-decoration: none; font-size: 1.25rem; font-weight: 300; letter-spacing: 0.02em; transition: color 0.2s; }
+    .hero-contact-info a:hover { color: var(--white); }
+    .hero-contact-info span { color: rgba(255,255,255,0.4); font-size: 1.25rem; }
+
+    .contact-form-block { background: var(--cream); padding: 72px 0; display: flex; flex-direction: column; align-items: center; }
+    .contact-form-block h2 { font-family: 'HeyLovely', cursive; font-size: 2.8rem; color: var(--green-dark); margin-bottom: 36px; width: 100%; max-width: 700px; }
+
+    form { display: flex; flex-direction: column; gap: 18px; width: 100%; max-width: 700px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+
+    input, select, textarea {
+      padding: 12px 14px;
+      border: 1px solid #d5cfc6;
+      background: var(--white);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.93rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: var(--green); }
+    textarea { resize: vertical; min-height: 110px; }
+
+    .pkg-field { display: none; flex-direction: column; gap: 6px; }
+    .pkg-field.visible { display: flex; }
+
+    /* Rental checklist */
+    .rental-list { border: 1px solid #d5cfc6; background: var(--white); }
+    .rental-section-title { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--green); background: #f0ece4; padding: 8px 14px; }
+    .rental-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #ede9e2; cursor: pointer; transition: background 0.15s; }
+    .rental-row:last-child { border-bottom: none; }
+    .rental-row:hover { background: #faf8f5; }
+    .rental-row input[type="checkbox"] { accent-color: var(--green); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+    .rental-item-name { font-size: 0.88rem; color: var(--text); flex: 1; font-weight: 400; text-transform: none; letter-spacing: 0; }
+    .rental-item-note { font-size: 0.75rem; color: var(--muted); display: block; margin-top: 1px; }
+    .rental-qty { display: none; align-items: center; gap: 6px; flex-shrink: 0; }
+    .rental-qty.show { display: flex; }
+    .qty-btn { width: 24px; height: 24px; border: 1px solid #d5cfc6; background: var(--white); font-size: 1rem; line-height: 1; cursor: pointer; color: var(--green-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .qty-btn:hover { background: #f0ece4; }
+    .qty-num { width: 36px; text-align: center; border: 1px solid #d5cfc6; padding: 3px 4px; font-size: 0.85rem; font-family: 'Lato', sans-serif; color: var(--text); }
+    .rental-item-price { font-size: 0.85rem; font-weight: 700; color: var(--green-dark); min-width: 60px; text-align: right; flex-shrink: 0; }
+    .rental-delivery-row { display: flex; align-items: center; gap: 12px; padding: 14px 0 6px; }
+    .rental-delivery-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .rental-delivery-select { border: 1px solid #d8d3ca; background: #fff; padding: 7px 12px; font-family: var(--sans); font-size: 0.9rem; color: var(--dark); border-radius: 4px; cursor: pointer; flex: 1; }
+    .rental-delivery-select:focus { outline: none; border-color: var(--green); }
+    .rental-total-bar { display: none; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 2px solid var(--green); border-bottom: 1px solid #d8d3ca; }
+    .rental-total-bar.visible { display: flex; }
+    .rental-total-bar span { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    .rental-total-bar strong { font-size: 1.1rem; color: var(--green-dark); }
+
+    .btn-green { padding: 15px 36px; background: var(--green); color: var(--white); border: none; font-family: 'Lato', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; text-align: center; align-self: stretch; transition: background 0.25s; }
+    .btn-green:hover { background: var(--green-dark); }
+
+    .fade-in { opacity: 0; transform: translateY(36px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    footer { background: var(--green-dark); padding: 26px 52px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+    footer p { color: rgba(255,255,255,0.4); font-size: 0.78rem; }
+    .footer-credits { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
+    .photo-credit-link { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); text-decoration: none; padding: 2px 10px 2px 7px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s; vertical-align: middle; }
+    .photo-credit-link::before { content: ""; display: inline-block; width: 13px; height: 13px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,0.75)" stroke="none"/></svg>') center/contain no-repeat; }
+    .photo-credit-link:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .footer-nav { list-style: none; display: flex; gap: 24px; }
+    .footer-nav a { color: var(--white); text-decoration: none; font-size: 0.76rem; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.5; transition: opacity 0.2s; }
+    .footer-nav a:hover { opacity: 1; }
+
+    @media (max-width: 768px) {
+      header { padding: 18px 24px; }
+      .nav-toggle { display: flex; }
+      .nav-links { display: none; position: fixed; inset: 0; background: var(--green-dark); flex-direction: column; align-items: center; justify-content: center; gap: 36px; z-index: 25; }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1.1rem; opacity: 1; }
+      .contact-form-block { padding: 52px 16px; }
+      form, .contact-form-block h2 { max-width: 100%; }
+      .hero-contact-info { gap: 20px; flex-direction: column; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 14px; text-align: center; padding: 28px 24px; }
+      .footer-nav { flex-wrap: wrap; justify-content: center; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; flex-shrink:0;"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>Augustine Music & Events</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="about.html">About</a></li>
+      <li><a href="event-rentals.html">Event Rentals</a></li>
+      <li><a href="event-music.html">Event Music</a></li>
+      <li><a href="contact.html" class="active">Book Now</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-content">
+      <h1>Let's Make Your Day Unforgettable</h1>
+      <div class="hero-contact-info">
+        <a href="mailto:raugustinemusic@gmail.com">raugustinemusic@gmail.com</a>
+        <span>·</span>
+        <a href="tel:9063956530">(906) 395-6530</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="fade-in">
+    <div class="contact-form-block">
+      <h2>Book Now</h2>
+      <form>
+        <div class="form-row">
+          <label>First Name <input type="text" name="first_name" placeholder="Jane" /></label>
+          <label>Last Name <input type="text" name="last_name" placeholder="Smith" /></label>
+        </div>
+        <label>Email <input type="email" name="email" placeholder="jane@example.com" /></label>
+        <label>Date of Event <input type="date" name="event_date" /></label>
+        <label>Package Type
+          <select name="package_type" id="packageType">
+            <option value="">Select a package type</option>
+            <option value="music">Event Music</option>
+            <option value="rentals">Event Rentals</option>
+            <option value="both">Both</option>
+          </select>
+        </label>
+
+        <label class="pkg-field" id="musicField">Music Package
+          <select name="music_package" id="musicPackageSelect">
+            <option value="0">Select a package</option>
+            <optgroup label="Ceremony Only">
+              <option value="550">Bronze — Solo · $550</option>
+              <option value="1100">Silver — Duo · $1,100</option>
+              <option value="1650">Gold — Trio · $1,650</option>
+            </optgroup>
+            <optgroup label="Ceremony + Cocktail Hour">
+              <option value="750">Emerald — Solo · $750</option>
+              <option value="1500">Sapphire — Duo · $1,500</option>
+              <option value="2050">Diamond — Trio · $2,050</option>
+            </optgroup>
+          </select>
+        </label>
+
+        <div class="pkg-field" id="rentalsField">
+          <span style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:700;">Rental Items</span>
+          <div class="rental-list">
+
+            <div class="rental-section-title">Linens</div>
+            <div class="rental-row"><input type="checkbox" data-price="10" data-unit="1"><span class="rental-item-name">Sage Green Toile Round Tablecloths<span class="rental-item-note">120" round · 11 available</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="11"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$10/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="10" data-unit="1"><span class="rental-item-name">Sage Green Toile Rectangular Tablecloths<span class="rental-item-note">90"×156" · 2 available</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="2"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$10/ea</span></div>
+
+            <div class="rental-section-title">Décor & Lighting</div>
+            <div class="rental-row"><input type="checkbox" data-price="25" data-unit="0"><span class="rental-item-name">Wisteria Chandelier<span class="rental-item-note">55" cream · 1 available</span></span><div class="rental-qty"></div><span class="rental-item-price">$25</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="200" data-unit="0"><span class="rental-item-name">Faux Floral Ground Installation<span class="rental-item-note">Cream & white flowers with greenery · 4 available</span></span><div class="rental-qty"></div><span class="rental-item-price">$200</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="3" data-unit="1" data-discount-qty="35" data-discount-price="100"><span class="rental-item-name">Brass Candlestick Holders<span class="rental-item-note">35 pieces available · $100 for full collection</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="35"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$3/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="7" data-unit="1" data-discount-qty="8" data-discount-price="50"><span class="rental-item-name">3 Arm Brass Candelabras<span class="rental-item-note">8 available · $50 for all 8</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="8"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$7/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="25" data-unit="0"><span class="rental-item-name">9 Arm Candelabra<span class="rental-item-note">Focal brass piece · 1 available</span></span><div class="rental-qty"></div><span class="rental-item-price">$25</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="200" data-unit="0"><span class="rental-item-name">Entire Brass Collection Bundle<span class="rental-item-note">All candlesticks, candelabras & Italian vases</span></span><div class="rental-qty"></div><span class="rental-item-price">$200</span></div>
+
+            <div class="rental-section-title">Tableware & Serveware</div>
+            <div class="rental-row"><input type="checkbox" data-price="1.25" data-unit="1"><span class="rental-item-name">White Round Dinner Plates<span class="rental-item-note">10.5" · 60 available · 20 minimum</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.25/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="0.75" data-unit="1"><span class="rental-item-name">White Round Salad Plates<span class="rental-item-note">7.5" · 60 available · 20 minimum</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$0.75/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="1.75" data-unit="1"><span class="rental-item-name">White Dessert Ramekins<span class="rental-item-note">Ruffled rim · 60 available · 20 minimum</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.75/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="1.25" data-unit="1"><span class="rental-item-name">Breadstick Baskets<span class="rental-item-note">4.5×4.5×4" woven · 18 available</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="18"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.25/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="20" data-unit="1"><span class="rental-item-name">Glass Beverage Dispensers<span class="rental-item-note">3 gal hammered glass w/ stand · 4 available</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="4"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$20/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="20" data-unit="0"><span class="rental-item-name">Beverage Urns<span class="rental-item-note">Garden style · set of 2</span></span><div class="rental-qty"></div><span class="rental-item-price">$20/set</span></div>
+
+            <div class="rental-section-title">Outdoor & Entertainment</div>
+            <div class="rental-row"><input type="checkbox" data-price="25" data-unit="0"><span class="rental-item-name">Sage Green Outdoor Umbrella<span class="rental-item-note">7ft fringe patio umbrella · 1 available</span></span><div class="rental-qty"></div><span class="rental-item-price">$25</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="40" data-unit="1"><span class="rental-item-name">Cornhole Game Boards<span class="rental-item-note">Handmade · 2 sets available · bags not included</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="2"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$40/set</span></div>
+
+          </div>
+          </div>
+
+        <div class="rental-delivery-row" id="deliveryRow" style="display:none;">
+          <label for="rentalDelivery" class="rental-delivery-label">Delivery or Pickup?</label>
+          <select id="rentalDelivery" name="rental_delivery" class="rental-delivery-select">
+            <option value="">— Select one —</option>
+            <option value="Pickup">Pickup</option>
+            <option value="Delivery">Delivery</option>
+          </select>
+        </div>
+
+        <div id="deliveryAddressRow" style="display:none;">
+          <label for="deliveryAddress" class="rental-delivery-label" style="display:block; margin-bottom:6px;">Delivery Address</label>
+          <input type="text" id="deliveryAddress" name="delivery_address" placeholder="Street address, city, state, ZIP" style="width:100%; border:1px solid #d8d3ca; padding:8px 12px; font-family:var(--sans); font-size:0.9rem; color:var(--dark); border-radius:4px; box-sizing:border-box;" />
+        </div>
+
+        <div class="rental-total-bar" id="estimatedTotal">
+          <span>Estimated Total</span>
+          <strong id="rentalTotal">$0.00</strong>
+        </div>
+
+        <input type="hidden" name="selected_rentals" id="hiddenRentals" />
+        <input type="hidden" name="estimated_total" id="hiddenTotal" />
+        <label>Message <textarea name="message" placeholder="Tell me about your event..."></textarea></label>
+        <button type="submit" class="btn-green">Book Now</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Augustine Music & Events. All rights reserved.</p>
+    <p class="footer-credits">Photography by <a href="https://www.instagram.com/erinelizabeth.photog?igsh=bGJ2ZzkxNmQ1M3Fk" target="_blank" rel="noopener" class="photo-credit-link">@erinelizabeth.photog</a> &nbsp;·&nbsp; Website by Jared Schnitker</p>
+    <ul class="footer-nav">
+      <li><a href="about.html">About</a></li>
+      <li><a href="event-rentals.html">Event Rentals</a></li>
+      <li><a href="event-music.html">Event Music</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const links = document.getElementById('navLinks');
+    toggle.addEventListener('click', function() { links.classList.toggle('open'); });
+    links.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', function() { links.classList.remove('open'); }); });
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(function(el) { observer.observe(el); });
+
+    // Show/hide package fields
+    const packageType = document.getElementById('packageType');
+    const musicField = document.getElementById('musicField');
+    const rentalsField = document.getElementById('rentalsField');
+
+    const estimatedTotal = document.getElementById('estimatedTotal');
+    const musicPackageSelect = document.getElementById('musicPackageSelect');
+    const deliveryRow = document.getElementById('deliveryRow');
+    const deliveryAddressRow = document.getElementById('deliveryAddressRow');
+    const rentalDelivery = document.getElementById('rentalDelivery');
+
+    rentalDelivery.addEventListener('change', function() {
+      deliveryAddressRow.style.display = this.value === 'Delivery' ? 'block' : 'none';
+    });
+
+    packageType.addEventListener('change', function() {
+      const val = this.value;
+      musicField.classList.toggle('visible', val === 'music' || val === 'both');
+      rentalsField.classList.toggle('visible', val === 'rentals' || val === 'both');
+      estimatedTotal.classList.toggle('visible', val !== '');
+      deliveryRow.style.display = (val === 'rentals' || val === 'both') ? 'flex' : 'none';
+      calcTotal();
+    });
+
+    musicPackageSelect.addEventListener('change', calcTotal);
+
+    // Rental checklist logic
+    function calcTotal() {
+      let total = 0;
+      const musicVal = parseFloat(musicPackageSelect.value) || 0;
+      total += musicVal;
+      document.querySelectorAll('.rental-row').forEach(function(row) {
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (!cb.checked) return;
+        const price = parseFloat(cb.dataset.price);
+        const isUnit = cb.dataset.unit === '1';
+        const qty = isUnit ? parseInt(row.querySelector('.qty-num').value) || 1 : 1;
+        const discountQty = cb.dataset.discountQty ? parseInt(cb.dataset.discountQty) : null;
+        const discountPrice = cb.dataset.discountPrice ? parseFloat(cb.dataset.discountPrice) : null;
+        if (discountQty && discountPrice && qty >= discountQty) {
+          total += discountPrice;
+        } else {
+          total += price * qty;
+        }
+      });
+      document.getElementById('rentalTotal').textContent = '$' + total.toFixed(2);
+    }
+
+    document.querySelectorAll('.rental-row').forEach(function(row) {
+      const cb = row.querySelector('input[type="checkbox"]');
+      const qtyWrap = row.querySelector('.rental-qty');
+      const isUnit = cb.dataset.unit === '1';
+      const qtyNum = row.querySelector('.qty-num');
+
+      // Toggle qty visibility on checkbox change
+      cb.addEventListener('change', function() {
+        if (isUnit && qtyWrap) qtyWrap.classList.toggle('show', cb.checked);
+        calcTotal();
+      });
+
+      // Clicking anywhere on the row toggles the checkbox
+      row.addEventListener('click', function(e) {
+        if (e.target === cb) return;
+        if (e.target.classList.contains('qty-btn') || e.target.classList.contains('qty-num')) return;
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change'));
+      });
+
+      // +/- buttons
+      row.querySelectorAll('.qty-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const delta = btn.textContent.trim() === '+' ? 1 : -1;
+          const min = parseInt(qtyNum.min) || 1;
+          const max = parseInt(qtyNum.max) || 99;
+          qtyNum.value = Math.min(max, Math.max(min, (parseInt(qtyNum.value) || min) + delta));
+          calcTotal();
+        });
+      });
+
+      if (qtyNum) qtyNum.addEventListener('input', calcTotal);
+    });
+
+    // Populate hidden fields and send via EmailJS
+    document.querySelector('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var form = this;
+
+      // Build rentals summary
+      var rentals = [];
+      document.querySelectorAll('.rental-row').forEach(function(row) {
+        var cb = row.querySelector('input[type="checkbox"]');
+        if (!cb.checked) return;
+        var name = row.querySelector('.rental-item-name').childNodes[0].textContent.trim();
+        var isUnit = cb.dataset.unit === '1';
+        var qty = isUnit ? row.querySelector('.qty-num').value : null;
+        var price = row.querySelector('.rental-item-price').textContent;
+        rentals.push(qty ? name + ' x' + qty + ' (' + price + ')' : name + ' (' + price + ')');
+      });
+
+      var packageTypeEl = document.getElementById('packageType');
+      var packageLabel = packageTypeEl.options[packageTypeEl.selectedIndex].text;
+      var musicEl = document.getElementById('musicPackageSelect');
+      var musicLabel = musicEl.value !== '0' ? musicEl.options[musicEl.selectedIndex].text : 'None';
+
+      var templateParams = {
+        first_name:       form.querySelector('[name="first_name"]').value,
+        last_name:        form.querySelector('[name="last_name"]').value,
+        email:            form.querySelector('[name="email"]').value,
+        event_date:       form.querySelector('[name="event_date"]').value,
+        package_type:     packageLabel,
+        music_package:    musicLabel,
+        rental_items:     rentals.length ? rentals.join('\n') : 'None',
+        estimated_total:  document.getElementById('rentalTotal').textContent,
+        rental_delivery:  form.querySelector('[name="rental_delivery"]').value || 'N/A',
+        delivery_address: form.querySelector('[name="delivery_address"]').value || 'N/A',
+        message:          form.querySelector('[name="message"]').value
+      };
+
+      var btn = form.querySelector('.btn-green');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      emailjs.send('service_i7u4b0s', 'template_qqheek4', templateParams)
+        .then(function() {
+          form.innerHTML = '<p style="font-family:\'Playfair Display\',serif;font-size:1.4rem;color:var(--green-dark);text-align:center;padding:40px 0;">Thank you! We\'ll be in touch soon.</p>';
+        }, function() {
+          btn.textContent = 'Book Now';
+          btn.disabled = false;
+          alert('Something went wrong. Please email raugustinemusic@gmail.com directly.');
+        });
+    });
+  </script>
+
+</body>
+</html>
