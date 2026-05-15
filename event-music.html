@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Music — Augustine Music & Events</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    @font-face { font-family: 'HeyLovely'; src: url('HeyLovely.ttf') format('truetype'); font-weight: normal; font-style: normal; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --green: #4a5e40; --green-dark: #2e3b28; --cream: #f5f2ec; --white: #fff; --text: #2c2c2c; --muted: #5a5a5a; }
+    body { font-family: 'Lato', sans-serif; color: var(--text); }
+
+    /* NAV */
+    header { background: var(--green-dark); padding: 22px 52px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 20; }
+    .logo { font-family: 'HeyLovely', cursive; color: var(--white); font-size: 1.8rem; text-decoration: none; display: flex; align-items: center; }
+    .nav-links { list-style: none; display: flex; gap: 32px; }
+    .nav-links a { color: var(--white); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; transition: opacity 0.2s; }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; }
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; z-index: 30; }
+    .nav-toggle span { display: block; width: 26px; height: 2px; background: var(--white); }
+
+    /* PAGE HERO */
+    .page-hero {
+      background: url('Screenshot 2026-03-26 190035.png') center / cover no-repeat var(--green-dark);
+      position: relative;
+      height: 580px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .page-hero::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.52); }
+    .page-hero-content { position: relative; z-index: 1; }
+    .page-hero h1 { font-family: 'HeyLovely', cursive; font-size: clamp(3.5rem, 8vw, 6rem); color: var(--white); margin-bottom: 10px; }
+    .page-hero p { color: rgba(255,255,255,0.8); font-size: 1rem; font-weight: 300; max-width: 600px; }
+
+    /* INTRO */
+    .intro { background: var(--cream); padding: 72px 10%; text-align: center; }
+    .intro h2 { font-family: 'HeyLovely', cursive; font-size: 3.2rem; color: var(--green-dark); margin-bottom: 24px; }
+    .intro p { font-size: 1.05rem; line-height: 1.9; color: var(--muted); max-width: 760px; margin: 0 auto 28px; }
+    .section-label { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: var(--green); margin-bottom: 12px; }
+
+    /* ABOUT STRIP */
+    .about-strip { background: var(--green-dark); padding: 64px 10%; text-align: center; }
+    .about-strip h2 { font-family: 'HeyLovely', cursive; font-size: 3rem; color: var(--white); margin-bottom: 16px; }
+    .about-strip p { color: rgba(255,255,255,0.75); font-size: 1rem; line-height: 1.85; max-width: 720px; margin: 0 auto; }
+
+    /* MUSIC OPTIONS */
+    .music-options { background: var(--white); padding: 72px 10%; }
+    .music-options h2 { font-family: 'HeyLovely', cursive; font-size: 3.2rem; color: var(--green-dark); margin-bottom: 48px; text-align: center; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+
+    .option-card { border: 1px solid #e0dbd2; padding: 40px 36px; }
+    .option-card h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--green-dark); margin-bottom: 12px; }
+    .option-card .note { font-size: 0.9rem; color: var(--muted); line-height: 1.75; margin-bottom: 20px; font-style: italic; }
+    .option-list { list-style: none; display: flex; flex-direction: column; }
+    .option-list li { font-size: 0.92rem; padding: 10px 0; border-bottom: 1px solid #ede9e2; color: var(--muted); display: flex; align-items: flex-start; gap: 10px; }
+    .option-list li:last-child { border-bottom: none; }
+    .option-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 6px; }
+    .option-list li strong { color: var(--text); }
+
+    /* PACKAGES */
+    .packages { background: var(--cream); padding: 72px 10%; }
+    .packages h2 { font-family: 'HeyLovely', cursive; font-size: 3.2rem; color: var(--green-dark); margin-bottom: 8px; text-align: center; }
+    .packages .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 48px; }
+
+    .pkg-group { margin-bottom: 60px; }
+    .pkg-group h3 { font-family: 'HeyLovely', cursive; font-size: 2.4rem; color: var(--green-dark); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--green); display: inline-block; }
+
+    .pkg-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+    .pkg-card { background: var(--white); padding: 36px 28px; display: flex; flex-direction: column; gap: 16px; position: relative; }
+    .pkg-card.featured { background: var(--green-dark); }
+
+    .pkg-tier { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: var(--green); }
+    .pkg-card.featured .pkg-tier { color: rgba(255,255,255,0.5); }
+
+    .pkg-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--green-dark); }
+    .pkg-card.featured .pkg-name { color: var(--white); }
+
+    .pkg-price { font-size: 2.2rem; font-weight: 300; color: var(--green-dark); letter-spacing: -0.02em; }
+    .pkg-card.featured .pkg-price { color: var(--white); }
+
+    .pkg-divider { width: 100%; height: 1px; background: #e0dbd2; }
+    .pkg-card.featured .pkg-divider { background: rgba(255,255,255,0.15); }
+
+    .pkg-includes { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .pkg-includes li { font-size: 0.88rem; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+    .pkg-card.featured .pkg-includes li { color: rgba(255,255,255,0.75); }
+    .pkg-includes li::before { content: '✓'; color: var(--green); font-size: 0.8rem; flex-shrink: 0; }
+    .pkg-card.featured .pkg-includes li::before { color: rgba(255,255,255,0.6); }
+
+    .btn-green { display: inline-block; padding: 13px 32px; background: var(--green); color: var(--white); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.25s; text-align: center; }
+    .btn-green:hover { background: var(--green-dark); }
+    .btn-outline-white { display: inline-block; padding: 13px 32px; border: 1px solid var(--white); color: var(--white); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.25s; text-align: center; }
+    .btn-outline-white:hover { background: rgba(255,255,255,0.1); }
+
+    /* ADDITIONAL DETAILS */
+    .details { background: var(--white); padding: 72px 10%; }
+    .details h2 { font-family: 'HeyLovely', cursive; font-size: 3rem; color: var(--green-dark); margin-bottom: 36px; text-align: center; }
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 800px; margin: 0 auto; }
+    .detail-item { border-left: 3px solid var(--green); padding: 4px 0 4px 20px; }
+    .detail-item h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--green-dark); margin-bottom: 8px; }
+    .detail-item p { font-size: 0.92rem; color: var(--muted); line-height: 1.75; }
+
+    /* CTA */
+    .cta-strip { background: var(--green-dark); padding: 72px 10%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .cta-strip h2 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.4rem; color: var(--white); }
+    .cta-strip p { color: rgba(255,255,255,0.72); font-size: 1rem; max-width: 520px; }
+    .contact-row { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+    .contact-row a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
+    .contact-row a:hover { color: var(--white); }
+
+    /* FOOTER */
+    footer { background: var(--green-dark); padding: 26px 52px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.1); }
+    footer p { color: rgba(255,255,255,0.4); font-size: 0.78rem; }
+    .footer-credits { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
+    .photo-credit-link { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); text-decoration: none; padding: 2px 10px 2px 7px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s; vertical-align: middle; }
+    .photo-credit-link::before { content: ""; display: inline-block; width: 13px; height: 13px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,0.75)" stroke="none"/></svg>') center/contain no-repeat; }
+    .photo-credit-link:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .footer-nav { list-style: none; display: flex; gap: 24px; }
+    .footer-nav a { color: var(--white); text-decoration: none; font-size: 0.76rem; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.5; transition: opacity 0.2s; }
+    .footer-nav a:hover { opacity: 1; }
+
+    /* ANIMATIONS */
+    .fade-in { opacity: 0; transform: translateY(36px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      header { padding: 18px 24px; }
+      .nav-toggle { display: flex; }
+      .nav-links { display: none; position: fixed; inset: 0; background: var(--green-dark); flex-direction: column; align-items: center; justify-content: center; gap: 36px; z-index: 25; }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1.1rem; opacity: 1; }
+      .intro, .about-strip, .music-options, .packages, .details, .cta-strip { padding: 52px 24px; }
+      .options-grid { grid-template-columns: 1fr; }
+      .pkg-cards { grid-template-columns: 1fr; }
+      .details-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 14px; text-align: center; padding: 28px 24px; }
+      .footer-nav { flex-wrap: wrap; justify-content: center; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; flex-shrink:0;"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>Augustine Music & Events</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="about.html">About</a></li>
+      <li><a href="event-rentals.html">Event Rentals</a></li>
+      <li><a href="event-music.html" class="active">Event Music</a></li>
+      <li><a href="contact.html">Book Now</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-content">
+      <h1>Event Music</h1>
+      <p>Creating unforgettable musical experiences for your most cherished moments</p>
+    </div>
+  </div>
+
+<section class="music-options fade-in">
+    <h2>Music Options</h2>
+    <div class="options-grid">
+      <div class="option-card">
+        <h3>Wedding Ceremony</h3>
+        <p class="note">One of the unique features of our service is our commitment to learning three specific songs chosen by you. This ensures that your ceremony feels deeply personal and reflective of your journey as a couple. No request is too big or small!</p>
+        <ul class="option-list">
+          <li><strong>Prelude</strong> — 20–30 minutes of music while your guests are being seated</li>
+          <li><strong>Processional</strong> — Bridal Party and Bride Entrance</li>
+          <li><strong>Special Song / Unity Song</strong> — Optional</li>
+          <li><strong>Recessional</strong> — Grand Exit</li>
+        </ul>
+      </div>
+      <div class="option-card">
+        <h3>Cocktail Hour</h3>
+        <p class="note">The perfect backdrop for mingling and celebrating after the ceremony.</p>
+        <ul class="option-list">
+          <li>1 full hour of music in your couple's choice of genre</li>
+          <li>Classical, Pop/Rock, Disney, and more</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="packages fade-in">
+    <h2>Our Packages</h2>
+    <p class="subtitle">Choose the package that best fits your vision</p>
+
+    <div class="pkg-group">
+      <h3>Ceremony Only</h3>
+      <div class="pkg-cards">
+        <div class="pkg-card">
+          <div class="pkg-tier">Solo</div>
+          <div class="pkg-name">Bronze</div>
+          <div class="pkg-price">$550</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-includes">
+            <li>Violin with Becca</li>
+            <li>Sound Equipment</li>
+            <li>Travel*</li>
+          </ul>
+          <a href="contact.html" class="btn-green">Book This Package</a>
+        </div>
+        <div class="pkg-card featured">
+          <div class="pkg-tier">Duo</div>
+          <div class="pkg-name">Silver</div>
+          <div class="pkg-price">$1,100</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-includes">
+            <li>Violin or Voice with Becca</li>
+            <li>Piano OR Guitar Accompaniment</li>
+            <li>Sound Equipment</li>
+            <li>Travel*</li>
+          </ul>
+          <a href="contact.html" class="btn-outline-white">Book This Package</a>
+        </div>
+        <div class="pkg-card">
+          <div class="pkg-tier">Trio</div>
+          <div class="pkg-name">Gold</div>
+          <div class="pkg-price">$1,650</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-includes">
+            <li>Violin or Voice with Becca</li>
+            <li>Piano</li>
+            <li>Guitar</li>
+            <li>Sound Equipment</li>
+            <li>Travel*</li>
+          </ul>
+          <a href="contact.html" class="btn-green">Book This Package</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pkg-group">
+      <h3>Ceremony + Cocktail Hour</h3>
+      <div class="pkg-cards">
+        <div class="pkg-card">
+          <div class="pkg-tier">Solo</div>
+          <div class="pkg-name">Emerald</div>
+          <div class="pkg-price">$750</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-includes">
+            <li>Violin with Becca</li>
+            <li>Sound Equipment</li>
+            <li>Travel*</li>
+          </ul>
+          <a href="contact.html" class="btn-green">Book This Package</a>
+        </div>
+        <div class="pkg-card featured">
+          <div class="pkg-tier">Duo</div>
+          <div class="pkg-name">Sapphire</div>
+          <div class="pkg-price">$1,500</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-includes">
+            <li>Violin or Voice with Becca</li>
+            <li>Piano OR Guitar Accompaniment</li>
+            <li>Sound Equipment</li>
+            <li>Travel*</li>
+          </ul>
+          <a href="contact.html" class="btn-outline-white">Book This Package</a>
+        </div>
+        <div class="pkg-card">
+          <div class="pkg-tier">Trio</div>
+          <div class="pkg-name">Diamond</div>
+          <div class="pkg-price">$2,050</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-includes">
+            <li>Violin or Voice with Becca</li>
+            <li>Piano</li>
+            <li>Guitar</li>
+            <li>Sound Equipment</li>
+            <li>Travel*</li>
+          </ul>
+          <a href="contact.html" class="btn-green">Book This Package</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="details fade-in">
+    <h2>Additional Details</h2>
+    <div class="details-grid">
+      <div class="detail-item">
+        <h4>Non-Refundable Deposit</h4>
+        <p>A deposit of $200 is required to secure your date.</p>
+      </div>
+      <div class="detail-item">
+        <h4>Travel Fee*</h4>
+        <p>Travel is included within 30 minutes of Nashville, TN. Each additional hour is $50. Travel exceeding 3 hours will be discussed in consultation.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-strip fade-in">
+    <h2>Ready to book your date?</h2>
+    <p>Reach out and let's start planning the perfect soundtrack for your celebration.</p>
+    <div class="contact-row">
+      <a href="tel:9063956530">(906) 395-6530</a>
+      <a href="mailto:raugustinemusic@gmail.com">raugustinemusic@gmail.com</a>
+      <a href="https://instagram.com/becca_augustine" target="_blank">@becca_augustine</a>
+    </div>
+    <a href="contact.html" class="btn-outline-white">Send a Message</a>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Augustine Music & Events. All rights reserved.</p>
+    <p class="footer-credits">Photography by <a href="https://www.instagram.com/erinelizabeth.photog?igsh=bGJ2ZzkxNmQ1M3Fk" target="_blank" rel="noopener" class="photo-credit-link">@erinelizabeth.photog</a> &nbsp;·&nbsp; Website by Jared Schnitker</p>
+    <ul class="footer-nav">
+      <li><a href="about.html">About</a></li>
+      <li><a href="event-rentals.html">Event Rentals</a></li>
+      <li><a href="event-music.html">Event Music</a></li>
+      <li><a href="contact.html">Book Now</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const links = document.getElementById('navLinks');
+    toggle.addEventListener('click', function() { links.classList.toggle('open'); });
+    links.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', function() { links.classList.remove('open'); }); });
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(function(el) { observer.observe(el); });
+  </script>
+
+</body>
+</html>
