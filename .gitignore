@@ -1,0 +1,5 @@
+# Working archives, never commit these
+*.zip
+
+# macOS
+.DS_Store
