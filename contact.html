@@ -158,6 +158,7 @@
         </div>
         <label>Email <input type="email" name="email" placeholder="jane@example.com" /></label>
         <label>Date of Event <input type="date" name="event_date" /></label>
+        <label>Venue Address <input type="text" name="venue_address" placeholder="Venue name, street, city, state" /></label>
         <label>Package Type
           <select name="package_type" id="packageType">
             <option value="">Select a package type</option>
@@ -411,6 +412,7 @@
         last_name:        form.querySelector('[name="last_name"]').value,
         email:            form.querySelector('[name="email"]').value,
         event_date:       form.querySelector('[name="event_date"]').value,
+        venue_address:    form.querySelector('[name="venue_address"]').value || 'Not provided',
         package_type:     packageLabel,
         music_package:    musicLabel,
         rental_items:     rentals.length ? rentals.join('\n') : 'None',
