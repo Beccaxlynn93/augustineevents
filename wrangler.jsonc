@@ -32,6 +32,10 @@
     }
   ],
 
+  // Sends the inquiry notification. Requires augustineevents.com to be
+  // onboarded first: npx wrangler email sending enable augustineevents.com
+  "send_email": [{ "name": "EMAIL" }],
+
   "observability": { "enabled": true },
 
   "assets": {

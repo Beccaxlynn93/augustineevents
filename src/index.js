@@ -7,10 +7,12 @@
  * pages, the images and the PDF all keep serving. The blast radius is limited
  * to paths that match no asset.
  *
- * The email is still sent from the browser via EmailJS and is deliberately not
- * routed through here. Capturing an inquiry must never be able to stop one
- * being delivered.
+ * The inquiry is written to D1 first, then the notification is sent. That order
+ * is deliberate: storage is the durable thing, and a mail failure is recorded
+ * rather than raised, so it can never cost us the record of a lead.
  */
+
+import { sendNotification } from './email.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 
@@ -72,7 +74,7 @@ async function recordInquiry(request, env) {
     return json({ ok: false, error: 'Nothing to record.' }, 422);
   }
 
-  await env.augustine_inquiries
+  const stored = await env.augustine_inquiries
     .prepare(
       `INSERT INTO inquiries (
          received_at, first_name, last_name, email, event_date, venue_address,
@@ -95,13 +97,32 @@ async function recordInquiry(request, env) {
       row.rental_delivery,
       row.delivery_address,
       row.message,
-      payload.email_sent ? 1 : 0,
+      0,
       clean(request.headers.get('user-agent')),
       request.headers.get('cf-ipcountry') || null
     )
     .run();
 
-  return json({ ok: true });
+  const id = stored && stored.meta ? stored.meta.last_row_id : null;
+
+  // The inquiry is safe at this point. Sending is best effort from here: a mail
+  // failure is recorded, never raised, and never costs us the record.
+  const result = await sendNotification(env, row);
+
+  if (result.sent && id) {
+    try {
+      await env.augustine_inquiries
+        .prepare('UPDATE inquiries SET email_sent = 1 WHERE id = ?')
+        .bind(id)
+        .run();
+    } catch {
+      /* the row exists, which is what matters */
+    }
+  } else if (!result.sent) {
+    console.error('inquiry', id, 'stored but notification failed:', result.error);
+  }
+
+  return json({ ok: true, notified: result.sent });
 }
 
 export default {
