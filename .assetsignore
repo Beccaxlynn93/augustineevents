@@ -5,6 +5,14 @@
 # it changes nothing a visitor can see. Everything NOT listed here is currently
 # served by the live site (34 files) and must keep being served.
 
+# --- Worker source, not web content ---
+# src/ is the Worker script and migrations/ is schema history. Neither should
+# ever be downloadable from the site.
+src
+src/**
+migrations
+migrations/**
+
 # --- tooling / repo metadata (never web content) ---
 # The site lives at the repo root, so the assets directory contains .git.
 # Without these, wrangler tries to upload the 155 MB pack file and fails.

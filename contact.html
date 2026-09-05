@@ -426,10 +426,33 @@
       btn.textContent = 'Sending...';
       btn.disabled = true;
 
+      // Record the inquiry independently of the email. This is deliberately
+      // fire and forget: if it fails, times out, or the endpoint is down, the
+      // visitor never sees it and the email is unaffected. The email remains
+      // the notification; this is the durable copy.
+      function recordInquiry(emailSent) {
+        try {
+          var body = JSON.stringify(
+            Object.assign({}, templateParams, { email_sent: emailSent ? 1 : 0 })
+          );
+          fetch('/api/inquiries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body,
+            keepalive: true
+          }).catch(function () {});
+        } catch (e) {
+          /* never let capture affect the visitor */
+        }
+      }
+
       emailjs.send('service_i7u4b0s', 'template_qqheek4', templateParams)
         .then(function() {
+          recordInquiry(true);
           form.innerHTML = '<p style="font-family:\'Playfair Display\',serif;font-size:1.4rem;color:var(--green-dark);text-align:center;padding:40px 0;">Thank you! We\'ll be in touch soon.</p>';
         }, function() {
+          // The email failed, which is exactly when the stored copy matters most.
+          recordInquiry(false);
           btn.textContent = 'Book Now';
           btn.disabled = false;
           alert('Something went wrong. Please email raugustinemusic@gmail.com directly.');

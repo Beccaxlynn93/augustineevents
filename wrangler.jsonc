@@ -19,7 +19,21 @@
   // version can be reviewed before it is promoted to production.
   "preview_urls": true,
 
-  // Assets-only Worker: no "main" script, so no assets "binding" either.
+  // Worker script. Static assets are still matched and served FIRST, so this
+  // code only runs for paths that match no file (today: /api/* and 404s).
+  // A failure in here cannot take the six static pages down.
+  "main": "src/index.js",
+
+  "d1_databases": [
+    {
+      "binding": "augustine_inquiries",
+      "database_name": "augustine-inquiries",
+      "database_id": "8233db2a-ce39-4b4e-8447-a8a00da7da6c"
+    }
+  ],
+
+  "observability": { "enabled": true },
+
   "assets": {
     "directory": "./",
 
