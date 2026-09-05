@@ -86,6 +86,7 @@
     .rental-delivery-select { border: 1px solid #d8d3ca; background: #fff; padding: 7px 12px; font-family: var(--sans); font-size: 0.9rem; color: var(--dark); border-radius: 4px; cursor: pointer; flex: 1; }
     .rental-delivery-select:focus { outline: none; border-color: var(--green); }
     .rental-delivery-note { font-size: 0.75rem; color: var(--green); margin: 2px 0 0; font-weight: 700; letter-spacing: 0.02em; }
+    .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
     .rental-total-bar { display: none; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 2px solid var(--green); border-bottom: 1px solid #d8d3ca; }
     .rental-total-bar.visible { display: flex; }
     .rental-total-bar span { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -152,6 +153,13 @@
     <div class="contact-form-block">
       <h2>Book Now</h2>
       <form>
+        <!-- Not a real field. Left in the DOM but off screen, out of the tab
+             order and hidden from assistive tech, so only automation fills it. -->
+        <div class="hp-field" aria-hidden="true">
+          <label>Website
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
         <div class="form-row">
           <label>First Name <input type="text" name="first_name" placeholder="Jane" /></label>
           <label>Last Name <input type="text" name="last_name" placeholder="Smith" /></label>
@@ -275,6 +283,10 @@
     const deliveryRow = document.getElementById('deliveryRow');
     const deliveryAddressRow = document.getElementById('deliveryAddressRow');
     const rentalDelivery = document.getElementById('rentalDelivery');
+
+    // Stamped when the form renders. A submission arriving milliseconds later
+    // was not typed by a person.
+    window.__formLoadedAt = Date.now();
 
     const deliveryOnlyNote = document.getElementById('deliveryOnlyNote');
     const pickupOption = rentalDelivery.querySelector('option[value="Pickup"]');
@@ -408,6 +420,8 @@
       var musicLabel = musicEl.value !== '0' ? musicEl.options[musicEl.selectedIndex].text : 'None';
 
       var templateParams = {
+        website:          form.querySelector('[name="website"]').value,
+        form_loaded_at:   window.__formLoadedAt || 0,
         first_name:       form.querySelector('[name="first_name"]').value,
         last_name:        form.querySelector('[name="last_name"]').value,
         email:            form.querySelector('[name="email"]').value,

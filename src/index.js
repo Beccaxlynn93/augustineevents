@@ -13,6 +13,7 @@
  */
 
 import { sendNotification } from './email.js';
+import { screen } from './guards.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 
@@ -74,14 +75,22 @@ async function recordInquiry(request, env) {
     return json({ ok: false, error: 'Nothing to record.' }, 422);
   }
 
+  // Abuse screening. A rejection is answered as success on purpose, so an
+  // automated caller learns nothing about why it was dropped.
+  const verdict = await screen(payload, row, request, env);
+  if (!verdict.ok) {
+    console.log('discarded submission:', verdict.reason);
+    return json({ ok: true });
+  }
+
   const stored = await env.augustine_inquiries
     .prepare(
       `INSERT INTO inquiries (
          received_at, first_name, last_name, email, event_date, venue_address,
          package_type, music_package, rental_items, estimated_total,
          rental_delivery, delivery_address, message, email_sent,
-         user_agent, country
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         user_agent, country, ip_hash
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       new Date().toISOString(),
@@ -99,7 +108,8 @@ async function recordInquiry(request, env) {
       row.message,
       0,
       clean(request.headers.get('user-agent')),
-      request.headers.get('cf-ipcountry') || null
+      request.headers.get('cf-ipcountry') || null,
+      verdict.ipHash || null
     )
     .run();
 
