@@ -85,6 +85,7 @@
     .rental-delivery-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--muted); white-space: nowrap; }
     .rental-delivery-select { border: 1px solid #d8d3ca; background: #fff; padding: 7px 12px; font-family: var(--sans); font-size: 0.9rem; color: var(--dark); border-radius: 4px; cursor: pointer; flex: 1; }
     .rental-delivery-select:focus { outline: none; border-color: var(--green); }
+    .rental-delivery-note { font-size: 0.75rem; color: var(--green); margin: 2px 0 0; font-weight: 700; letter-spacing: 0.02em; }
     .rental-total-bar { display: none; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 2px solid var(--green); border-bottom: 1px solid #d8d3ca; }
     .rental-total-bar.visible { display: flex; }
     .rental-total-bar span { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -199,11 +200,11 @@
             <div class="rental-row"><input type="checkbox" data-price="230" data-unit="0"><span class="rental-item-name">Entire Brass Collection Bundle<span class="rental-item-note">All candlesticks, candelabras &amp; Italian vases</span></span><div class="rental-qty"></div><span class="rental-item-price">$230</span></div>
 
             <div class="rental-section-title">Tableware & Serveware</div>
-            <div class="rental-row"><input type="checkbox" data-price="1.25" data-unit="1"><span class="rental-item-name">White Round Dinner Plates<span class="rental-item-note">10.5" · 60 available · 20 minimum · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.25/ea</span></div>
-            <div class="rental-row"><input type="checkbox" data-price="0.75" data-unit="1"><span class="rental-item-name">White Round Salad Plates<span class="rental-item-note">7.5" · 60 available · 20 minimum · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$0.75/ea</span></div>
-            <div class="rental-row"><input type="checkbox" data-price="1.75" data-unit="1"><span class="rental-item-name">White Dessert Ramekins<span class="rental-item-note">Ruffled rim · 60 available · 20 minimum · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.75/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="1.25" data-unit="1" data-delivery-only="1"><span class="rental-item-name">White Round Dinner Plates<span class="rental-item-note">10.5" · 60 available · 20 minimum · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.25/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="0.75" data-unit="1" data-delivery-only="1"><span class="rental-item-name">White Round Salad Plates<span class="rental-item-note">7.5" · 60 available · 20 minimum · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$0.75/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="1.75" data-unit="1" data-delivery-only="1"><span class="rental-item-name">White Dessert Ramekins<span class="rental-item-note">Ruffled rim · 60 available · 20 minimum · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.75/ea</span></div>
             <div class="rental-row"><input type="checkbox" data-price="1.25" data-unit="1"><span class="rental-item-name">Breadstick Baskets<span class="rental-item-note">4.5×4.5×4" woven · 18 available</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="18"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.25/ea</span></div>
-            <div class="rental-row"><input type="checkbox" data-price="20" data-unit="1"><span class="rental-item-name">Glass Beverage Dispensers<span class="rental-item-note">3 gal hammered glass w/ stand · 4 available · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="4"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$20/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="20" data-unit="1" data-delivery-only="1"><span class="rental-item-name">Glass Beverage Dispensers<span class="rental-item-note">3 gal hammered glass w/ stand · 4 available · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="4"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$20/ea</span></div>
             <div class="rental-row"><input type="checkbox" data-price="20" data-unit="0"><span class="rental-item-name">Beverage Urns<span class="rental-item-note">Garden style · set of 2</span></span><div class="rental-qty"></div><span class="rental-item-price">$20/set</span></div>
 
             <div class="rental-section-title">Outdoor & Entertainment</div>
@@ -221,6 +222,7 @@
             <option value="Delivery">Delivery</option>
           </select>
         </div>
+        <p class="rental-delivery-note" id="deliveryOnlyNote" hidden>Your selection includes delivery only items, so pickup is not available.</p>
 
         <div id="deliveryAddressRow" style="display:none;">
           <label for="deliveryAddress" class="rental-delivery-label" style="display:block; margin-bottom:6px;">Delivery Address</label>
@@ -273,9 +275,45 @@
     const deliveryAddressRow = document.getElementById('deliveryAddressRow');
     const rentalDelivery = document.getElementById('rentalDelivery');
 
-    rentalDelivery.addEventListener('change', function() {
-      deliveryAddressRow.style.display = this.value === 'Delivery' ? 'block' : 'none';
-    });
+    const deliveryOnlyNote = document.getElementById('deliveryOnlyNote');
+    const pickupOption = rentalDelivery.querySelector('option[value="Pickup"]');
+    const blankOption = rentalDelivery.querySelector('option[value=""]');
+
+    // Tracks whether Delivery was chosen by the system rather than the visitor,
+    // so the choice can be handed back when the delivery only item is removed.
+    let deliveryForced = false;
+
+    function showAddressRow() {
+      const rentalsActive = deliveryRow.style.display !== 'none';
+      deliveryAddressRow.style.display =
+        (rentalsActive && rentalDelivery.value === 'Delivery') ? 'block' : 'none';
+    }
+
+    // Some items are delivery only. If any are selected, pickup is not an option.
+    function syncDeliveryOnly() {
+      const rentalsActive = deliveryRow.style.display !== 'none';
+      const forced = rentalsActive &&
+        !!document.querySelector('.rental-row input[type="checkbox"][data-delivery-only]:checked');
+
+      pickupOption.disabled = forced;
+      blankOption.disabled = forced;
+      deliveryOnlyNote.hidden = !forced;
+
+      if (forced) {
+        // If the visitor had already picked Delivery, this is their choice, not ours.
+        if (rentalDelivery.value !== 'Delivery') {
+          rentalDelivery.value = 'Delivery';
+          deliveryForced = true;
+        }
+      } else if (deliveryForced) {
+        // Only clear what we set ourselves, never a deliberate choice.
+        rentalDelivery.value = '';
+        deliveryForced = false;
+      }
+      showAddressRow();
+    }
+
+    rentalDelivery.addEventListener('change', showAddressRow);
 
     packageType.addEventListener('change', function() {
       const val = this.value;
@@ -283,6 +321,7 @@
       rentalsField.classList.toggle('visible', val === 'rentals' || val === 'both');
       estimatedTotal.classList.toggle('visible', val !== '');
       deliveryRow.style.display = (val === 'rentals' || val === 'both') ? 'flex' : 'none';
+      syncDeliveryOnly();
       calcTotal();
     });
 
@@ -319,6 +358,7 @@
       // Toggle qty visibility on checkbox change
       cb.addEventListener('change', function() {
         if (isUnit && qtyWrap) qtyWrap.classList.toggle('show', cb.checked);
+        syncDeliveryOnly();
         calcTotal();
       });
 
