@@ -135,19 +135,45 @@ export function buildEmail(row) {
 export async function sendNotification(env, row) {
   if (!env.EMAIL) return { sent: false, error: 'EMAIL binding not configured' };
 
+  // Recipients come from config when present, so they can be changed without a
+  // code edit. Falls back to the two owners.
+  const recipients = (env.NOTIFY_EMAILS || '')
+    .split(',')
+    .map((a) => a.trim())
+    .filter(Boolean);
+  const to = recipients.length ? recipients : NOTIFY;
+
   const { subject, text, html } = buildEmail(row);
-  try {
-    await env.EMAIL.send({
-      to: NOTIFY,
-      from: FROM,
-      // Lets Becca hit reply and land in the customer's inbox.
-      replyTo: row.email || undefined,
-      subject,
-      text,
-      html,
-    });
-    return { sent: true };
-  } catch (err) {
-    return { sent: false, error: (err && err.message) || 'unknown' };
-  }
+
+  // Sent one recipient at a time on purpose. On the free path a send is only
+  // permitted to verified destination addresses, and a single unverified
+  // address would otherwise fail the whole call and cost everyone the
+  // notification.
+  const results = await Promise.all(
+    to.map(async (address) => {
+      try {
+        await env.EMAIL.send({
+          to: address,
+          from: FROM,
+          // Lets Becca hit reply and land in the customer's inbox.
+          replyTo: row.email || undefined,
+          subject,
+          text,
+          html,
+        });
+        return { address, ok: true };
+      } catch (err) {
+        return { address, ok: false, error: (err && err.message) || 'unknown' };
+      }
+    })
+  );
+
+  const delivered = results.filter((r) => r.ok).map((r) => r.address);
+  const failed = results.filter((r) => !r.ok);
+
+  return {
+    sent: delivered.length > 0,
+    delivered,
+    failed: failed.map((f) => `${f.address}: ${f.error}`),
+  };
 }

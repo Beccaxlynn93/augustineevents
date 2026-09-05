@@ -129,7 +129,12 @@ async function recordInquiry(request, env) {
       /* the row exists, which is what matters */
     }
   } else if (!result.sent) {
-    console.error('inquiry', id, 'stored but notification failed:', result.error);
+    console.error('inquiry', id, 'stored but no notification delivered:',
+      (result.failed || [result.error]).join(' | '));
+  }
+
+  if (result.failed && result.failed.length && result.sent) {
+    console.warn('inquiry', id, 'partially delivered, failed:', result.failed.join(' | '));
   }
 
   return json({ ok: true, notified: result.sent });
