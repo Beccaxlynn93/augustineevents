@@ -7,8 +7,17 @@
   // to match the Worker in the dashboard, or the build fails outright.
   "name": "rough-salad-4d39",
 
+  // Raugustinemusic@gmail.com's Account. Pinned deliberately: the maintainers
+  // have access to more than one Cloudflare account, and without this wrangler
+  // can silently create a new Worker in the wrong one.
+  "account_id": "20da6feefc828587a10b5b232912d1a5",
+
   // Matches the live version's compatibility_date. Do not bump casually.
   "compatibility_date": "2026-05-15",
+
+  // Enables the *.workers.dev preview URL for non-promoted versions, so a
+  // version can be reviewed before it is promoted to production.
+  "preview_urls": true,
 
   // Assets-only Worker: no "main" script, so no assets "binding" either.
   "assets": {
