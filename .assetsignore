@@ -1,0 +1,61 @@
+# Files that must NOT be uploaded as static assets.
+#
+# Derived 2026-09-05 by probing every file in this repo against production.
+# Everything listed here returns 404 on augustineevents.com today, so excluding
+# it changes nothing a visitor can see. Everything NOT listed here is currently
+# served by the live site (34 files) and must keep being served.
+
+# --- tooling / repo metadata (never web content) ---
+# The site lives at the repo root, so the assets directory contains .git.
+# Without these, wrangler tries to upload the 155 MB pack file and fails.
+**/.git
+**/.git/**
+**/.DS_Store
+**/node_modules
+.gitignore
+.assetsignore
+wrangler.jsonc
+CLAUDE.md
+
+# CNAME is a GitHub Pages artifact pointing at www.augustineevents.com, a
+# hostname with no DNS record. Not served in production. See CLAUDE.md.
+CNAME
+
+# --- working archives ---
+*.zip
+
+# --- accidental "Save Page As" commit ---
+*.js.download
+*.ltr.css
+9ebe5bfcf37fcce0d8e45969bcd8e089.css
+static_font_4.ltr.css
+saved_resource
+saved_resource.html
+saved_resource(1).html
+t.webp
+width_1109
+749002f5a04f784cc1802d77d2fed423.svg
+vcd15cbe7772f49c399c6a5babf22c1241717689176015
+
+# Byte-identical duplicate of HeyLovely.ttf. Only the space-free name is
+# referenced by the @font-face rules.
+Hey Lovely.ttf
+
+# --- oversized root JPGs, superseded by "Photographer photos/" ---
+# These are 3-14 MB camera originals that were never deployed. The versions
+# production actually serves live in "Photographer photos/" and are 42-99 KB.
+# Anchored with a leading slash so the "Photographer photos/" copies survive.
+/3 arm candelabra.jpg
+/9 arm candelabra.jpg
+/Beverage Dispensers.jpg
+/Beverage Urns.jpg
+/Breadstick Baskets.jpg
+/Cornhole Boards.jpg
+/Dessert Ramekins.jpg
+/Dinner Plates.jpg
+/Rectangle Toile Tablecloths.jpg
+/Round Toile Tablecloths.jpg
+/Sage Green Fringe Umbrella.jpg
+/Salad Plates.jpg
+/Single Assorted Brass Candlesticks.jpg
+/Wisteria Chandelier.jpg

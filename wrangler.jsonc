@@ -1,0 +1,24 @@
+{
+  // Mirrors the live Worker exactly as it existed on 2026-09-05 (version 7,
+  // uploaded by hand 2026-05-15). Verified against the Cloudflare API and
+  // against what augustineevents.com actually serves.
+  //
+  // "name" MUST stay "rough-salad-4d39". Workers Builds requires the name here
+  // to match the Worker in the dashboard, or the build fails outright.
+  "name": "rough-salad-4d39",
+
+  // Matches the live version's compatibility_date. Do not bump casually.
+  "compatibility_date": "2026-05-15",
+
+  // Assets-only Worker: no "main" script, so no assets "binding" either.
+  "assets": {
+    "directory": "./",
+
+    // Live behavior: /about.html 307s to /about. Changing this changes every
+    // URL on the site.
+    "html_handling": "auto-trailing-slash",
+
+    // Live behavior: unmatched paths return a plain 404. There is no 404.html.
+    "not_found_handling": "none"
+  }
+}
