@@ -2,10 +2,12 @@
 
 Context and working instructions for Claude Code on this repository.
 
-> **Verified 2026-09-03** against the repo, the live site, and the Cloudflare API.
-> The deployment section was materially wrong before that audit: this is a
-> hand-deployed Cloudflare Worker, not GitHub Pages, and not Cloudflare Pages.
+> **Verified 2026-09-05** against the repo, the live site, the Cloudflare API, and
+> the Workers Builds configuration.
+> This is a Cloudflare Worker, not GitHub Pages and not Cloudflare Pages. As of
+> 2026-09-05 it deploys from git; before that it was hand-uploaded.
 > Do not trust an unverified claim in this file over what production actually returns.
+> This document has been confidently wrong before.
 
 ---
 
@@ -15,34 +17,38 @@ The marketing website for **Augustine Music & Events**, a Nashville wedding musi
 
 Hand-written static HTML. No build step, no framework, no package.json. Each page carries its own `<style>` block inline.
 
-**Hosting is a hand-deployed Cloudflare Worker, not GitHub Pages.** See "Deployment" below before touching anything deploy-related. This is the single most misunderstood thing about this project.
+**Hosting is a Cloudflare Worker, not GitHub Pages.** As of 2026-09-05 it deploys automatically from `main` via Workers Builds. See "Deployment" below before touching anything deploy-related.
 
 A booking system is planned as a separate Next.js project. This repo stays static until that migration. Do not add a build step, framework, or bundler here.
 
 ---
 
-## READ FIRST: git and production are not connected
+## READ FIRST: pushing to `main` now deploys
 
-**Resolved 2026-09-03:** the live site once served 16 files that existed in no branch
-and no commit here. They are now recovered and committed on branch `recover-live-site`
-(`b811597`). The repo can reproduce the live site: 29 asset references across the six
-real pages, 0 missing.
+**Changed 2026-09-05.** This repository is connected to production. A push to `main`
+builds and deploys the live site. That was not true before this date, and the
+warnings that used to fill this section are now obsolete.
 
-**Still true, and the reason this can happen again:** there is no link of any kind
-between this repository and production. No git integration, no build, no CI. The live
-site is a Cloudflare Worker updated by dragging a folder into a dashboard.
+What changed, in order:
 
-So:
+1. The 16 files that existed only on the Worker were recovered, verified byte for
+   byte against production, and pushed. `main` reproduces production exactly.
+2. `wrangler.jsonc` and `.assetsignore` were added so deploys come from this repo.
+3. Workers Builds was connected to `Beccaxlynn93/augustineevents` by the repo owner.
 
-1. **Pushing to `main` deploys nothing.** Merging a PR deploys nothing.
-2. **A hand-upload can reintroduce the drift at any time**, and Cloudflare's asset
-   store is upload-only (no API reads files back), so anything uploaded but not
-   committed exists in exactly one place.
-3. Rental images are **not** broken in production and never were. Any claim that they
-   are is stale, and predates the 2026-09-03 audit.
+**Consequences:**
 
-**Highest priority open task:** wire up `wrangler` so deploys come from this repo.
-Until that exists, git and production will keep drifting.
+- **A push to `main` is a production deploy.** Use the staging workflow below for
+  anything that should be looked at first.
+- A push to any other branch uploads a version and gives it a preview URL. It does
+  not touch production.
+
+**Still true, and still the way this can break:** Cloudflare's asset store is
+upload-only. No API reads files back out of the Worker. If anyone hand-uploads
+through the dashboard again, the drift returns and is invisible from inside this
+repo. To check production, mirror it over HTTP.
+
+**Verify before assuming.** `curl -sSI https://augustineevents.com/` costs nothing.
 
 ---
 
@@ -67,9 +73,10 @@ Until that exists, git and production will keep drifting.
   `event-rentals.html` and working in production.**
 - `hero 1.jpg` — 1920x1080, 1.7 MB. Hero background for `index.html` and `contact.html`.
   Recovered 2026-09-03.
-- `608A5063.jpg` — music package photo on the homepage. **3648x5472, 12.5 MB, a Canon
-  EOS R6 original.** Recovered 2026-09-03. See Known issues; this is the site's real
-  performance problem.
+- `608A5063.jpg` — music package photo on the homepage. **1400x2100, 958 KB.**
+  Resized 2026-09-05 from a 3648x5472 / 11.96 MB Canon EOS R6 original, a 92%
+  reduction. The full resolution original remains in git history. `.pkg-card` uses
+  `object-fit: cover` in a two column grid, so width is the binding dimension.
 - `romantic music and intimate wedding rentals.png` — 1366px, used by `index.html`.
   **Do not delete**; it is easy to mistake for junk.
 - `Screenshot 2026-03-25 194905 / 194925 / 194933 / 194941.png` and
@@ -77,8 +84,15 @@ Until that exists, git and production will keep drifting.
   Low resolution, see Known issues.
 - `CNAME` — contains `www.augustineevents.com`, a hostname that **does not resolve**.
   Vestigial; GitHub Pages is not serving this site. See Deployment.
-- `Augustine Wedding Rentals Catalog.pdf` — do not delete without asking, may be linked
-  externally.
+- `Photographer photos/Faux Floral Arrangements.jpg` — 1000x1000, 279 KB. Added
+  2026-09-05. Full frame width preserved, cropped only top and bottom, because
+  `.item-card img` crops with `object-fit: cover` and the sides must not be lost.
+- `Augustine Wedding Rentals Catalog.pdf` — **served in production** (confirmed 200,
+  2026-09-05) though no page links it. Do not delete; it may be linked externally.
+- `Becca Website.jpg` and `Screenshot 2026-03-25 203402 / 194914.png` — **served in
+  production** despite being referenced by no page. Kept in the asset upload set so
+  existing URLs keep working.
+- `wrangler.jsonc` and `.assetsignore` — deploy configuration. See Deployment.
 - `.gitignore` — ignores `*.zip` and `.DS_Store`. Added 2026-09-03 so the 147 MB working
   archive cannot be committed by accident.
 
@@ -109,12 +123,13 @@ Roughly 40 files from an accidental browser "Save Page As" commit. Not reference
 - `vcd15cbe7772f49c399c6a5babf22c1241717689176015`
 - `Augustine Music Packages.html` and its `_files` references
 - `Hey Lovely.ttf` — byte-identical duplicate of `HeyLovely.ttf`; only the space-free name is referenced
-- `Screenshot 2026-03-25 203402.png` — 522px, referenced by no page
-- `Screenshot 2026-03-25 194914.png` — no longer referenced. Production replaced it with
-  `608A5063.jpg`; confirmed unreferenced by all six pages as of 2026-09-03.
-- The 15 oversized root `.jpg` files (`Dinner Plates.jpg`, `Wisteria Chandelier.jpg`,
+- ~~`Screenshot 2026-03-25 203402.png`~~ and ~~`Screenshot 2026-03-25 194914.png`~~ —
+  **do not delete.** Unreferenced by any page, but both return 200 in production, so
+  they stay in the upload set.
+- The 14 oversized root `.jpg` files (`Dinner Plates.jpg`, `Wisteria Chandelier.jpg`,
   etc., 3-14 MB each). These are **not** what production serves; the real ones live in
-  `Photographer photos/`. Superseded and safe to delete from the working tree.
+  `Photographer photos/`. All 14 return 404 in production and are excluded by
+  `.assetsignore`. Note `Becca Website.jpg` is **not** one of these; it is live.
 - `augustineevents-main.zip` (147 MB) and `augustine-optimized-assets.zip` (4.4 MB) —
   working files. Now covered by `.gitignore`; never commit them.
 
@@ -155,136 +170,151 @@ Match these conventions when adding markup. Do not introduce Tailwind, CSS frame
 
 ## Deployment
 
-**Verified 2026-09-03. The previous version of this section was wrong on every point.**
+**Verified 2026-09-05** against the Cloudflare API, the Workers Builds config, and
+the live site.
 
-### What actually serves the site
+### What serves the site
 
-A **Cloudflare Worker with static assets**, not Cloudflare Pages. Confirmed via the
-Cloudflare API on 2026-09-03.
+A **Cloudflare Worker with static assets**, not Cloudflare Pages.
 
 | | |
 |---|---|
 | Account | `Raugustinemusic@gmail.com's Account` (`20da6feefc828587a10b5b232912d1a5`) |
-| Worker | `rough-salad-4d39`, created 2026-05-15 |
+| Worker | `rough-salad-4d39`, script tag `efa2f16198fd422b8695cc0e97d82110` |
 | Custom domain | `augustineevents.com` -> `rough-salad-4d39` (production) |
 | Direct origin | `https://rough-salad-4d39.raugustinemusic.workers.dev` |
+| Staging alias | `https://staging-rough-salad-4d39.raugustinemusic.workers.dev` |
 | Zone | `augustineevents.com`, Free plan, active |
 | Bindings | none |
 
-DNS for the zone is a single record:
+DNS for the zone is a single record, `AAAA augustineevents.com -> 100:: (proxied)`,
+Cloudflare's placeholder for a Worker custom domain. **There is still no `www`
+record**, which is why the GitHub Pages redirect dead-ends.
+
+### How it deploys
+
+**Workers Builds is connected to `Beccaxlynn93/augustineevents`** (connected
+2026-09-05 by the repo owner; only a personal repo's owner can install the
+Cloudflare GitHub App).
+
+| Trigger | Branch | Command |
+|---|---|---|
+| Production | `main` | `npx wrangler deploy` |
+| Preview | every branch except `main` | `npx wrangler versions upload` |
+
+Build command is empty and root directory is `/`. Correct: this site has no build step.
+
+**A push to `main` deploys to production.** Any other branch gets a preview URL and
+leaves production alone.
+
+### wrangler.jsonc
+
+Reproduces the live Worker exactly. Do not change these casually:
+
+- **`name` must stay `rough-salad-4d39`**, or Workers Builds fails outright. The name
+  here must match the Worker in the dashboard.
+- **`account_id` is pinned** because the maintainers can see two Cloudflare accounts.
+  Without it, wrangler can silently create a new Worker in the wrong account.
+- **`html_handling: "auto-trailing-slash"`** preserves the live redirect behavior,
+  `/about.html` -> `/about`. Changing it changes every URL on the site.
+- **`not_found_handling: "none"`** matches production. There is no `404.html`.
+- **`preview_urls: true`** must stay in sync with the dashboard toggle. Cloudflare
+  warns that if config and dashboard disagree, the next wrangler deploy silently
+  flips the dashboard setting.
+
+### .assetsignore
+
+Derived empirically, not guessed: every file in the repo was requested from
+production, and only files returning 404 were excluded. The upload set is exactly the
+files production serves.
+
+**It must keep excluding `**/.git`.** The site lives at the repo root, so `.git` sits
+inside the assets directory. Without that exclusion wrangler tries to upload the
+157 MB pack file and aborts.
+
+When adding a file that should be live, confirm it is not caught by an existing
+pattern. Verify with:
 
 ```
-AAAA  augustineevents.com  ->  100::  (proxied)
+WRANGLER_LOG=debug npx wrangler deploy --dry-run 2>&1 | grep '^Ignoring asset: '
 ```
 
-`100::` is Cloudflare's placeholder address for a Worker custom domain. **There is no
-`www` record and never has been**, which is why the GitHub Pages redirect to
-`www.augustineevents.com` dead-ends.
+### Staging workflow
 
-### How it gets deployed: by hand, from the dashboard
-
-Every deployment in the Worker's history is a manual upload:
+A stable preview alias exists. Use it before promoting anything:
 
 ```
-2026-05-15T17:11  source=dash  triggered_by=upload  raugustinemusic@gmail.com
-2026-05-15T16:57  source=dash  triggered_by=upload  raugustinemusic@gmail.com
-2026-05-15T16:53  source=dash  triggered_by=upload  raugustinemusic@gmail.com
-2026-05-15T16:52  source=dash  triggered_by=upload  raugustinemusic@gmail.com
-2026-05-15T16:52  source=dash  triggered_by=upload  raugustinemusic@gmail.com
-2026-05-15T06:01  source=dash  triggered_by=upload  raugustinemusic@gmail.com
-2026-05-15T06:00  source=api   triggered_by=upload  raugustinemusic@gmail.com
+npx wrangler versions upload --preview-alias staging
 ```
 
-**There is no git integration, no build step, and no CI.** This is the complete
-explanation for why this repo and the live site diverged: they were never connected.
+The URL does not change between uploads, so it can be shared once and revisited.
+Production keeps serving whatever is deployed.
 
-**The site has not been deployed since 2026-05-15.** Pushing to `main` does nothing.
-Merging a PR does nothing. The only way content reaches production today is someone
-dragging a folder into the Cloudflare dashboard.
+- Promote a reviewed version: `npx wrangler versions deploy`
+- Roll back: deploy an earlier version id. Version 7,
+  `ca5cfc70-84e5-4d84-8b51-156b0a4cf2de`, is the last hand-uploaded state and the
+  known-good fallback.
 
-### GitHub Pages is configured and broken
+### GitHub Pages is still configured and still broken
 
-Do not rely on it. `gh api repos/Beccaxlynn93/augustineevents/pages` returns:
+Cert in `bad_authz`, expired 2026-08-12, redirecting to `www.augustineevents.com`
+which has no DNS record. It serves nobody. Recommend deleting the Pages config. The
+repo's `CNAME` points at that same non-resolving hostname and is excluded from asset
+uploads.
 
-```json
-{"status":"built", "source":{"branch":"main"}, "cname":"www.augustineevents.com",
- "https_certificate":{"state":"bad_authz",
-   "description":"The ACME authorization is in a bad state. We need to start over.",
-   "expires_at":"2026-08-12"}}
-```
-
-- `beccaxlynn93.github.io/augustineevents/` responds `301 -> https://www.augustineevents.com/`
-- **`www.augustineevents.com` has no DNS record**, confirmed against 1.1.1.1 and 8.8.8.8
-- Only the apex resolves, to Cloudflare IPs (104.21.41.195, 172.67.166.213)
-- The certificate expired 2026-08-12
-
-So GitHub Pages redirects all traffic to a hostname that does not exist, over a dead cert.
-**The repo's `CNAME` file points at that same non-resolving hostname.**
-
-### Recommended direction
-
-Keep Cloudflare, but replace drag-and-drop with `wrangler` driven from this repo:
-
-1. The Worker and custom domain already work and already have valid TLS at the apex.
-2. Adding a `wrangler.jsonc` with an assets directory makes **git the source of truth**
-   and gives real deploys, rollbacks, and history.
-3. The booking system needs server code. This is already a Worker, so that migration
-   becomes an extension of what exists rather than a platform move.
-4. Retire GitHub Pages entirely. Nothing points at it and its cert is dead.
-
-Before any of that: **get the live files into git.** They are readable from both
-`https://augustineevents.com` and `https://rough-salad-4d39.raugustinemusic.workers.dev`,
-so this is a mirror-and-commit, not a rescue. Do it before the next hand-upload
-overwrites something.
-
-### Inspecting production without the dashboard
+### Inspecting production
 
 The Cloudflare MCP server (plugin `cloudflare@cloudflare`) is authenticated against
-this account and can query the Worker directly. Useful calls:
+this account and can read Worker config, versions, deployments, and the Builds
+setup. **In practice it is read-only**: writes to the subdomain endpoint return
+`10000: Authentication error`. Use `wrangler` or the dashboard for changes.
 
-```
-GET /accounts/{account_id}/workers/scripts/rough-salad-4d39/deployments
-GET /accounts/{account_id}/workers/scripts/rough-salad-4d39/versions
-GET /accounts/{account_id}/workers/domains
-GET /zones/{zone_id}/dns_records
-```
+**You cannot read assets back.** `/content` returns `10405 Method not allowed`, and
+`/assets` is upload-only. To recover production files, mirror them over HTTP, which
+is how the 2026-09-03 recovery was done.
 
-**You cannot read files back out.** Verified 2026-09-03: `/content` returns
-`10405 Method not allowed for this authentication scheme`, and `/assets` plus
-`/asset-upload` are upload-only (204, empty). Version history returns metadata about
-the asset config, never the assets. **To recover production files, mirror them over
-HTTP** from `https://augustineevents.com` or the workers.dev origin, which is how the
-2026-09-03 recovery was done.
+### Access notes
 
-### Working rule
-
-Work on a branch and open a PR. But understand that **merging does not deploy**.
-Nothing in git reaches production until someone uploads it to the Worker, and `main`
-does not reflect production today.
-
-Before assuming anything about production, check it. `curl -sSI https://augustineevents.com/`
-costs nothing and this document has been confidently wrong before.
+- The repo is **user-owned**, not org-owned. GitHub offers no collaborator role
+  dropdown on personal repos: collaborators get write, and only the owner is admin.
+  Installing GitHub Apps and setting Actions secrets require the owner.
+- Justin is a **Super Administrator** on the Cloudflare account under
+  `justinben2335@gmail.com` and does not need Becca's login. In the dashboard he must
+  switch accounts; his personal account is the default.
+- If `git push` fails with "Invalid username or token", the macOS keychain holds a
+  stale credential. Fix with `gh auth setup-git`.
 
 ---
 
 ## Known issues
 
+Updated 2026-09-05. Items resolved that day are listed at the bottom.
+
 | Issue | Notes |
 |---|---|
-| **Deploys are manual and disconnected from git** | Highest priority. Nothing in this repo reaches production without a hand-upload. See "READ FIRST". |
-| **`608A5063.jpg` is 12.5 MB on the homepage** | 3648x5472 Canon EOS R6 original, served at full size to every visitor. Alone it is 2.6x the entire optimized zip. This is the site's actual performance problem. Resizing is a content change, so ask first. |
+| **Contact form has no validation or bot protection** | `contact.html` calls `preventDefault()` and sends immediately. Zero `required` attributes, so a blank form submits. No captcha, Turnstile, or honeypot. Nothing is stored: if the email fails or lands in spam, the inquiry is gone. Only one `emailjs.send`, so the customer gets no confirmation. The estimated total is computed client-side and is not authoritative. |
+| **Em dash rule is violated site-wide** | **26 em/en dashes** remain across the six pages (was 29; 3 removed 2026-09-05 on lines already being edited). Highest counts: `contact.html` 9, `event-music.html` 6, `event-rentals.html` 4. Includes `<title>` tags. |
 | **`CNAME` points at a dead hostname** | Says `www.augustineevents.com`, which has no DNS record. Vestigial. Delete it or add the record. |
-| **GitHub Pages is configured and broken** | Cert in `bad_authz`, expired 2026-08-12, redirects to the non-resolving `www` host. Serves nobody. Recommend deleting the Pages config outright. |
-| **Em dash rule is violated site-wide** | 29 em/en dashes across all six pages, including every `<title>`. An open cleanup task, not just a go-forward convention. |
+| **GitHub Pages is configured and broken** | Cert `bad_authz`, expired 2026-08-12, redirects to the non-resolving `www` host. Serves nobody. Recommend deleting the Pages config. |
 | **Interior page heroes are screenshots** | Measured 698-860px wide, used full-bleed. Low source resolution; cannot be fixed by optimizing. Replace with real photography, do not upscale. |
 | **Instagram handle is outdated** | Footer links `instagram.com/becca_augustine`. Should be `@augustinemusicandevents`. |
-| **Photographer credit is contradictory** | Markup links `instagram.com/erinelizabeth.photog`; prior guidance credited `@awarrickphotography`. Confirm which is correct before publishing either. |
 | **Music package names** | Should read "Bronze Package, Violin or Voice with Becca" and "Emerald Package, Violin or Voice with Becca". Currently just "Bronze" and "Emerald". |
-| **Rental inventory is stale** | `event-rentals.html:277` says 35 pieces / $100 collection. Should be 50, collection $145, brass bundle $240. Large Brass Italian Vase is missing entirely. |
-| **Delivery-only items not marked** | Dinner plates, salad plates, dessert ramekins, beverage dispensers, and beverage urns are delivery-only. The page does not say so. |
-| **Faux Floral Ground Installation** | Shows "Photo Coming Soon". Awaiting a photo. |
+| **`services.html` footer is inconsistent** | The other five pages carry a `.footer-credits` line with the photographer credit. `services.html` has a simpler footer with none. |
+| **Beverage urns: delivery-only status unconfirmed** | Becca's 2026-09-05 notes listed ceramic plates, ramekins, and glass beverage dispensers as delivery-only, and those are flagged. An earlier note also claimed **beverage urns**, which her list did not include. Left unflagged pending confirmation. |
 | **No testimonials, no service area, weak local SEO** | Known gaps, not yet scheduled. |
-| **`.git` is 155 MB** | Bloated by the oversized root JPGs already in history. Deleting them from the working tree does not shrink it; only a history rewrite does, which changes hashes for anyone with a clone. Separate decision. |
+| **`.git` is 157 MB** | Bloated by oversized images in history. Deleting them from the working tree does not shrink it; only a history rewrite does, which changes hashes for anyone with a clone. Separate decision. |
+
+### Resolved 2026-09-05
+
+| Was | Now |
+|---|---|
+| Deploys manual and disconnected from git | Workers Builds deploys `main`. See Deployment. |
+| Recovered files existed only on one laptop | Pushed; `main` reproduces production exactly. |
+| `608A5063.jpg` 12.5 MB on the homepage | Resized to 1400x2100 / 958 KB, a 92% reduction. |
+| Faux Floral showed "Photo Coming Soon" | Real photo added. |
+| Rental inventory stale | Updated from Becca's notes: candlesticks 50 pieces / $140, brass bundle $230, rectangular tablecloths 3, floral $75 each or $250 for four. |
+| Delivery-only items unmarked | "Delivery Only Item" flag added to dinner plates, salad plates, ramekins, and glass beverage dispensers. |
+| Photographer credit contradictory | Confirmed **@erinelizabeth.photog**, who shot most of the photos. Already correct in markup on all five pages that carry a credit. |
 
 ---
 
@@ -308,9 +338,10 @@ actually serves:
 So the zip is an **image quality** upgrade at roughly 4.7x the current bytes. It is not
 a performance fix.
 
-**More importantly, it targets the wrong page.** The rental catalog was never the
-problem. The homepage is: `608A5063.jpg` alone is 12.5 MB, and the zip does not address
-it at all. Fixing that one image would do more than the entire zip.
+**More importantly, it targeted the wrong page.** The rental catalog was never the
+problem. The homepage was: `608A5063.jpg` alone was 12.5 MB, and the zip did not
+address it at all. **That image was fixed directly on 2026-09-05** (958 KB), which
+removed the site's actual performance problem without applying the zip.
 
 **Do not apply the zip without a decision from the owners** on quality versus weight.
 If applied, it must be reconciled against the recovered `Photographer photos/` files,
@@ -343,11 +374,27 @@ Also avoid: "link in bio", cliché wedding-industry phrasing, and any claim abou
 - Do not commit secrets. There are none in this repo today and it should stay that way.
 - **Verify deploy assumptions against the live site, not against this file.** This document was confidently wrong about hosting for its entire prior existence.
 
+**Release process.** Work on a branch, push it, and review the staging alias. Merging
+to `main` deploys to production, so treat it as the release step, not bookkeeping.
+Never hand-upload through the Cloudflare dashboard: that is what caused the original
+drift between git and production, and it is invisible from inside this repo.
+
+**Images.** Resize before committing. Check how the CSS crops the image first: a
+`.item-card img` is `height: 220px` with `object-fit: cover` in a roughly 281px wide
+grid cell, so the sides are never cropped by the browser but the top and bottom are.
+Crop vertically, never horizontally, and preserve the full frame width. Note that
+`sips -Z` caps the *larger* dimension, which silently under-sizes a portrait image;
+use `--resampleWidth` instead.
+
 ---
 
 ## What is coming
 
 A rental booking system is specified in a separate document (`augustine-booking-build-spec.md`). It will be a Next.js application with Postgres, handling inventory availability, contract generation, and Venmo/Zelle payment coordination.
+
+**What it replaces.** Today "Book Now" is not a booking system. Every CTA on every
+page points at `contact.html`, a single EmailJS form that emails Becca. Nothing is
+stored, reserved, validated, or paid. See Known issues for the specific gaps.
 
 That project will eventually absorb these six pages as static routes. Until then, keep this repo simple and static. Do not begin that migration here without explicit instruction.
 
