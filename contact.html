@@ -409,8 +409,19 @@
         if (!cb.checked) return;
         var name = row.querySelector('.rental-item-name').childNodes[0].textContent.trim();
         var isUnit = cb.dataset.unit === '1';
-        var qty = isUnit ? row.querySelector('.qty-num').value : null;
-        var price = row.querySelector('.rental-item-price').textContent;
+        var qty = isUnit ? parseInt(row.querySelector('.qty-num').value) || 1 : null;
+
+        // Show what the line actually costs. Using the per unit label here made
+        // a bundled line read as "x4 ($75/ea)" while the total charged the $250
+        // bundle, so the summary appeared not to add up.
+        var discountQty = cb.dataset.discountQty ? parseInt(cb.dataset.discountQty) : null;
+        var discountPrice = cb.dataset.discountPrice ? parseFloat(cb.dataset.discountPrice) : null;
+        var bundled = discountQty && discountPrice && qty && qty >= discountQty;
+
+        var price = bundled
+          ? '$' + discountPrice.toFixed(2) + ' for all ' + qty
+          : row.querySelector('.rental-item-price').textContent;
+
         rentals.push(qty ? name + ' x' + qty + ' (' + price + ')' : name + ' (' + price + ')');
       });
 
