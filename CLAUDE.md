@@ -293,24 +293,33 @@ pattern. Verify with:
 WRANGLER_LOG=debug npx wrangler deploy --dry-run 2>&1 | grep '^Ignoring asset: '
 ```
 
-### D1 migrations: the bookkeeping is out of step
+### D1 migrations
 
-**The schema was applied by hand, not through the migrations runner.** The `inquiries`
-table and its `ip_hash` column are live and correct, but `d1_migrations` was empty as
-of 2026-09-09, so `wrangler d1 migrations list` reports both files as pending and
-`wrangler d1 list` can show a stale `num_tables: 0`.
+**Reconciled 2026-09-09.** `wrangler d1 migrations list --remote` now reports
+`No migrations to apply!` and the runner is safe to use for the next migration.
 
-Do not take that as "the database was never set up". Check the schema directly:
+The history is worth knowing, because the symptom is confusing if it recurs. The
+schema was originally applied by hand through `d1 execute` rather than through the
+migrations runner, so the `inquiries` table and its `ip_hash` column were live and
+correct while `d1_migrations` sat empty. In that state `migrations list` reports every
+file as pending and `d1 list` can show a stale `num_tables: 0`, neither of which means
+the database is unset. Running `migrations apply` would have aborted on `0002`'s
+`ALTER TABLE inquiries ADD COLUMN ip_hash`, because the column already existed. It was
+fixed by backfilling the two rows with their real timestamps.
+
+Check the schema directly rather than trusting the ledger or the table count:
 
 ```
 npx wrangler d1 execute augustine-inquiries --remote \
   --command "SELECT name FROM sqlite_master WHERE type='table'"
 ```
 
-**Running `wrangler d1 migrations apply` against production while the bookkeeping is
-empty will fail.** `0001` is `CREATE TABLE IF NOT EXISTS` and survives a re-run, but
-`0002`'s `ALTER TABLE inquiries ADD COLUMN ip_hash` aborts on the duplicate column.
-Backfill the two rows into `d1_migrations` first.
+**Pass SQL with `--file`, not a multi-line `--command`.** A multi-line quoted
+statement pasted into a terminal failed with `7403: The given account is not valid or
+is not authorized to access this service`, which reads like a permissions problem and
+is not one. The identical SQL in a file succeeded immediately. Reads and other writes
+worked throughout, so treat a lone 7403 on a pasted statement as a mangled command
+before going anywhere near account access.
 
 ### Staging workflow
 
@@ -386,6 +395,8 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | No bot protection on the form | Honeypot, minimum fill time, email shape and per-IP rate limit. Verified live: a honeypot submission is answered 200 and writes no row. |
 | Bundled rental lines misread in the summary | A bundled line showed `x4 ($75/ea)` while the total charged the $250 bundle, so the emailed summary appeared not to add up. It now uses the same condition the total does. |
 | Workers Builds connected but never exercised | First build-sourced deployment, `4984765d`. See Deployment. |
+| Bundle and its member items both selectable | Selecting the Brass Collection Bundle alongside the individual brass pieces charged for the same items twice. A real submission caught it at `$283.00`. Checking the bundle now clears and locks its members. Deployed as `0bf75d0d` and verified live. |
+| `d1_migrations` empty while the schema was live | Backfilled with the real timestamps. `migrations list --remote` reports nothing to apply. See D1 migrations. |
 
 ### Resolved 2026-09-05
 
@@ -439,6 +450,15 @@ which are what production actually uses.
 **Hard rule: no em dashes or en dashes in any client-facing copy.** Use commas, parentheses, periods, or restructure. This applies to page copy, alt text, meta descriptions, and `<title>` tags. It is a standing rule from the owners, not a stylistic suggestion. The site currently violates this in 29 places; see Known issues.
 
 Also avoid: "link in bio", cliché wedding-industry phrasing, and any claim about packages or pricing not confirmed in the inventory workbook.
+
+**Rental bundles.** A bundle row carries `data-bundle="<name>"` and every item it
+contains carries `data-bundle-member="<name>"`. Checking the bundle clears, disables
+and visually mutes its members, and reveals their `.bundle-included` line; unchecking
+hands them back. This exists so a visitor cannot pay twice for the same pieces, and
+`syncBundles()` must keep running before `syncDeliveryOnly()` in the checkbox handler,
+because clearing a member can change which delivery only items are still selected.
+Adding another bundle needs only these two attributes and a `.bundle-included` span,
+no new JavaScript. Today the only bundle is the brass collection.
 
 **Images.** Always include meaningful `alt` text describing the item, not the filename. Keep `loading="lazy"` on catalog images. New photos must be resized to 1400px max width and saved as WebP before committing. Never commit a multi-megabyte image.
 
