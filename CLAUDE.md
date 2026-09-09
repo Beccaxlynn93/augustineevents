@@ -2,10 +2,12 @@
 
 Context and working instructions for Claude Code on this repository.
 
-> **Verified 2026-09-05** against the repo, the live site, the Cloudflare API, and
+> **Verified 2026-09-09** against the repo, the live site, the Cloudflare API, and
 > the Workers Builds configuration.
-> This is a Cloudflare Worker, not GitHub Pages and not Cloudflare Pages. As of
-> 2026-09-05 it deploys from git; before that it was hand-uploaded.
+> This is a Cloudflare Worker, not GitHub Pages and not Cloudflare Pages. It
+> deploys from git, and on 2026-09-09 a push to `main` produced the first
+> build-sourced deployment, which is what finally proved the pipeline. Until that
+> day production was still serving the hand-uploaded version from 2026-05-15.
 > Do not trust an unverified claim in this file over what production actually returns.
 > This document has been confidently wrong before.
 
@@ -15,11 +17,20 @@ Context and working instructions for Claude Code on this repository.
 
 The marketing website for **Augustine Music & Events**, a Nashville wedding music and event rental business run by Becca Augustine (violinist and vocalist) and Justin Brown (keys, guitar, operations).
 
-Hand-written static HTML. No build step, no framework, no package.json. Each page carries its own `<style>` block inline.
+Hand-written static HTML with **no build step, no framework and no package.json**.
+Each page carries its own `<style>` block inline.
+
+Since 2026-09-05 the repo also carries a small Worker script (`src/`) that records
+contact form submissions to D1 and sends the notification email. It is plain ESM
+with no dependencies and no bundler, so the "no build step" rule still holds. Static
+assets are matched and served *before* that code runs, so a failure in it cannot take
+the six pages down.
 
 **Hosting is a Cloudflare Worker, not GitHub Pages.** As of 2026-09-05 it deploys automatically from `main` via Workers Builds. See "Deployment" below before touching anything deploy-related.
 
-A booking system is planned as a separate Next.js project. This repo stays static until that migration. Do not add a build step, framework, or bundler here.
+A booking system is planned as a separate Next.js project. This repo stays static
+until that migration, apart from the inquiry Worker described above. Do not add a
+build step, framework, or bundler here.
 
 ---
 
@@ -96,9 +107,31 @@ repo. To check production, mirror it over HTTP.
 - `.gitignore` — ignores `*.zip` and `.DS_Store`. Added 2026-09-03 so the 147 MB working
   archive cannot be committed by accident.
 
+### The inquiry Worker
+
+Added 2026-09-05, live in production since 2026-09-09.
+
+| Path | Purpose |
+|---|---|
+| `src/index.js` | Entry point. Serves `POST /api/inquiries` only; every other unmatched path returns a bare 404, which is what production did before. Writes to D1 first, then sends the email, so a mail failure can never cost the record of a lead. |
+| `src/email.js` | Builds and sends the notification. Recipients default to Becca and Justin, overridable with the `NOTIFY_EMAILS` var. Sends one recipient at a time on purpose, so one bad address cannot fail the whole call. |
+| `src/guards.js` | Honeypot, minimum fill time, email shape check, and a rate limit of 5 per hashed IP per hour. A rejected submission is answered with a normal success response so a bot learns nothing. |
+| `migrations/` | D1 schema. See the warning about migration bookkeeping under Deployment. |
+
+The D1 database is `augustine-inquiries` (`8233db2a-ce39-4b4e-8447-a8a00da7da6c`),
+bound as `env.augustine_inquiries`. **There is only one database.** Preview and
+staging versions bind the same one production does, so a staging test writes real
+rows. That is a feature when verifying a deploy and a trap if you forget it.
+
+`IP_SALT` is an optional secret. Without it `hashIp` falls back to a default string,
+so the Worker deploys and runs fine, but the hashes are less resistant to a
+precomputed lookup. Setting it is a small, worthwhile hardening step.
+
 ### Third-party dependency
 
-`contact.html` loads **EmailJS** from jsDelivr and is the site's only conversion path:
+`contact.html` loads **EmailJS** from jsDelivr. It is no longer the only conversion
+path (the Worker also emails and stores the inquiry), but it is still the one the
+visitor's success message depends on:
 
 ```
 line   8: <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
@@ -107,9 +140,15 @@ line 387: emailjs.send('service_i7u4b0s', 'template_qqheek4', ...)
 ```
 
 Those three identifiers are **publishable by design** for EmailJS and are not secrets.
-Do not "fix" them by moving them to env vars; there is no server to read env vars from,
-and removing them breaks the contact form. There are no real secrets in this repo and
-it should stay that way.
+Do not "fix" them by moving them to env vars; removing them breaks the visitor-facing
+success path. There are no real secrets in this repo and it should stay that way.
+
+The form posts to `/api/inquiries` **fire and forget**, wrapped in `.catch()`, after
+EmailJS resolves or rejects. That ordering is deliberate: if the Worker, the database
+or the endpoint is down, the visitor never sees it and the email is unaffected. Retiring
+EmailJS is possible now that the Worker sends its own mail, but it is a separate
+decision and would make the Worker a single point of failure for the only conversion
+path on the site.
 
 ### Junk to delete
 
@@ -207,6 +246,21 @@ Build command is empty and root directory is `/`. Correct: this site has no buil
 **A push to `main` deploys to production.** Any other branch gets a preview URL and
 leaves production alone.
 
+**Proven 2026-09-09.** Until that day this was configuration, not observed behavior:
+Workers Builds was connected on 2026-09-05, but production was still serving
+`ca5cfc70` from 2026-05-15, the last hand-upload, because no push had exercised it.
+The pipeline is now confirmed working in both directions:
+
+| | |
+|---|---|
+| Branch push (`site-updates`) | uploaded version `3fa96db5` |
+| `main` push (`3197a16..40696cc`) | deployed version `4984765d`, live in about 40 seconds |
+
+Live matching `main` is therefore no longer evidence that a deploy ran. Before the
+first build, the two matched anyway, because `main` had been reconstructed *from*
+production during the 2026-09-03 recovery. To confirm a deploy actually happened,
+check `wrangler deployments list`, not the page bytes.
+
 ### wrangler.jsonc
 
 Reproduces the live Worker exactly. Do not change these casually:
@@ -238,6 +292,25 @@ pattern. Verify with:
 ```
 WRANGLER_LOG=debug npx wrangler deploy --dry-run 2>&1 | grep '^Ignoring asset: '
 ```
+
+### D1 migrations: the bookkeeping is out of step
+
+**The schema was applied by hand, not through the migrations runner.** The `inquiries`
+table and its `ip_hash` column are live and correct, but `d1_migrations` was empty as
+of 2026-09-09, so `wrangler d1 migrations list` reports both files as pending and
+`wrangler d1 list` can show a stale `num_tables: 0`.
+
+Do not take that as "the database was never set up". Check the schema directly:
+
+```
+npx wrangler d1 execute augustine-inquiries --remote \
+  --command "SELECT name FROM sqlite_master WHERE type='table'"
+```
+
+**Running `wrangler d1 migrations apply` against production while the bookkeeping is
+empty will fail.** `0001` is `CREATE TABLE IF NOT EXISTS` and survives a re-run, but
+`0002`'s `ALTER TABLE inquiries ADD COLUMN ip_hash` aborts on the duplicate column.
+Backfill the two rows into `d1_migrations` first.
 
 ### Staging workflow
 
@@ -292,7 +365,7 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 
 | Issue | Notes |
 |---|---|
-| **Contact form has no validation or bot protection** | `contact.html` calls `preventDefault()` and sends immediately. Zero `required` attributes, so a blank form submits. No captcha, Turnstile, or honeypot. Nothing is stored: if the email fails or lands in spam, the inquiry is gone. Only one `emailjs.send`, so the customer gets no confirmation. The estimated total is computed client-side and is not authoritative. |
+| **Contact form still has no field validation** | Partly addressed 2026-09-09. Still true: zero `required` attributes, so a blank form submits, and the estimated total is computed client-side and is not authoritative. The customer still gets no confirmation email, only Becca and Justin are notified. **No longer true:** submissions are stored in D1, and the endpoint has honeypot, timing, email-shape and rate-limit guards. A lost or spam-filtered email no longer means a lost inquiry. |
 | **Em dash rule is violated site-wide** | **26 em/en dashes** remain across the six pages (was 29; 3 removed 2026-09-05 on lines already being edited). Highest counts: `contact.html` 9, `event-music.html` 6, `event-rentals.html` 4. Includes `<title>` tags. |
 | **`CNAME` points at a dead hostname** | Says `www.augustineevents.com`, which has no DNS record. Vestigial. Delete it or add the record. |
 | **GitHub Pages is configured and broken** | Cert `bad_authz`, expired 2026-08-12, redirects to the non-resolving `www` host. Serves nobody. Recommend deleting the Pages config. |
@@ -303,6 +376,15 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | **Beverage urns: delivery-only status unconfirmed** | Becca's 2026-09-05 notes listed ceramic plates, ramekins, and glass beverage dispensers as delivery-only, and those are flagged. An earlier note also claimed **beverage urns**, which her list did not include. Left unflagged pending confirmation. |
 | **No testimonials, no service area, weak local SEO** | Known gaps, not yet scheduled. |
 | **`.git` is 157 MB** | Bloated by oversized images in history. Deleting them from the working tree does not shrink it; only a history rewrite does, which changes hashes for anyone with a clone. Separate decision. |
+
+### Resolved 2026-09-09
+
+| Was | Now |
+|---|---|
+| Inquiries existed only as an EmailJS send | Stored in D1 and sent from the Worker. Verified in production: a submission records a row and notifies both recipients. |
+| No bot protection on the form | Honeypot, minimum fill time, email shape and per-IP rate limit. Verified live: a honeypot submission is answered 200 and writes no row. |
+| Bundled rental lines misread in the summary | A bundled line showed `x4 ($75/ea)` while the total charged the $250 bundle, so the emailed summary appeared not to add up. It now uses the same condition the total does. |
+| Workers Builds connected but never exercised | First build-sourced deployment, `4984765d`. See Deployment. |
 
 ### Resolved 2026-09-05
 
@@ -378,6 +460,11 @@ Also avoid: "link in bio", cliché wedding-industry phrasing, and any claim abou
 to `main` deploys to production, so treat it as the release step, not bookkeeping.
 Never hand-upload through the Cloudflare dashboard: that is what caused the original
 drift between git and production, and it is invisible from inside this repo.
+
+When a release touches the Worker, verify the endpoint against staging before
+promoting, and remember that staging writes to the **production** database and sends
+**real email** to Becca and Justin. Label test submissions clearly, and clean up the
+rows afterward.
 
 **Images.** Resize before committing. Check how the CSS crops the image first: a
 `.item-card img` is `height: 220px` with `object-fit: cover` in a roughly 281px wide
