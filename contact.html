@@ -77,6 +77,15 @@
     .rental-item-note { font-size: 0.75rem; color: var(--muted); display: block; margin-top: 1px; }
     .rental-qty { display: none; align-items: center; gap: 6px; flex-shrink: 0; }
     .rental-qty.show { display: flex; }
+    .rental-row.in-bundle { cursor: default; background: #faf8f5; }
+    .rental-row.in-bundle:hover { background: #faf8f5; }
+    .rental-row.in-bundle input[type="checkbox"] { cursor: default; }
+    /* Muted with colour rather than opacity, because opacity on the row would
+       fade the "included" line along with everything else. */
+    .rental-row.in-bundle .rental-item-name { color: #a9a49c; }
+    .rental-row.in-bundle .rental-item-note { color: #b7b2aa; }
+    .rental-row.in-bundle .rental-item-price { color: #b7b2aa; text-decoration: line-through; }
+    .rental-row.in-bundle .bundle-included { color: var(--green); font-weight: 700; }
     .qty-btn { width: 24px; height: 24px; border: 1px solid #d5cfc6; background: var(--white); font-size: 1rem; line-height: 1; cursor: pointer; color: var(--green-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .qty-btn:hover { background: #f0ece4; }
     .qty-num { width: 36px; text-align: center; border: 1px solid #d5cfc6; padding: 3px 4px; font-size: 0.85rem; font-family: 'Lato', sans-serif; color: var(--text); }
@@ -203,10 +212,10 @@
             <div class="rental-section-title">Décor & Lighting</div>
             <div class="rental-row"><input type="checkbox" data-price="25" data-unit="0"><span class="rental-item-name">Wisteria Chandelier<span class="rental-item-note">55" cream · 1 available</span></span><div class="rental-qty"></div><span class="rental-item-price">$25</span></div>
             <div class="rental-row"><input type="checkbox" data-price="75" data-unit="1" data-discount-qty="4" data-discount-price="250"><span class="rental-item-name">Faux Floral Large Arrangements<span class="rental-item-note">Ivory, white &amp; light blush · 4 available · $250 for all four</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="4"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$75/ea</span></div>
-            <div class="rental-row"><input type="checkbox" data-price="3" data-unit="1" data-discount-qty="50" data-discount-price="140"><span class="rental-item-name">Brass Candlestick Holders<span class="rental-item-note">50 pieces available · $140 for full collection</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="50"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$3/ea</span></div>
-            <div class="rental-row"><input type="checkbox" data-price="7" data-unit="1" data-discount-qty="8" data-discount-price="50"><span class="rental-item-name">3 Arm Brass Candelabras<span class="rental-item-note">8 available · $50 for all 8</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="8"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$7/ea</span></div>
-            <div class="rental-row"><input type="checkbox" data-price="25" data-unit="0"><span class="rental-item-name">9 Arm Candelabra<span class="rental-item-note">Focal brass piece · 1 available</span></span><div class="rental-qty"></div><span class="rental-item-price">$25</span></div>
-            <div class="rental-row"><input type="checkbox" data-price="230" data-unit="0"><span class="rental-item-name">Entire Brass Collection Bundle<span class="rental-item-note">All candlesticks, candelabras &amp; Italian vases</span></span><div class="rental-qty"></div><span class="rental-item-price">$230</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="3" data-unit="1" data-discount-qty="50" data-discount-price="140" data-bundle-member="brass"><span class="rental-item-name">Brass Candlestick Holders<span class="rental-item-note">50 pieces available · $140 for full collection</span><span class="rental-item-note bundle-included" hidden>Included in the Entire Brass Collection Bundle</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="50"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$3/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="7" data-unit="1" data-discount-qty="8" data-discount-price="50" data-bundle-member="brass"><span class="rental-item-name">3 Arm Brass Candelabras<span class="rental-item-note">8 available · $50 for all 8</span><span class="rental-item-note bundle-included" hidden>Included in the Entire Brass Collection Bundle</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="1" min="1" max="8"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$7/ea</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="25" data-unit="0" data-bundle-member="brass"><span class="rental-item-name">9 Arm Candelabra<span class="rental-item-note">Focal brass piece · 1 available</span><span class="rental-item-note bundle-included" hidden>Included in the Entire Brass Collection Bundle</span></span><div class="rental-qty"></div><span class="rental-item-price">$25</span></div>
+            <div class="rental-row"><input type="checkbox" data-price="230" data-unit="0" data-bundle="brass"><span class="rental-item-name">Entire Brass Collection Bundle<span class="rental-item-note">All candlesticks, candelabras &amp; Italian vases</span></span><div class="rental-qty"></div><span class="rental-item-price">$230</span></div>
 
             <div class="rental-section-title">Tableware & Serveware</div>
             <div class="rental-row"><input type="checkbox" data-price="1.25" data-unit="1" data-delivery-only="1"><span class="rental-item-name">White Round Dinner Plates<span class="rental-item-note">10.5" · 60 available · 20 minimum · Delivery only</span></span><div class="rental-qty"><button type="button" class="qty-btn">−</button><input type="number" class="qty-num" value="20" min="20" max="60"><button type="button" class="qty-btn">+</button></div><span class="rental-item-price">$1.25/ea</span></div>
@@ -326,6 +335,31 @@
       showAddressRow();
     }
 
+    // A bundle already contains its member items, so they cannot be added on top
+    // of it and charged twice. Checking the bundle clears and locks them;
+    // unchecking hands them back. Driven by data attributes rather than a list of
+    // ids, so adding a second bundle later needs no new code.
+    function syncBundles() {
+      document.querySelectorAll('.rental-row input[data-bundle]').forEach(function(bundleCb) {
+        const locked = bundleCb.checked;
+        const members = document.querySelectorAll(
+          '.rental-row input[data-bundle-member="' + bundleCb.dataset.bundle + '"]'
+        );
+        members.forEach(function(cb) {
+          const row = cb.closest('.rental-row');
+          if (locked && cb.checked) {
+            cb.checked = false;
+            const qtyWrap = row.querySelector('.rental-qty');
+            if (qtyWrap) qtyWrap.classList.remove('show');
+          }
+          cb.disabled = locked;
+          row.classList.toggle('in-bundle', locked);
+          const flag = row.querySelector('.bundle-included');
+          if (flag) flag.hidden = !locked;
+        });
+      });
+    }
+
     rentalDelivery.addEventListener('change', showAddressRow);
 
     packageType.addEventListener('change', function() {
@@ -371,12 +405,16 @@
       // Toggle qty visibility on checkbox change
       cb.addEventListener('change', function() {
         if (isUnit && qtyWrap) qtyWrap.classList.toggle('show', cb.checked);
+        // Before the delivery sync, because clearing a member can change which
+        // delivery only items are still selected.
+        syncBundles();
         syncDeliveryOnly();
         calcTotal();
       });
 
       // Clicking anywhere on the row toggles the checkbox
       row.addEventListener('click', function(e) {
+        if (cb.disabled) return;
         if (e.target === cb) return;
         if (e.target.classList.contains('qty-btn') || e.target.classList.contains('qty-num')) return;
         cb.checked = !cb.checked;
