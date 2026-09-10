@@ -2,8 +2,8 @@
 
 Context and working instructions for Claude Code on this repository.
 
-> **Verified 2026-09-09** against the repo, the live site, the Cloudflare API, and
-> the Workers Builds configuration.
+> **Verified 2026-09-10** against the repo, the live site, the Cloudflare API, the
+> Workers Builds configuration, and the production D1 database.
 > This is a Cloudflare Worker, not GitHub Pages and not Cloudflare Pages. It
 > deploys from git, and on 2026-09-09 a push to `main` produced the first
 > build-sourced deployment, which is what finally proved the pipeline. Until that
@@ -28,9 +28,23 @@ the six pages down.
 
 **Hosting is a Cloudflare Worker, not GitHub Pages.** As of 2026-09-05 it deploys automatically from `main` via Workers Builds. See "Deployment" below before touching anything deploy-related.
 
-A booking system is planned as a separate Next.js project. This repo stays static
-until that migration, apart from the inquiry Worker described above. Do not add a
-build step, framework, or bundler here.
+Since 2026-09-10 the repo also carries the rental catalog as data in D1, with a
+server-side pricing resolver. See "The rental catalog" below.
+
+**The booking system is being built here, in this Worker. It is not a separate
+Next.js project.** That plan was written when the site was believed to be on GitHub
+Pages, which cannot run server code. That constraint is gone, and the reasons not to
+migrate are strong: a Next.js rewrite would mean rebuilding all six pages as
+components, adding the build step this file forbids, running Postgres alongside the
+D1 that already exists, and re-proving the deploy pipeline. It would also destroy the
+property that makes this setup safe, which is that static assets are matched and
+served **before** any code runs, so a bug in the Worker cannot take the marketing
+site down. In a Next.js app it can.
+
+**No React, no framework, no bundler, no build step, and no `package.json`.** The six
+pages stay hand-written HTML with inline `<style>` and vanilla JS. Booking is a state
+problem, not a rendering problem: it lives in D1 and the Worker. Tests run on Node's
+built-in runner and `node:sqlite`, which is why there is still no `package.json`.
 
 ---
 
@@ -126,6 +140,53 @@ rows. That is a feature when verifying a deploy and a trap if you forget it.
 `IP_SALT` is an optional secret. Without it `hashIp` falls back to a default string,
 so the Worker deploys and runs fine, but the hashes are less resistant to a
 precomputed lookup. Setting it is a small, worthwhile hardening step.
+
+### The rental catalog
+
+Added 2026-09-10. **This is now the source of truth for items, counts and prices.**
+The catalog previously lived in two places, the cards in `event-rentals.html` and the
+checkbox rows in `contact.html`, and they drifted. That is how the florals came to be
+priced differently on the two pages.
+
+| Path | Purpose |
+|---|---|
+| `migrations/0003_catalog.sql` | `items`, `bundles`, `bundle_items`. |
+| `migrations/0004_catalog_seed.sql` | 17 items and 4 bundles, seeded from the inventory workbook. |
+| `src/pricing.js` | `resolveCart`. Server-authoritative pricing. |
+| `src/catalog.js` | Row adapter shared by D1 and the tests. |
+| `src/pricing.test.mjs` | 16 fixture tests. Run `node --test src/pricing.test.mjs`. |
+
+Seeded from **`augustine-inventory-master.numbers`** (v2, Sept 2026), Becca's physical
+inventory workbook, which is more current than either page. It is not in this repo. To
+read it: open in Numbers and export as CSV, or drive that export from AppleScript.
+
+**Pricing is a resolver, not a sum.** A cart of 50 candlesticks and 8 candelabras is
+not `50 x $3 + 8 x $7 = $206`, it is the candlestick collection at $140 plus the
+candelabra set at $50, so $190. Bundles overlap and nest, so `resolveCart` enumerates
+every combination of applicable bundles and keeps the cheapest, which is the only way
+to guarantee a customer is never punished for how they clicked. **Volume discounts are
+modelled as single-item bundles** ("$250 for all four florals" is a bundle containing
+4 of one item) so the resolver has one concept rather than two. Adding a discount
+therefore means adding a bundle row, never new code.
+
+Money is **integer cents** throughout. Never floats: `0.75 * 20` is not `15` in binary
+floating point, and this arithmetic ends up on a contract.
+
+**Hold buffers are per item, not global.** The rental price covers 48 hours, typically
+Friday 10am to Sunday 10am, so the day either side of the event belongs to the booking.
+What varies is turnaround, held in `items.buffer_after_days`: linens need 3 days,
+anything washed needs 2, everything else needs 1. **Nothing is 0**, and a test enforces
+that. A single global buffer, which the build plan assumed, would over-block every
+one-of-one item and under-block the plates.
+
+`active` and `listed` are different things. `active` means it exists and can be
+reserved; `listed` means it appears in the public catalog. The Italian vases are
+active but unlisted, so the Brass Collection Bundle can reserve them against a date
+while they stay bundle only on the site.
+
+**The tests load the real migration files** into in-memory SQLite rather than a
+fixture, because a fixture would drift from the seed, which is the bug class this
+whole layer exists to kill. Keep it that way.
 
 ### Third-party dependency
 
@@ -295,8 +356,37 @@ WRANGLER_LOG=debug npx wrangler deploy --dry-run 2>&1 | grep '^Ignoring asset: '
 
 ### D1 migrations
 
-**Reconciled 2026-09-09.** `wrangler d1 migrations list --remote` now reports
-`No migrations to apply!` and the runner is safe to use for the next migration.
+**Reconciled 2026-09-09.** The runner is safe to use. As of 2026-09-10 all four
+migrations are recorded as applied.
+
+**Set `CLOUDFLARE_ACCOUNT_ID` for every `d1` command.** `wrangler.jsonc` pins
+`account_id`, but the `d1` subcommands do not read it, so they fail with *"More than
+one account available but unable to select one in non-interactive mode"*. This is the
+two-account trap described under Access notes, wearing a different hat:
+
+```
+export CLOUDFLARE_ACCOUNT_ID=20da6feefc828587a10b5b232912d1a5
+```
+
+**D1 rejects a multi-row `VALUES` clause past a low ceiling.** A 17 row insert failed
+with `too many terms in compound SELECT` (`SQLITE_ERROR 7500`) while the identical
+file applied cleanly to local SQLite. The cause is not obvious: SQLite implements a
+multi-row `VALUES` as a compound SELECT internally, so a 17 row insert **is** a 17
+term compound select, and D1's ceiling sits well below stock SQLite's 500. **Local
+testing cannot catch this**, because local SQLite has the higher limit. Write one
+statement per row, and resolve foreign keys with a two-table `WHERE` rather than a
+`UNION ALL` chain. `0004_catalog_seed.sql` is the worked example.
+
+**Make every seed statement `INSERT OR IGNORE`.** The failed attempt above left
+nothing behind and the file was safe to re-run unchanged. Verify that claim against
+the tables rather than assuming it.
+
+**There is one database, and it is production's.** Preview, staging and production all
+bind `augustine-inquiries`. There is no preview copy, so `migrations apply --remote`
+touches production whatever branch the code is on, and Workers Builds does **not** run
+migrations: only a human typing `wrangler d1 migrations apply` does. Migrations must
+therefore land **before** the code that reads them, or the preview 500s on tables that
+do not exist. Back up first; three rows cost nothing to export.
 
 The history is worth knowing, because the symptom is confusing if it recurs. The
 schema was originally applied by hand through `d1 execute` rather than through the
@@ -374,7 +464,7 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 
 | Issue | Notes |
 |---|---|
-| **Contact form still has no field validation** | Partly addressed 2026-09-09. Still true: zero `required` attributes, so a blank form submits, and the estimated total is computed client-side and is not authoritative. The customer still gets no confirmation email, only Becca and Justin are notified. **No longer true:** submissions are stored in D1, and the endpoint has honeypot, timing, email-shape and rate-limit guards. A lost or spam-filtered email no longer means a lost inquiry. |
+| **Contact form still has no field validation** | Partly addressed 2026-09-09. Still true: zero `required` attributes, so a blank form submits, and the estimated total is still computed client-side and posted as text, so it arrives from the client and can be edited before sending. `resolveCart` exists to fix exactly this but **is not yet wired into `/api/inquiries`**. The customer still gets no confirmation email, only Becca and Justin are notified. **No longer true:** submissions are stored in D1, and the endpoint has honeypot, timing, email-shape and rate-limit guards. A lost or spam-filtered email no longer means a lost inquiry. |
 | **Em dash rule is violated site-wide** | **26 em/en dashes** remain across the six pages (was 29; 3 removed 2026-09-05 on lines already being edited). Highest counts: `contact.html` 9, `event-music.html` 6, `event-rentals.html` 4. Includes `<title>` tags. |
 | **`CNAME` points at a dead hostname** | Says `www.augustineevents.com`, which has no DNS record. Vestigial. Delete it or add the record. |
 | **GitHub Pages is configured and broken** | Cert `bad_authz`, expired 2026-08-12, redirects to the non-resolving `www` host. Serves nobody. Recommend deleting the Pages config. |
@@ -382,9 +472,35 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | **Instagram handle is outdated** | Footer links `instagram.com/becca_augustine`. Should be `@augustinemusicandevents`. |
 | **Music package names** | Should read "Bronze Package, Violin or Voice with Becca" and "Emerald Package, Violin or Voice with Becca". Currently just "Bronze" and "Emerald". |
 | **`services.html` footer is inconsistent** | The other five pages carry a `.footer-credits` line with the photographer credit. `services.html` has a simpler footer with none. |
-| **Italian vases are not individually bookable** | They appear only inside the Brass Collection Bundle description, on `event-rentals.html` and in the booking form. There is no catalog entry, price, count, or photo for them anywhere. Decided 2026-09-09 to leave them out of the booking form and keep them bundle only. Revisit if Becca wants to rent them separately, which needs a per-vase price and a count from her. |
+| **The catalog is data, but nothing renders from it yet** | `items` and `bundles` are live in D1 and authoritative, but `event-rentals.html` and `contact.html` still carry hardcoded copies. Until `/api/catalog` exists and both pages render from it, the drift this layer was built to kill is still possible. This is the rest of Phase 01. |
+| **Italian vases still have no photo and no catalog entry** | Resolved as inventory (see below), but they remain `listed = 0`: bundle only, with no card on `event-rentals.html` and no photo. Revisit if Becca wants to rent them separately. |
+| **Three replacement costs are text, not numbers** | In the inventory workbook: dinner plates, beverage dispensers, cornhole boards. Exhibit A of the rental contract pulls that column, and "Out of Stock" is not a chargeable amount. Blocking for contracts (Phase 04), not for anything sooner. |
+| **The inventory workbook needs three corrections** | Beverage urns `Delivery Only` should be **N**; rectangular tablecloths `Qty Available` should be **3**; the Collections tab is missing a row for the live **$250 four-floral** discount. The workbook is Becca's file, so these have to be made there. |
 | **No testimonials, no service area, weak local SEO** | Known gaps, not yet scheduled. |
 | **`.git` is 157 MB** | Bloated by oversized images in history. Deleting them from the working tree does not shrink it; only a history rewrite does, which changes hashes for anyone with a clone. Separate decision. |
+
+### Resolved 2026-09-10
+
+| Was | Now |
+|---|---|
+| The catalog lived in two hardcoded pages and drifted | `items`, `bundles`, `bundle_items` live in D1, seeded from the inventory workbook and verified in production: 17 items, 4 bundles, 8 memberships. |
+| No server-side pricing | `resolveCart` in `src/pricing.js`, with 16 tests. Enforces per-item minimums, the $100 order minimum, and bundle resolution. Not yet wired to the endpoint. |
+| The $100 order minimum was advertised but never enforced | `event-rentals.html` line 390 promises it; `contact.html` never checked. The resolver does. |
+| Italian vases were an inventory mystery | Real, and two SKUs: **2 small at $5** (`BR-VS-ITL-SM`) and **1 large at $15** (`BR-VS-ITL-LG`). The Brass Collection Bundle had been selling them for as long as it existed with no page listing them. Seeded active but unlisted, so the bundle can reserve them. |
+| Hold buffers were assumed to be one global number | Per item, from the workbook's Turnaround Days column. Linens 3, washed items 2, everything else 1, never 0. |
+| Beverage urns delivery-only status unconfirmed | Becca confirmed **not** delivery only. The workbook cell says otherwise and is wrong. |
+| Booking system planned as a separate Next.js app | Settled: built here, in this Worker, on D1. No React, no build step. See "What this is". |
+| `augustine-booking-build-spec.md` did not exist | Replaced by a build plan artifact. See "What is coming". |
+
+**Prices confirmed unchanged 2026-09-09** where the workbook disagreed with the live
+site. The live figure won in both cases: candlestick collection **$140** (workbook said
+$145), Brass Collection Bundle **$230** (workbook said $240). All 3 rectangular
+tablecloths are rentable; the workbook's "2 available" is stale. The **$250 four-floral**
+discount is real and simply missing from the workbook.
+
+Note the workbook's own Pricing Check tab grades the candlestick collection at a 3.3%
+discount and the brass bundle at 6.3%, against a 15 to 25% norm, and suggests $120 and
+$205. **That is a business decision for Becca and has not been taken.**
 
 ### Resolved 2026-09-09
 
@@ -498,13 +614,40 @@ use `--resampleWidth` instead.
 
 ## What is coming
 
-A rental booking system is specified in a separate document (`augustine-booking-build-spec.md`). It will be a Next.js application with Postgres, handling inventory availability, contract generation, and Venmo/Zelle payment coordination.
+The booking system is **being built in this repo**, extending the Worker with D1. The
+`augustine-booking-build-spec.md` this file used to reference never existed on disk; it
+was replaced by a build plan artifact, which carries the data model, the availability
+rule, the phasing and the open questions:
 
-**What it replaces.** Today "Book Now" is not a booking system. Every CTA on every
-page points at `contact.html`, a single EmailJS form that emails Becca. Nothing is
-stored, reserved, validated, or paid. See Known issues for the specific gaps.
+`https://claude.ai/code/artifact/cc1764ed-2068-4d5a-99ad-65a0b0bd7ac0`
 
-That project will eventually absorb these six pages as static routes. Until then, keep this repo simple and static. Do not begin that migration here without explicit instruction.
+That plan is itself **one phase stale**: it describes the Worker as assets-only with no
+`main` script, which stopped being true on 2026-09-05. Read it for the design, not for
+the status.
 
-Note that the hosting question is already settled in its favor: the site is on Cloudflare,
-which can run the server code GitHub Pages cannot.
+| Phase | State |
+|---|---|
+| **00** Stop losing inquiries | Done 2026-09-09, except Turnstile. Guards are honeypot, fill time, email shape and per-IP rate limit instead. |
+| **01** Inventory becomes data | **Half done 2026-09-10.** Schema, seed and pricing resolver are live. Still to do: `GET /api/catalog`, render both pages from it, and wire `resolveCart` into `/api/inquiries`. |
+| **02** Availability | Not started. Needs the date-overlap query, using the per-item buffers already seeded. |
+| **03** Self-serve booking | Not started. Needs a Durable Object to serialize reservation, plus cron hold expiry. |
+| **04** Contracts and payment | Not started. Blocked on the three text replacement costs and on a deposit and cancellation policy. |
+
+**Decisions taken with the owners 2026-09-09:**
+
+- **Bookings require Becca's approval**, they do not auto-confirm. This preserves the
+  consultative close; the plan flags self-serve as fighting the existing sales process.
+- **Courtesy holds last 48 hours.**
+- **Rental period is 48 hours**, typically Friday 10am to Sunday 10am.
+- **Payments stay payment-agnostic.** Confirmation is a state transition, never coupled
+  to a payment event. Venmo and Zelle are recorded manually; Stripe stays a seam.
+
+**The race condition is the launch blocker for Phase 03.** Two people checking out the
+last Wisteria Chandelier a second apart will both pass an availability check and both
+write a booking. A third of the catalog is one-of-one. Reading availability and writing
+the reservation must be one indivisible step, which is what the Durable Object is for.
+Do not ship self-serve booking without it.
+
+**Still unanswered:** deposit amount, cancellation and refund policy, whether the
+contract wording holds up in Tennessee (not a question to answer from here), and who is
+on call when a booking fails at 11pm on a Friday.
