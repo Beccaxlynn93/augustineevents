@@ -383,7 +383,6 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | **Music package names** | Should read "Bronze Package, Violin or Voice with Becca" and "Emerald Package, Violin or Voice with Becca". Currently just "Bronze" and "Emerald". |
 | **`services.html` footer is inconsistent** | The other five pages carry a `.footer-credits` line with the photographer credit. `services.html` has a simpler footer with none. |
 | **Italian vases are not individually bookable** | They appear only inside the Brass Collection Bundle description, on `event-rentals.html` and in the booking form. There is no catalog entry, price, count, or photo for them anywhere. Decided 2026-09-09 to leave them out of the booking form and keep them bundle only. Revisit if Becca wants to rent them separately, which needs a per-vase price and a count from her. |
-| **Beverage urns: delivery-only status unconfirmed** | Becca's 2026-09-05 notes listed ceramic plates, ramekins, and glass beverage dispensers as delivery-only, and those are flagged. An earlier note also claimed **beverage urns**, which her list did not include. Left unflagged pending confirmation. |
 | **No testimonials, no service area, weak local SEO** | Known gaps, not yet scheduled. |
 | **`.git` is 157 MB** | Bloated by oversized images in history. Deleting them from the working tree does not shrink it; only a history rewrite does, which changes hashes for anyone with a clone. Separate decision. |
 
@@ -395,6 +394,7 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | No bot protection on the form | Honeypot, minimum fill time, email shape and per-IP rate limit. Verified live: a honeypot submission is answered 200 and writes no row. |
 | Bundled rental lines misread in the summary | A bundled line showed `x4 ($75/ea)` while the total charged the $250 bundle, so the emailed summary appeared not to add up. It now uses the same condition the total does. |
 | Workers Builds connected but never exercised | First build-sourced deployment, `4984765d`. See Deployment. |
+| Beverage urns delivery-only status unconfirmed | Confirmed by Becca: urns are **not** delivery only. Customer pickup is fine. The markup already carried no flag on either page, so no change was needed. |
 | Bundle and its member items both selectable | Selecting the Brass Collection Bundle alongside the individual brass pieces charged for the same items twice. A real submission caught it at `$283.00`. Checking the bundle now clears and locks its members. Deployed as `0bf75d0d` and verified live. |
 | `d1_migrations` empty while the schema was live | Backfilled with the real timestamps. `migrations list --remote` reports nothing to apply. See D1 migrations. |
 
