@@ -469,7 +469,6 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | **`CNAME` points at a dead hostname** | Says `www.augustineevents.com`, which has no DNS record. Vestigial. Delete it or add the record. |
 | **GitHub Pages is configured and broken** | Cert `bad_authz`, expired 2026-08-12, redirects to the non-resolving `www` host. Serves nobody. Recommend deleting the Pages config. |
 | **Interior page heroes are screenshots** | Measured 698-860px wide, used full-bleed. Low source resolution; cannot be fixed by optimizing. Replace with real photography, do not upscale. |
-| **Instagram handle is outdated** | Footer links `instagram.com/becca_augustine`. Should be `@augustinemusicandevents`. |
 | **Music package names** | Should read "Bronze Package, Violin or Voice with Becca" and "Emerald Package, Violin or Voice with Becca". Currently just "Bronze" and "Emerald". |
 | **`services.html` footer is inconsistent** | The other five pages carry a `.footer-credits` line with the photographer credit. `services.html` has a simpler footer with none. |
 | **The catalog is data, but nothing renders from it yet** | `items` and `bundles` are live in D1 and authoritative, but `event-rentals.html` and `contact.html` still carry hardcoded copies. Until `/api/catalog` exists and both pages render from it, the drift this layer was built to kill is still possible. This is the rest of Phase 01. |

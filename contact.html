@@ -88,7 +88,12 @@
     .rental-row.in-bundle .bundle-included { color: var(--green); font-weight: 700; }
     .qty-btn { width: 24px; height: 24px; border: 1px solid #d5cfc6; background: var(--white); font-size: 1rem; line-height: 1; cursor: pointer; color: var(--green-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .qty-btn:hover { background: #f0ece4; }
-    .qty-num { width: 36px; text-align: center; border: 1px solid #d5cfc6; padding: 3px 4px; font-size: 0.85rem; font-family: 'Lato', sans-serif; color: var(--text); }
+    /* The +/- buttons make the native spinners redundant, and the spinners eat
+       enough of the box that two-digit quantities get clipped. Hide them and
+       size the field for the widest quantity in the catalog. */
+    .qty-num { width: 48px; text-align: center; border: 1px solid #d5cfc6; padding: 3px 4px; font-size: 0.85rem; font-family: 'Lato', sans-serif; color: var(--text); flex-shrink: 0; -moz-appearance: textfield; appearance: textfield; }
+    .qty-num::-webkit-outer-spin-button,
+    .qty-num::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
     .rental-item-price { font-size: 0.85rem; font-weight: 700; color: var(--green-dark); min-width: 60px; text-align: right; flex-shrink: 0; }
     .rental-delivery-row { display: flex; align-items: center; gap: 12px; padding: 14px 0 6px; }
     .rental-delivery-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--muted); white-space: nowrap; }
