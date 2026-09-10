@@ -102,21 +102,21 @@
 
     .hero-content { position: relative; z-index: 1; max-width: 1400px; width: 95%; padding: 0 28px; }
 
-    /* Was a 1366px PNG stretched to width:100%, which upscaled ~2x on a desktop
-       display and left the page with no <h1> at all. Live type is sharp at any
-       size, reflows on a phone, and is readable by search engines. */
-    .hero-content h1.hero-text {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-weight: 400;
-      color: var(--white);
-      font-size: clamp(2.1rem, 5.4vw, 5.25rem);
-      line-height: 1.14;
-      letter-spacing: 0.015em;
-      text-wrap: balance;
-      text-shadow: 0 2px 28px rgba(0,0,0,0.42);
+    /* The headline font is Becca's Canva font, so it stays an image. It used to
+       be a 1366x768 PNG stretched to width:100%, which upscaled the text ~3.7x
+       on a retina desktop and left the page with no <h1>. hero-headline.png is
+       the same pixels trimmed to the ink (1176x206), wrapped in a real <h1>
+       whose alt text is the heading, and capped so it barely upscales.
+       The original export is kept in the repo, untouched. */
+    .hero-content h1.hero-text { margin: 0; line-height: 0; }
+    .hero-content h1.hero-text img {
+      display: block;
+      width: min(760px, 88vw);
+      height: auto;
+      margin: 0 auto;
+      /* keeps the thin white strokes legible over the lighter overlay */
+      filter: drop-shadow(0 2px 16px rgba(0,0,0,0.45));
     }
-
-    .hero-content h1.hero-text span { display: block; }
 
     .hero-content p {
       color: rgba(255,255,255,0.88);
@@ -371,7 +371,6 @@
       footer { flex-direction: column; gap: 14px; text-align: center; padding: 28px 24px; }
       .footer-nav { flex-wrap: wrap; justify-content: center; gap: 16px; }
 
-      .hero-content h1.hero-text { letter-spacing: 0.01em; }
       .hero-content p { font-size: 1.1rem; margin-bottom: 8px; }
     }
   </style>
@@ -400,7 +399,10 @@
 
   <section class="hero">
     <div class="hero-content">
-      <h1 class="hero-text">Romantic Music &amp; Intimate <span>Wedding Rentals</span></h1>
+      <h1 class="hero-text">
+        <img src="hero-headline.png" alt="Romantic Music &amp; Intimate Wedding Rentals"
+             width="1176" height="206" fetchpriority="high" />
+      </h1>
 
     </div>
   </section>
