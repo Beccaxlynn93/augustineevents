@@ -3,3 +3,6 @@
 
 # macOS
 .DS_Store
+
+# wrangler working state: build output, local D1 databases, simulated emails
+.wrangler/

@@ -20,6 +20,15 @@ migrations/**
 **/.git/**
 **/.DS_Store
 **/node_modules
+
+# wrangler's own working directory. It sits inside the assets directory, and
+# holds build output (deploy-*/index.js.map), local D1 databases with inquiry
+# rows in them, and simulated emails. Found 2026-09-10 when a staging upload
+# listed a .wrangler/tmp source map as a static asset. Must never be served.
+.wrangler
+.wrangler/**
+**/.wrangler
+**/.wrangler/**
 .gitignore
 .assetsignore
 wrangler.jsonc

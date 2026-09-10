@@ -10,13 +10,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
-import { readFileSync } from 'node:fs';
-import { resolveCart, ORDER_MINIMUM } from './pricing.js';
-import { buildCatalog } from './catalog.js';
+import { readFileSync, existsSync } from 'node:fs';
+// Shared with the browser: contact.html imports these same two files to show
+// its live estimate, so the estimate and the stored price cannot disagree.
+import { resolveCart, ORDER_MINIMUM, describeQuote } from '../js/pricing.js';
+import { buildCatalog } from '../js/catalog.js';
 
 const db = new DatabaseSync(':memory:');
 db.exec(readFileSync(new URL('../migrations/0003_catalog.sql', import.meta.url), 'utf8'));
 db.exec(readFileSync(new URL('../migrations/0004_catalog_seed.sql', import.meta.url), 'utf8'));
+db.exec(readFileSync(new URL('../migrations/0005_item_photos.sql', import.meta.url), 'utf8'));
 
 const catalog = buildCatalog(
   db.prepare('SELECT * FROM items WHERE active = 1').all(),
@@ -152,4 +155,54 @@ test('turnaround days match the inventory workbook', () => {
   }
   const zero = db.prepare('SELECT count(*) AS n FROM items WHERE buffer_after_days < 1').get();
   assert.equal(zero.n, 0, 'no item may have a zero day turnaround');
+});
+
+test('every listed item has a photo, and every photo exists on disk', () => {
+  const rows = db.prepare('SELECT slug, photo FROM items WHERE listed = 1').all();
+  assert.equal(rows.length, 15);
+  for (const r of rows) {
+    assert.ok(r.photo, `${r.slug} has no photo`);
+    // Stored root-relative; the repo root is the site root.
+    const onDisk = new URL('..' + r.photo, import.meta.url);
+    assert.ok(existsSync(onDisk), `${r.slug}: ${r.photo} is not in the repo`);
+  }
+});
+
+test('photo crops carry over from the rentals page', () => {
+  const pos = (slug) => db.prepare('SELECT photo_position FROM items WHERE slug = ?').get(slug).photo_position;
+  assert.equal(pos('toile-round-tablecloth'), 'center 65%');
+  assert.equal(pos('patio-umbrella'), 'center top');
+  assert.equal(pos('dinner-plate'), null);
+});
+
+test('the bundle-only vases stay unphotographed and unlisted', () => {
+  const vases = db.prepare("SELECT photo, listed FROM items WHERE slug LIKE 'italian-vase-%'").all();
+  assert.equal(vases.length, 2);
+  for (const v of vases) { assert.equal(v.photo, null); assert.equal(v.listed, 0); }
+});
+
+test('choosing the brass package prices every member through the package', () => {
+  // This is the cart js/rental-picker.js builds when the package row is ticked:
+  // every member at its package quantity, the unlisted vases included.
+  const pkg = catalog.bundles.find((b) => b.slug === 'brass-collection');
+  const cart = [...pkg.items].map(([slug, qty]) => ({ slug, qty }));
+  cart.push({ slug: 'dinner-plate', qty: 20 });
+  const q = resolveCart(cart, catalog);
+  assert.equal(q.subtotal, 23000 + 20 * 125);
+  assert.deepEqual(q.bundles.map((b) => b.slug), ['brass-collection']);
+
+  const text = describeQuote(q, catalog);
+  assert.ok(text.includes('Small Brass Italian Vases x2: included in Entire Brass Collection Bundle'), text.join('\n'));
+  assert.ok(text.includes('White Round Dinner Plates x20 at $1.25 = $25.00'));
+  assert.ok(text.includes('Entire Brass Collection Bundle: $230.00'));
+  assert.ok(text.includes('Rental subtotal: $255.00'));
+  assert.ok(text.includes('Includes delivery only items.'));
+});
+
+test('a partial volume bundle is described line by line', () => {
+  const q = resolveCart([{ slug: 'brass-candlestick', qty: 55 }], catalog);
+  assert.equal(q.ok, false, 'over the 50 in stock');
+  const q2 = resolveCart([{ slug: 'faux-floral-arrangement', qty: 4 }], catalog);
+  const text = describeQuote(q2, catalog);
+  assert.ok(text.some((l) => l.startsWith('Faux Floral Large Arrangements x4: included in')), text.join('\n'));
 });

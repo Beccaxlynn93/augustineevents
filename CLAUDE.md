@@ -131,7 +131,7 @@ Added 2026-09-05, live in production since 2026-09-09.
 
 | Path | Purpose |
 |---|---|
-| `src/index.js` | Entry point. Serves `POST /api/inquiries` only; every other unmatched path returns a bare 404, which is what production did before. Writes to D1 first, then sends the email, so a mail failure can never cost the record of a lead. |
+| `src/index.js` | Entry point. Serves `GET /api/catalog` and `POST /api/inquiries`; every other unmatched path returns a bare 404, which is what production did before. Writes to D1 first, then sends the email, so a mail failure can never cost the record of a lead. |
 | `src/email.js` | Builds and sends the notification. Recipients default to Becca and Justin, overridable with the `NOTIFY_EMAILS` var. Sends one recipient at a time on purpose, so one bad address cannot fail the whole call. |
 | `src/guards.js` | Honeypot, minimum fill time, email shape check, and a rate limit of 5 per hashed IP per hour. A rejected submission is answered with a normal success response so a bot learns nothing. |
 | `migrations/` | D1 schema. See the warning about migration bookkeeping under Deployment. |
@@ -156,9 +156,41 @@ priced differently on the two pages.
 |---|---|
 | `migrations/0003_catalog.sql` | `items`, `bundles`, `bundle_items`. |
 | `migrations/0004_catalog_seed.sql` | 17 items and 4 bundles, seeded from the inventory workbook. |
-| `src/pricing.js` | `resolveCart`. Server-authoritative pricing. |
-| `src/catalog.js` | Row adapter shared by D1 and the tests. |
-| `src/pricing.test.mjs` | 16 fixture tests. Run `node --test src/pricing.test.mjs`. |
+| `migrations/0005_item_photos.sql` | `items.photo` and `items.photo_position`, for the 15 listed items. |
+| `js/pricing.js` | `resolveCart` and `describeQuote`. Pricing, and the breakdown text both emails use. |
+| `js/catalog.js` | Row adapter shared by D1, the browser and the tests. |
+| `js/rental-picker.js` | The booking form's rental picker, rendered from `/api/catalog`. |
+| `src/pricing.test.mjs` | 21 fixture tests. Run `node --test src/pricing.test.mjs`. |
+
+**`js/` is shared by the Worker and the browser, and that is the point.** `pricing.js`
+and `catalog.js` are pure ES modules with no imports. The Worker bundles them
+(`src/index.js` imports `../js/...`), and they are also served as static assets, so
+`contact.html` loads the same files. The estimate a visitor sees and the price the
+Worker stores come from one implementation and cannot drift. Keep them dependency
+free and browser safe; anything Worker only belongs in `src/`.
+
+**How the booking form uses it (2026-09-10).** `GET /api/catalog` returns active items
+(listed and unlisted, because the brass package contains the unlisted vases), bundles
+and memberships. `js/rental-picker.js` renders a row per listed item with its photo,
+generates each note from the data (stock, minimums, volume prices, delivery only),
+and prices the selection live with `resolveCart`. A bundle of **one** item is a
+volume discount that applies by itself as quantity rises; a bundle of **several**
+items is a package the visitor ticks as a unit. On submit the page sends a structured
+`cart` to `/api/inquiries`, which re-prices it and stores the server's breakdown and
+total, overriding the browser's text. A browser total that disagrees is logged as
+`estimate mismatch`.
+
+**The picker is deliberately not load-bearing.** Submission, the package toggle and
+the nav live in the page's ordinary script; the picker is a separate module that talks
+to it only through `window.RentalPicker` and a `rentals:change` event. If the module,
+the catalog request or D1 fails, the picker shows a fallback asking for items in the
+message box and the form still submits. Keep it that way: this is the site's only
+conversion path.
+
+**Pricing never rejects a lead.** A cart over stock, under a minimum or below the $100
+order minimum is still stored, with a note, because Becca approves every booking.
+Music packages are not in the catalog yet, so `music_price` is the one figure still
+taken from the browser. It is a fixed list of six.
 
 Seeded from **`augustine-inventory-master.numbers`** (v2, Sept 2026), Becca's physical
 inventory workbook, which is more current than either page. It is not in this repo. To
@@ -352,6 +384,26 @@ files production serves.
 inside the assets directory. Without that exclusion wrangler tries to upload the
 157 MB pack file and aborts.
 
+**It must keep excluding `.wrangler`.** Found 2026-09-10: `.wrangler/` also sits in
+the assets directory and was not excluded, so a staging upload listed
+`.wrangler/tmp/deploy-*/index.js.map` as a static asset. Worse, `wrangler dev` and
+`d1 --local` write local SQLite databases (with inquiry rows) and simulated emails
+there, which the next upload would have published. It was caught before that
+happened. `.wrangler/` is now in both `.assetsignore` and `.gitignore`.
+
+**Run local dev with `--persist-to` outside the repo.** Because the assets directory
+is the repo root, `wrangler dev` watches `.wrangler/` and reloads on every local D1
+write, which loops. Keep local state out of the tree:
+
+```
+npx wrangler d1 migrations apply augustine-inquiries --local --persist-to /tmp/wstate
+npx wrangler dev --local --persist-to /tmp/wstate
+```
+
+Local mode simulates `send_email` (it writes the message to a file), so local tests
+never email Becca. **EmailJS is not simulated**: submitting the real form locally
+still sends through EmailJS unless `emailjs.send` is stubbed.
+
 When adding a file that should be live, confirm it is not caught by an existing
 pattern. Verify with:
 
@@ -476,8 +528,7 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | **Interior page heroes are screenshots** | Measured 698-860px wide, used full-bleed. Low source resolution; cannot be fixed by optimizing. Replace with real photography, do not upscale. |
 | **Music package names** | Should read "Bronze Package, Violin or Voice with Becca" and "Emerald Package, Violin or Voice with Becca". Currently just "Bronze" and "Emerald". |
 | **`services.html` footer is inconsistent** | The other five pages carry a `.footer-credits` line with the photographer credit. `services.html` has a simpler footer with none. |
-| **The catalog is data, but nothing renders from it yet** | `items` and `bundles` are live in D1 and authoritative, but `event-rentals.html` and `contact.html` still carry hardcoded copies. Until `/api/catalog` exists and both pages render from it, the drift this layer was built to kill is still possible. This is the rest of Phase 01. |
-| **Phase 01 code is on `main` but only half-wired** | Merged 2026-09-10 so two content fixes could deploy. `migrations/0003_catalog.sql` and `0004_catalog_seed.sql` sit in the repo **unapplied** (a deploy does not run migrations), and `src/catalog.js` and `src/pricing.js` are **not imported by `src/index.js`**, so they are dead code in production. Harmless today, but `main` is no longer "everything here is live and working." |
+| **`event-rentals.html` still hardcodes the catalog** | The booking form renders from D1 as of 2026-09-10, but the rentals page cards are still static HTML, so they can drift from D1. Left static on purpose for now: rendering them client-side would take the items out of the HTML search engines read. The fix is server-side rendering (HTMLRewriter in the Worker) or a test that fails when the page and the seed disagree. |
 | **Italian vases still have no photo and no catalog entry** | Resolved as inventory (see below), but they remain `listed = 0`: bundle only, with no card on `event-rentals.html` and no photo. Revisit if Becca wants to rent them separately. |
 | **Three replacement costs are text, not numbers** | In the inventory workbook: dinner plates, beverage dispensers, cornhole boards. Exhibit A of the rental contract pulls that column, and "Out of Stock" is not a chargeable amount. Blocking for contracts (Phase 04), not for anything sooner. |
 | **The inventory workbook needs three corrections** | Beverage urns `Delivery Only` should be **N**; rectangular tablecloths `Qty Available` should be **3**; the Collections tab is missing a row for the live **$250 four-floral** discount. The workbook is Becca's file, so these have to be made there. |
@@ -489,7 +540,8 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | Was | Now |
 |---|---|
 | The catalog lived in two hardcoded pages and drifted | `items`, `bundles`, `bundle_items` live in D1, seeded from the inventory workbook and verified in production: 17 items, 4 bundles, 8 memberships. |
-| No server-side pricing | `resolveCart` in `src/pricing.js`, with 16 tests. Enforces per-item minimums, the $100 order minimum, and bundle resolution. Not yet wired to the endpoint. |
+| No server-side pricing | `resolveCart` in `js/pricing.js`, 21 tests. Wired into `/api/inquiries` 2026-09-10: the stored rental breakdown and total are the server's, not the browser's. |
+| Brass items always read "Included in the Entire Brass Collection Bundle" | On the booking form, `.rental-item-note { display: block }` overrode the `hidden` attribute on that label, so it showed whether or not the bundle was ticked. Fixed with a `[hidden]` rule when the picker moved to `js/rental-picker.js`. |
 | The $100 order minimum was advertised but never enforced | `event-rentals.html` line 390 promises it; `contact.html` never checked. The resolver does. |
 | Italian vases were an inventory mystery | Real, and two SKUs: **2 small at $5** (`BR-VS-ITL-SM`) and **1 large at $15** (`BR-VS-ITL-LG`). The Brass Collection Bundle had been selling them for as long as it existed with no page listing them. Seeded active but unlisted, so the bundle can reserve them. |
 | Hold buffers were assumed to be one global number | Per item, from the workbook's Turnaround Days column. Linens 3, washed items 2, everything else 1, never 0. |
@@ -633,7 +685,7 @@ the status.
 | Phase | State |
 |---|---|
 | **00** Stop losing inquiries | Done 2026-09-09, except Turnstile. Guards are honeypot, fill time, email shape and per-IP rate limit instead. |
-| **01** Inventory becomes data | **Half done 2026-09-10.** Schema, seed and pricing resolver are live. Still to do: `GET /api/catalog`, render both pages from it, and wire `resolveCart` into `/api/inquiries`. |
+| **01** Inventory becomes data | **Mostly done 2026-09-10.** Schema, seed, pricing, `GET /api/catalog`, the booking form picker with photos, and server pricing of inquiries. Remaining: `event-rentals.html` still renders from static HTML (see Known issues), and music packages are not catalog items. **`0005_item_photos.sql` must be applied to production before this code deploys.** |
 | **02** Availability | Not started. Needs the date-overlap query, using the per-item buffers already seeded. |
 | **03** Self-serve booking | Not started. Needs a Durable Object to serialize reservation, plus cron hold expiry. |
 | **04** Contracts and payment | Not started. Blocked on the three text replacement costs and on a deposit and cancellation policy. |

@@ -131,3 +131,37 @@ export function resolveCart(cart, catalog) {
     delivery_required: deliveryOnly,
   };
 }
+
+export const dollars = (cents) => '$' + (cents / 100).toFixed(2);
+
+/**
+ * A resolved cart as human-readable lines, for the inquiry email and the stored
+ * record. Shared by the browser and the Worker so both emails read identically.
+ *
+ * @param quote   the result of resolveCart
+ * @param catalog the same catalog resolveCart was given
+ */
+export function describeQuote(quote, catalog) {
+  const chosen = new Set(quote.bundles.map((b) => b.slug));
+  // The bundle an item was absorbed into, for "included in ..." wording.
+  const bundleFor = (slug) => {
+    for (const b of catalog.bundles) if (chosen.has(b.slug) && b.items.has(slug)) return b.name;
+    return 'a bundle';
+  };
+
+  const out = [];
+  for (const l of quote.lines) {
+    if (l.qty_in_bundle && l.qty_billed) {
+      out.push(`${l.name} x${l.qty}: ${l.qty_in_bundle} in ${bundleFor(l.slug)}, ${l.qty_billed} at ${dollars(l.unit_price)} = ${dollars(l.amount)}`);
+    } else if (l.qty_in_bundle) {
+      out.push(`${l.name} x${l.qty}: included in ${bundleFor(l.slug)}`);
+    } else {
+      out.push(`${l.name} x${l.qty} at ${dollars(l.unit_price)} = ${dollars(l.amount)}`);
+    }
+  }
+  for (const b of quote.bundles) out.push(`${b.name}: ${dollars(b.price)}`);
+  out.push(`Rental subtotal: ${dollars(quote.subtotal)}`);
+  if (quote.delivery_required) out.push('Includes delivery only items.');
+  for (const e of quote.errors) out.push('Note: ' + e);
+  return out;
+}
