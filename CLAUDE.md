@@ -67,6 +67,10 @@ What changed, in order:
   anything that should be looked at first.
 - A push to any other branch uploads a version and gives it a preview URL. It does
   not touch production.
+- **This bit on 2026-09-10.** Two content fixes were committed and pushed to
+  `booking-phase-1` and reported as shipped. Production kept serving the old bytes,
+  because a branch push is not a deploy. Nothing is live until it is on `main`.
+  Verify with curl against production, not with `git push` having succeeded.
 
 **Still true, and still the way this can break:** Cloudflare's asset store is
 upload-only. No API reads files back out of the Worker. If anyone hand-uploads
@@ -316,6 +320,7 @@ The pipeline is now confirmed working in both directions:
 |---|---|
 | Branch push (`site-updates`) | uploaded version `3fa96db5` |
 | `main` push (`3197a16..40696cc`) | deployed version `4984765d`, live in about 40 seconds |
+| `main` push (`112ede9..1e5d9b6`) | 2026-09-10, live in about 40 seconds, confirmed by curling production |
 
 Live matching `main` is therefore no longer evidence that a deploy ran. Before the
 first build, the two matched anyway, because `main` had been reconstructed *from*
@@ -472,6 +477,7 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | **Music package names** | Should read "Bronze Package, Violin or Voice with Becca" and "Emerald Package, Violin or Voice with Becca". Currently just "Bronze" and "Emerald". |
 | **`services.html` footer is inconsistent** | The other five pages carry a `.footer-credits` line with the photographer credit. `services.html` has a simpler footer with none. |
 | **The catalog is data, but nothing renders from it yet** | `items` and `bundles` are live in D1 and authoritative, but `event-rentals.html` and `contact.html` still carry hardcoded copies. Until `/api/catalog` exists and both pages render from it, the drift this layer was built to kill is still possible. This is the rest of Phase 01. |
+| **Phase 01 code is on `main` but only half-wired** | Merged 2026-09-10 so two content fixes could deploy. `migrations/0003_catalog.sql` and `0004_catalog_seed.sql` sit in the repo **unapplied** (a deploy does not run migrations), and `src/catalog.js` and `src/pricing.js` are **not imported by `src/index.js`**, so they are dead code in production. Harmless today, but `main` is no longer "everything here is live and working." |
 | **Italian vases still have no photo and no catalog entry** | Resolved as inventory (see below), but they remain `listed = 0`: bundle only, with no card on `event-rentals.html` and no photo. Revisit if Becca wants to rent them separately. |
 | **Three replacement costs are text, not numbers** | In the inventory workbook: dinner plates, beverage dispensers, cornhole boards. Exhibit A of the rental contract pulls that column, and "Out of Stock" is not a chargeable amount. Blocking for contracts (Phase 04), not for anything sooner. |
 | **The inventory workbook needs three corrections** | Beverage urns `Delivery Only` should be **N**; rectangular tablecloths `Qty Available` should be **3**; the Collections tab is missing a row for the live **$250 four-floral** discount. The workbook is Becca's file, so these have to be made there. |
