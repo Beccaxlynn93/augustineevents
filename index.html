@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Augustine Music & Events</title>
+  <meta name="description" content="Romantic live wedding music and a boutique event rental collection, serving weddings and celebrations in the greater Nashville, TN area." />
+  <link rel="canonical" href="https://augustineevents.com/" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Augustine Music &amp; Events" />
+  <meta property="og:title" content="Augustine Music & Events" />
+  <meta property="og:description" content="Romantic live wedding music and a boutique event rental collection, serving weddings and celebrations in the greater Nashville, TN area." />
+  <meta property="og:url" content="https://augustineevents.com/" />
+  <meta property="og:image" content="https://augustineevents.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="A candlelit wedding reception table set with glassware, greenery and white florals." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Augustine Music & Events" />
+  <meta name="twitter:description" content="Romantic live wedding music and a boutique event rental collection, serving weddings and celebrations in the greater Nashville, TN area." />
+  <meta name="twitter:image" content="https://augustineevents.com/og-image.jpg" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
     @font-face { font-family: 'HeyLovely'; src: url('HeyLovely.ttf') format('truetype'); font-weight: normal; font-style: normal; }
@@ -80,15 +96,27 @@
       text-align: center;
     }
 
-    .hero::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.48); }
+    /* Was a flat rgba(0,0,0,0.48), which muddied the photograph. A lighter
+       gradient keeps contrast under the headline without dulling the image. */
+    .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.26), rgba(0,0,0,0.42)); }
 
     .hero-content { position: relative; z-index: 1; max-width: 1400px; width: 95%; padding: 0 28px; }
 
-    .hero-content img.hero-text {
-      width: 100%;
-      display: block;
-      margin: 0 auto -100px;
+    /* Was a 1366px PNG stretched to width:100%, which upscaled ~2x on a desktop
+       display and left the page with no <h1> at all. Live type is sharp at any
+       size, reflows on a phone, and is readable by search engines. */
+    .hero-content h1.hero-text {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 400;
+      color: var(--white);
+      font-size: clamp(2.1rem, 5.4vw, 5.25rem);
+      line-height: 1.14;
+      letter-spacing: 0.015em;
+      text-wrap: balance;
+      text-shadow: 0 2px 28px rgba(0,0,0,0.42);
     }
+
+    .hero-content h1.hero-text span { display: block; }
 
     .hero-content p {
       color: rgba(255,255,255,0.88);
@@ -198,7 +226,10 @@
       line-height: 1.25;
     }
 
-    .about-text p { color: rgba(255,255,255,0.75); font-size: 1.05rem; line-height: 1.85; }
+        /* Measured 145-191 characters per line on a desktop display before this cap.
+       Comfortable reading is 45-75; ~68ch lands in range at these font sizes.
+       event-rentals.html and event-music.html already capped their text this way. */
+    .about-text p { color: rgba(255,255,255,0.75); font-size: 1.05rem; line-height: 1.85; max-width: 60ch; }
 
     /* ── EXPERTISE + VENUE ── */
     .expertise-venue { display: grid; grid-template-columns: 55% 45%; }
@@ -209,7 +240,7 @@
 
     .expertise-item h3 { font-family: 'HeyLovely', cursive; font-size: 2rem; color: var(--green-dark); margin-bottom: 10px; }
 
-    .expertise-item p { color: var(--muted); font-size: 1.05rem; line-height: 1.85; }
+    .expertise-item p { color: var(--muted); font-size: 1.05rem; line-height: 1.85; max-width: 62ch; }
 
     .divider { width: 100%; height: 1px; background: #d0cbc2; margin-bottom: 16px; }
 
@@ -240,7 +271,7 @@
       line-height: 1.2;
     }
 
-    .cta-text p { color: var(--muted); font-size: 1.1rem; line-height: 1.85; }
+    .cta-text p { color: var(--muted); font-size: 1.1rem; line-height: 1.85; max-width: 62ch; }
 
     .contact-links { display: flex; flex-direction: column; gap: 10px; }
 
@@ -259,9 +290,9 @@
       flex-wrap: wrap;
     }
 
-    footer p { color: rgba(255,255,255,0.4); font-size: 0.78rem; }
-    .footer-credits { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
-    .photo-credit-link { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); text-decoration: none; padding: 2px 10px 2px 7px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s; vertical-align: middle; }
+    footer p { color: rgba(255,255,255,0.62); font-size: 0.78rem; }
+    .footer-credits { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
+    .photo-credit-link { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.88); text-decoration: none; padding: 2px 10px 2px 7px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s; vertical-align: middle; }
     .photo-credit-link::before { content: ""; display: inline-block; width: 13px; height: 13px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,0.75)" stroke="none"/></svg>') center/contain no-repeat; }
     .photo-credit-link:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
@@ -340,10 +371,15 @@
       footer { flex-direction: column; gap: 14px; text-align: center; padding: 28px 24px; }
       .footer-nav { flex-wrap: wrap; justify-content: center; gap: 16px; }
 
-      .hero-content img.hero-text { margin-bottom: -60px; }
+      .hero-content h1.hero-text { letter-spacing: 0.01em; }
       .hero-content p { font-size: 1.1rem; margin-bottom: 8px; }
     }
   </style>
+  <noscript>
+    <!-- .fade-in starts at opacity 0 and is revealed by an IntersectionObserver.
+         Without JS that would leave the page blank, so reveal everything up front. -->
+    <style>.fade-in { opacity: 1 !important; transform: none !important; }</style>
+  </noscript>
 </head>
 <body>
 
@@ -364,20 +400,20 @@
 
   <section class="hero">
     <div class="hero-content">
-      <img src="romantic music and intimate wedding rentals.png" alt="Romantic Music & Intimate Wedding Rentals" class="hero-text" />
+      <h1 class="hero-text">Romantic Music &amp; Intimate <span>Wedding Rentals</span></h1>
 
     </div>
   </section>
 
   <section class="packages-preview fade-in">
     <div class="pkg-card">
-      <img src="Screenshot 2026-03-25 194905.png" alt="Rental Package" />
+      <img src="Screenshot 2026-03-25 194905.png" alt="Rental Package" loading="lazy" decoding="async" />
       <div class="pkg-overlay">
         <a href="event-rentals.html" class="btn-pkg">View Rental Services</a>
       </div>
     </div>
     <div class="pkg-card">
-      <img src="608A5063.jpg" alt="Music Package" style="object-position: bottom;" />
+      <img src="608A5063.jpg" alt="Music Package" style="object-position: bottom;" loading="lazy" decoding="async" />
       <div class="pkg-overlay">
         <a href="event-music.html" class="btn-pkg">View Music Services</a>
       </div>
@@ -386,7 +422,7 @@
 
   <section class="about fade-in">
     <div class="about-photo">
-      <img src="Screenshot 2026-03-25 194941.png" alt="Becca Augustine with violin" />
+      <img src="Screenshot 2026-03-25 194941.png" alt="Becca Augustine with violin" loading="lazy" decoding="async" />
     </div>
     <div class="about-text">
       <span class="label">About Becca</span>
@@ -416,13 +452,13 @@
       </div>
     </div>
     <div class="venue-photo">
-      <img src="Screenshot 2026-03-25 194933.png" alt="Event venue" />
+      <img src="Screenshot 2026-03-25 194933.png" alt="Event venue" loading="lazy" decoding="async" />
     </div>
   </section>
 
   <section class="cta fade-in">
     <div class="cta-photo">
-      <img src="Screenshot 2026-03-25 194925.png" alt="Elegant wedding setting" />
+      <img src="Screenshot 2026-03-25 194925.png" alt="Elegant wedding setting" loading="lazy" decoding="async" />
     </div>
     <div class="cta-text">
       <h2>Let's make your day unforgettable!</h2>

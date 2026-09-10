@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Book Now — Augustine Music & Events</title>
+  <meta name="description" content="Request a date, check rental availability and build a custom package for your wedding or event in the greater Nashville, TN area." />
+  <link rel="canonical" href="https://augustineevents.com/contact" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Augustine Music &amp; Events" />
+  <meta property="og:title" content="Book Now | Augustine Music & Events" />
+  <meta property="og:description" content="Request a date, check rental availability and build a custom package for your wedding or event in the greater Nashville, TN area." />
+  <meta property="og:url" content="https://augustineevents.com/contact" />
+  <meta property="og:image" content="https://augustineevents.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="A candlelit wedding reception table set with glassware, greenery and white florals." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Book Now | Augustine Music & Events" />
+  <meta name="twitter:description" content="Request a date, check rental availability and build a custom package for your wedding or event in the greater Nashville, TN area." />
+  <meta name="twitter:image" content="https://augustineevents.com/og-image.jpg" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>emailjs.init('_gnvsXbH1iYymclUs');</script>
@@ -63,6 +79,17 @@
     input:focus, select:focus, textarea:focus { border-color: var(--green); }
     textarea { resize: vertical; min-height: 110px; }
 
+    /* The form had no required fields and no error state, so a blank submit
+       looked identical to a valid one. :user-invalid only styles a field the
+       visitor has actually interacted with, so nothing is red on first paint. */
+    .lbl { display: block; }
+    .req { color: #a4442f; margin-left: 1px; font-weight: 700; }
+    input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: #a4442f; background: #fdf7f5; }
+    input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus { border-color: #a4442f; }
+
+    .form-note { font-size: 0.8rem; color: var(--muted); line-height: 1.7; letter-spacing: 0; text-transform: none; font-weight: 400; }
+    .form-note strong { color: var(--green-dark); font-weight: 700; }
+
     .pkg-field { display: none; flex-direction: column; gap: 6px; }
     .pkg-field.visible { display: flex; }
 
@@ -113,9 +140,9 @@
     .fade-in.visible { opacity: 1; transform: translateY(0); }
 
     footer { background: var(--green-dark); padding: 26px 52px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
-    footer p { color: rgba(255,255,255,0.4); font-size: 0.78rem; }
-    .footer-credits { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
-    .photo-credit-link { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); text-decoration: none; padding: 2px 10px 2px 7px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s; vertical-align: middle; }
+    footer p { color: rgba(255,255,255,0.62); font-size: 0.78rem; }
+    .footer-credits { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
+    .photo-credit-link { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.88); text-decoration: none; padding: 2px 10px 2px 7px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s; vertical-align: middle; }
     .photo-credit-link::before { content: ""; display: inline-block; width: 13px; height: 13px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,0.75)" stroke="none"/></svg>') center/contain no-repeat; }
     .photo-credit-link:hover { background: rgba(255,255,255,0.2); color: #fff; }
     .footer-nav { list-style: none; display: flex; gap: 24px; }
@@ -136,6 +163,11 @@
       .footer-nav { flex-wrap: wrap; justify-content: center; gap: 16px; }
     }
   </style>
+  <noscript>
+    <!-- .fade-in starts at opacity 0 and is revealed by an IntersectionObserver.
+         Without JS that would leave the page blank, so reveal everything up front. -->
+    <style>.fade-in { opacity: 1 !important; transform: none !important; }</style>
+  </noscript>
 </head>
 <body>
 
@@ -175,14 +207,14 @@
           </label>
         </div>
         <div class="form-row">
-          <label>First Name <input type="text" name="first_name" placeholder="Jane" /></label>
-          <label>Last Name <input type="text" name="last_name" placeholder="Smith" /></label>
+          <label><span class="lbl">First Name <span class="req" aria-hidden="true">*</span></span><input type="text" name="first_name" placeholder="Jane" required /></label>
+          <label><span class="lbl">Last Name <span class="req" aria-hidden="true">*</span></span><input type="text" name="last_name" placeholder="Smith" required /></label>
         </div>
-        <label>Email <input type="email" name="email" placeholder="jane@example.com" /></label>
-        <label>Date of Event <input type="date" name="event_date" /></label>
+        <label><span class="lbl">Email <span class="req" aria-hidden="true">*</span></span><input type="email" name="email" placeholder="jane@example.com" required /></label>
+        <label><span class="lbl">Date of Event <span class="req" aria-hidden="true">*</span></span><input type="date" name="event_date" required /></label>
         <label>Venue Address <input type="text" name="venue_address" placeholder="Venue name, street, city, state" /></label>
-        <label>Package Type
-          <select name="package_type" id="packageType">
+        <label><span class="lbl">Package Type <span class="req" aria-hidden="true">*</span></span>
+          <select name="package_type" id="packageType" required>
             <option value="">Select a package type</option>
             <option value="music">Event Music</option>
             <option value="rentals">Event Rentals</option>
@@ -260,7 +292,8 @@
         <input type="hidden" name="selected_rentals" id="hiddenRentals" />
         <input type="hidden" name="estimated_total" id="hiddenTotal" />
         <label>Message <textarea name="message" placeholder="Tell me about your event..."></textarea></label>
-        <button type="submit" class="btn-green">Book Now</button>
+        <button type="submit" class="btn-green">Send Booking Request</button>
+        <p class="form-note">Fields marked <span class="req" aria-hidden="true">*</span> are required. Your request goes directly to Becca, who will follow up by email to confirm availability and next steps. Any estimate shown above is a starting point, not a final quote. <strong>Serving the greater Nashville, TN area.</strong></p>
       </form>
     </div>
   </section>
