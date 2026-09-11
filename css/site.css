@@ -184,8 +184,10 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 }
 
 .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; flex: none; }
-.brand-mark { width: 30px; height: 30px; flex: none; transition: transform 0.9s var(--ease-out); }
-.brand:hover .brand-mark { transform: rotate(72deg); }
+.brand-mark { width: 40px; height: 40px; flex: none; }
+/* The wreath turns gently around the A on hover; the letter stays put. */
+.brand-mark .mark-wreath { transform-box: view-box; transform-origin: 32px 32px; transition: transform 1.2s var(--ease-out); }
+.brand:hover .brand-mark .mark-wreath { transform: rotate(24deg); }
 .brand-name { font-family: var(--script); font-size: 1.7rem; line-height: 1; padding-top: 6px; }
 
 .nav-links { list-style: none; display: flex; align-items: center; gap: clamp(20px, 2.6vw, 40px); }
@@ -410,7 +412,7 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
   .site-header.is-scrolled { --header-h: 62px; }
   .nav-toggle { display: block; }
   .brand-name { font-size: 1.45rem; }
-  .brand-mark { width: 26px; height: 26px; }
+  .brand-mark { width: 34px; height: 34px; }
 
   /* Full-screen menu. Links rise in one after another. */
   .site-nav {
