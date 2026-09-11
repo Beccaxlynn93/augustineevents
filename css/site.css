@@ -262,7 +262,16 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
   padding-top: calc(var(--header-h) + clamp(28px, 5vw, 64px));
   padding-bottom: clamp(56px, 7vw, 96px);
 }
-.page-hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(36px, 6vw, 96px); align-items: center; }
+/* Flowing vines drawn by js/site.js from the heading area into the photo's
+   outline. Behind the content, and thin enough never to compete with text. */
+.hero-vines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; color: var(--green); }
+.hero-vines path { fill: none; stroke: currentColor; stroke-width: 1.15; stroke-linecap: round; stroke-linejoin: round; opacity: 0.5; }
+.hero-vines .leaf { stroke-width: 1; opacity: 0.48; fill: currentColor; fill-opacity: 0.06; }
+.hero-vines .bloom { fill: currentColor; stroke: none; opacity: 0.62; }
+.hero-vines .bloom-core { fill: var(--cream); stroke: none; opacity: 1; }
+.hero-vines .draw { transition: stroke-dashoffset 2.4s var(--ease-out); }
+.hero-vines .grow { transform-box: fill-box; transform-origin: center; transition: transform 1s var(--ease-out), opacity 1s var(--ease); }
+.page-hero .wrap { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(36px, 6vw, 96px); align-items: center; }
 .page-hero-text { display: grid; gap: 24px; justify-items: start; }
 .page-hero-text .lede { max-width: 46ch; }
 .page-hero .display { max-width: 12ch; }

@@ -91,6 +91,123 @@
   }
   document.querySelectorAll('[data-botanical]').forEach(function (el) { el.innerHTML = branch(); });
 
+  // ---- page-hero vines: flowing lines from the heading into the photo frame --
+  // Measured, not drawn by hand, because the frame sits somewhere different at
+  // every screen size. Each vine arrives at the frame's outline tangentially so
+  // it reads as growing into it. Redrawn (without animating) on resize.
+  var NS = 'http://www.w3.org/2000/svg';
+  var SHIFT = 14; // .arch::before is the frame shifted 14px up and left
+
+  function bez(c, t) {
+    var u = 1 - t;
+    return [
+      u * u * u * c[0][0] + 3 * u * u * t * c[1][0] + 3 * u * t * t * c[2][0] + t * t * t * c[3][0],
+      u * u * u * c[0][1] + 3 * u * u * t * c[1][1] + 3 * u * t * t * c[2][1] + t * t * t * c[3][1],
+    ];
+  }
+  function leaf(c, t, side, len) {
+    var P = bez(c, t), Q = bez(c, Math.min(1, t + 0.01));
+    var a = Math.atan2(Q[1] - P[1], Q[0] - P[0]) + side * 0.85;
+    var w = len * 0.36, ex = P[0] + Math.cos(a) * len, ey = P[1] + Math.sin(a) * len;
+    var nx = -Math.sin(a) * w, ny = Math.cos(a) * w, mx = (P[0] + ex) / 2, my = (P[1] + ey) / 2;
+    var f = function (n) { return n.toFixed(1); };
+    return '<path class="leaf grow" d="M' + f(P[0]) + ' ' + f(P[1]) + ' Q' + f(mx + nx) + ' ' + f(my + ny) + ' ' + f(ex) + ' ' + f(ey) +
+      ' Q' + f(mx - nx) + ' ' + f(my - ny) + ' ' + f(P[0]) + ' ' + f(P[1]) + '"/>';
+  }
+  function curve(c) {
+    var f = function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); };
+    return '<path class="draw" d="M' + f(c[0]) + ' C' + f(c[1]) + ', ' + f(c[2]) + ', ' + f(c[3]) + '"/>';
+  }
+  function bloom(x, y, s) {
+    var petals = '';
+    for (var k = 0; k < 5; k++) {
+      petals += '<path transform="rotate(' + k * 72 + ')" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/>';
+    }
+    return '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') scale(' + s + ')"><g class="bloom grow">' + petals +
+      '<circle class="bloom-core" r="2.2"/></g></g>';
+  }
+
+  function drawVines(hero, animate) {
+    var fig = hero.querySelector('.arch'), text = hero.querySelector('.page-hero-text');
+    if (!fig || !text) return;
+    var H = hero.getBoundingClientRect(), F = fig.getBoundingClientRect(), T = text.getBoundingClientRect();
+    var W = H.width, HH = H.height;
+    var o = { x: F.left - H.left - SHIFT, y: F.top - H.top - SHIFT, w: F.width, h: F.height };
+    var framed = fig.classList.contains('is-framed');
+    var r = framed ? 18 : o.w / 2;
+    var tx = T.left - H.left, tr = T.right - H.left, ty = T.top - H.top, tb = T.bottom - H.top;
+    var sideL = [o.x, o.y + r], sideR = [o.x + o.w, o.y + r];
+    var apex = [o.x + o.w / 2, o.y], cornerBL = [o.x + 6, o.y + o.h], cornerBR = [o.x + o.w - 6, o.y + o.h];
+    var clampY = function (y) { return Math.max(8, Math.min(HH - 10, y)); };
+    var parts = [];
+
+    if (F.bottom <= T.top + 2) {
+      // Phone: the photo sits above the text. Vines grow from the frame's
+      // lower corners out toward the heading, and one climbs into its side.
+      var cl = [cornerBL, [cornerBL[0] - 70, cornerBL[1]], [8, clampY(ty - 40)], [0, clampY(ty + 26)]];
+      var cr = [cornerBR, [cornerBR[0] + 70, cornerBR[1]], [W - 8, clampY(ty - 40)], [W, clampY(ty + 26)]];
+      var cs = [[0, clampY(o.y + o.h * 0.8)], [o.x * 0.1, clampY(o.y + o.h * 0.5)], [sideL[0], sideL[1] - 60], sideL];
+      parts.push(curve(cl), curve(cr), curve(cs));
+      parts.push(leaf(cl, 0.45, 1, 18), leaf(cl, 0.7, -1, 15), leaf(cr, 0.45, -1, 18), leaf(cr, 0.7, 1, 15), leaf(cs, 0.4, 1, 15));
+      parts.push(bloom(sideL[0], sideL[1], 1.05));
+    } else {
+      // Side by side: one vine arches over the heading and flows down into the
+      // frame's side, one sweeps under the text into its bottom corner, and a
+      // third drapes onto the top of the arch.
+      var over = [[0, clampY(ty - 18)], [tx + (tr - tx) * 0.5, clampY(ty - 120)], [sideL[0], clampY(sideL[1] - 140)], sideL];
+      var under = [[0, clampY(tb + 44)], [tx + (tr - tx) * 0.55, clampY(tb + 120)], [cornerBL[0] - 150, cornerBL[1]], cornerBL];
+      var start = [tr + (o.x - tr) * 0.25, clampY(ty - 60)];
+      var drape = [start, [start[0] + 20, clampY(apex[1] + 70)], [apex[0] - 110, apex[1]], apex];
+      parts.push(curve(over), curve(under), curve(drape));
+      parts.push(leaf(over, 0.26, 1, 22), leaf(over, 0.42, -1, 20), leaf(over, 0.6, 1, 19), leaf(over, 0.78, -1, 16));
+      parts.push(leaf(under, 0.3, -1, 20), leaf(under, 0.5, 1, 19), leaf(under, 0.72, -1, 16));
+      parts.push(leaf(drape, 0.35, 1, 15), leaf(drape, 0.62, -1, 14));
+      parts.push(bloom(sideL[0], sideL[1], 1.25), bloom(start[0], start[1], 0.8));
+    }
+
+    var svg = hero.querySelector('svg.hero-vines');
+    if (!svg) {
+      svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('class', 'hero-vines');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('focusable', 'false');
+      hero.insertBefore(svg, hero.firstChild);
+    }
+    svg.setAttribute('viewBox', '0 0 ' + W.toFixed(0) + ' ' + HH.toFixed(0));
+    svg.innerHTML = parts.join('');
+
+    if (!animate) return;
+    var lines = svg.querySelectorAll('.draw'), growers = svg.querySelectorAll('.grow');
+    Array.prototype.forEach.call(lines, function (p) {
+      var len = p.getTotalLength();
+      p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+    });
+    Array.prototype.forEach.call(growers, function (g) { g.style.transform = 'scale(0)'; g.style.opacity = '0'; });
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      Array.prototype.forEach.call(lines, function (p, i) {
+        p.style.transitionDelay = (0.7 + i * 0.25) + 's'; p.style.strokeDashoffset = '0';
+      });
+      Array.prototype.forEach.call(growers, function (g, i) {
+        g.style.transitionDelay = (1.6 + i * 0.09) + 's'; g.style.transform = ''; g.style.opacity = '';
+      });
+    }); });
+  }
+
+  var heroes = document.querySelectorAll('.page-hero');
+  if (heroes.length) {
+    var firstDraw = function () { heroes.forEach(function (h) { drawVines(h, !reduceMotion); }); };
+    // Wait for the web fonts, which change the heading's size and so the curves.
+    var started = false;
+    var go = function () { if (!started) { started = true; firstDraw(); } };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+    setTimeout(go, 1500);
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { heroes.forEach(function (h) { drawVines(h, false); }); }, 150);
+    });
+  }
+
   // ---- reveals ------------------------------------------------------------
   var revealables = document.querySelectorAll('.fade-in, .reveal-clip, .flourish');
   var reveal = function (el) { el.classList.add(el.classList.contains('flourish') ? 'is-drawn' : 'visible'); };
