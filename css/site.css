@@ -285,6 +285,14 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 }
 .arch:hover::before { transform: translate(6px, -6px); }
 
+/* For photos already cropped tight at the top, like both of Becca's portraits,
+   an arch's curve trims her hair. .is-framed shows the whole photo at its own
+   shape in a softly rounded frame instead, and crops nothing. */
+.arch.is-framed::before { border-radius: var(--radius-lg); }
+/* The page sets --ratio to the photo's own proportions. A bare aspect-ratio:auto
+   would discard the space reserved from width/height and shift the page on load. */
+.arch.is-framed img { aspect-ratio: var(--ratio, 4 / 5); border-radius: var(--radius-lg); }
+
 /* A faint line-drawn sprig in the corner of large light sections. */
 .botanical-watermark { position: absolute; pointer-events: none; color: var(--green); opacity: 0.09; width: clamp(220px, 28vw, 380px); height: auto; }
 .botanical-watermark path { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; }
@@ -360,6 +368,8 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 .reveal-ready .arch.reveal-clip { clip-path: none; }
 .reveal-ready .arch.reveal-clip img { clip-path: inset(100% 0 0 0 round 999px 999px 0 0); transition: clip-path 1.5s var(--ease-out) 0.15s; }
 .reveal-ready .arch.reveal-clip.visible img { clip-path: inset(0 0 0 0 round 999px 999px var(--radius) var(--radius)); }
+.reveal-ready .arch.is-framed.reveal-clip img { clip-path: inset(100% 0 0 0 round var(--radius-lg)); }
+.reveal-ready .arch.is-framed.reveal-clip.visible img { clip-path: inset(0 0 0 0 round var(--radius-lg)); }
 .reveal-ready .arch.reveal-clip::before { opacity: 0; transform: translate(-10px, 10px); transition: opacity 1s var(--ease) 0.6s, transform 1.4s var(--ease-out) 0.6s; }
 .reveal-ready .arch.reveal-clip.visible::before { opacity: 1; transform: none; }
 
