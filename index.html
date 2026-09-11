@@ -78,17 +78,37 @@
     .signature { font-size: 2.6rem; color: var(--green); line-height: 1; margin-top: -4px; }
 
     /* ── photo band ── */
-    .photo-band { position: relative; height: clamp(380px, 56vw, 620px); overflow: hidden; display: grid; place-items: center; text-align: center; isolation: isolate; }
+    .photo-band { position: relative; min-height: clamp(380px, 56vw, 620px); padding-block: clamp(72px, 9vw, 120px); overflow: hidden; display: grid; place-items: center; text-align: center; isolation: isolate; }
     .photo-band img { position: absolute; inset: -8% 0; width: 100%; height: 116%; object-fit: cover; z-index: -2; will-change: transform; }
     .photo-band::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(rgba(20, 26, 18, 0.28), rgba(20, 26, 18, 0.5)); }
     .photo-band-copy { display: grid; justify-items: center; gap: 18px; padding-inline: var(--gutter); }
     .photo-band .eyebrow { color: var(--on-dark); }
+    /* Three short summaries floating over the photograph. Opaque enough that
+       the text never depends on what part of the photo sits behind it. */
+    .offer-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 24px); width: min(var(--wrap), 100%); margin-top: clamp(28px, 4vw, 48px); text-align: left; }
+    .offer-card {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+      padding: clamp(24px, 2.6vw, 34px); border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--cream) 92%, transparent);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      border: 1px solid color-mix(in srgb, var(--cream) 60%, transparent);
+      box-shadow: 0 18px 44px rgba(20, 26, 18, 0.22);
+      transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+    }
+    .offer-card:hover { transform: translateY(-5px); box-shadow: 0 24px 56px rgba(20, 26, 18, 0.28); }
+    .offer-card .service-card-kicker { margin-bottom: -2px; }
+    .offer-card h3 { font-size: 1.7rem; font-weight: 500; line-height: 1.15; }
+    .offer-card p:not(.service-card-kicker) { color: var(--muted); font-size: 0.98rem; line-height: 1.65; }
+    .offer-card .text-link { margin-top: auto; padding-top: 6px; }
     .band-line { font-family: var(--serif); font-weight: 300; font-size: clamp(2.4rem, 5.6vw, 4.8rem); line-height: 1.04; color: var(--cream); }
     .band-line em { font-style: italic; }
 
     @media (max-width: 900px) {
       .about-grid { grid-template-columns: 1fr; }
       .about-grid .arch { width: min(360px, 80vw); }
+    }
+    @media (max-width: 900px) {
+      .offer-cards { grid-template-columns: 1fr; max-width: 520px; }
     }
     @media (max-width: 700px) {
       .service-cards { grid-template-columns: 1fr; }
@@ -122,7 +142,7 @@
         <h1 class="hero-text rise" style="--d:1">
           <img src="hero-headline.png" alt="Romantic Music &amp; Intimate Wedding Rentals" width="1176" height="206" fetchpriority="high" />
         </h1>
-        <p class="hero-lede rise" style="--d:2">Live violin and voice for your ceremony, and boutique rentals to style the room.</p>
+        <p class="hero-lede rise" style="--d:2">Live violin, voice and piano for your ceremony, and boutique rentals to style the room.</p>
         <div class="btn-row rise" style="--d:3">
           <a href="event-rentals.html" class="btn btn-solid-light">Explore Rentals <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
           <a href="event-music.html" class="btn btn-light">Event Music</a>
@@ -155,8 +175,8 @@
             </div>
             <div class="service-card-body">
               <p class="service-card-kicker">Event Music</p>
-              <h3 class="h3">Violin and voice for your ceremony</h3>
-              <p>Professional violinist with years of live performance experience. Custom music selections to make your ceremony uniquely yours.</p>
+              <h3 class="h3">Violin, voice and piano for your ceremony</h3>
+              <p>Professional violinist with years of live performance experience, joined by Justin on piano. Custom music selections to make your ceremony uniquely yours.</p>
               <span class="text-link">See music packages <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span>
             </div>
           </a>
@@ -189,7 +209,27 @@
       <img src="img/wisteria-chandelier.webp" alt="" loading="lazy" data-parallax="0.1" width="1400" height="933" />
       <div class="photo-band-copy">
         <p class="eyebrow center fade-in">Flexible service options</p>
-        <p class="band-line fade-in">Book music, rentals, <em>or both.</em></p>
+        <h2 class="band-line fade-in">Book music, rentals, <em>or both.</em></h2>
+        <div class="offer-cards" data-stagger>
+          <div class="offer-card fade-in">
+            <p class="service-card-kicker">Event Music</p>
+            <h3>Live violin, voice and piano</h3>
+            <p>Violin or voice with Becca, or piano with Justin, as a solo, duo or trio for your ceremony and cocktail hour. Includes three songs you choose, learned just for you.</p>
+            <a href="event-music.html" class="text-link">Music packages <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+          <div class="offer-card fade-in">
+            <p class="service-card-kicker">Event Rentals</p>
+            <h3>Boutique decor</h3>
+            <p>Brass candlesticks and candelabras, sage toile linens, a wisteria chandelier, florals, tableware and lawn games, with delivery within an hour of Nashville.</p>
+            <a href="event-rentals.html" class="text-link">Browse the collection <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+          <div class="offer-card fade-in">
+            <p class="service-card-kicker">Both</p>
+            <h3>One booking, all of it</h3>
+            <p>Pair live music with styled rentals and plan it together. Choose "Both" on the booking form and send one request for everything.</p>
+            <a href="contact.html" class="text-link">Start a booking <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -220,7 +260,7 @@
           <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g fill="currentColor" fill-opacity="0.5"><path d="M30 45 C 22 43 15 46 11 54 C 19 56 26 53 30 45 Z"/><path d="M34 45 C 42 43 49 46 53 54 C 45 56 38 53 34 45 Z"/></g><g fill="currentColor"><path transform="rotate(0 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(72 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(144 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(216 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(288 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/></g></svg>
           <span class="brand-name">Augustine Music &amp; Events</span>
         </a>
-        <p class="footer-tagline">Live violin and voice, and a boutique rental collection, for weddings and celebrations in the greater Nashville area.</p>
+        <p class="footer-tagline">Live violin, voice and piano, and a boutique rental collection, for weddings and celebrations in the greater Nashville area.</p>
       </div>
       <div class="footer-col">
         <h2 class="footer-heading">Explore</h2>
