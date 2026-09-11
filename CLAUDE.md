@@ -2,8 +2,12 @@
 
 Context and working instructions for Claude Code on this repository.
 
-> **Verified 2026-09-10** against the repo, the live site, the Cloudflare API, the
+> **Verified 2026-09-11** against the repo, the live site, the Cloudflare API, the
 > Workers Builds configuration, and the production D1 database.
+>
+> **This copy is on the `redesign` branch and describes it.** `main` is nine commits
+> behind and still serves the previous design with the old booking form. See
+> "Branches and previews" for what each branch holds and the order to merge them.
 > This is a Cloudflare Worker, not GitHub Pages and not Cloudflare Pages. It
 > deploys from git, and on 2026-09-09 a push to `main` produced the first
 > build-sourced deployment, which is what finally proved the pipeline. Until that
@@ -81,18 +85,49 @@ repo. To check production, mirror it over HTTP.
 
 ---
 
+## Branches and previews
+
+Four branches, each built on the one before, so the newest contains all of it.
+Nothing below is on `main` yet. The owners reviewed the redesign on 2026-09-11 and
+approved it, with tweaks outstanding.
+
+| Branch | Adds | Preview |
+|---|---|---|
+| `main` | What production serves today. | augustineevents.com |
+| `design-pass` | Live-text headline (later reverted to Becca's image), readable line length, share metadata, favicon, form validation, contrast fixes. | version URL only |
+| `booking-catalog` | The booking form's rental picker rendered from D1 with photos, `GET /api/catalog`, server-side pricing of inquiries. | `staging-rough-salad-4d39.raugustinemusic.workers.dev` |
+| `redesign` | The new look: shared design system, arched page heroes, motion, line art, the A monogram, plus the copy changes below. | `redesign-rough-salad-4d39.raugustinemusic.workers.dev` |
+
+**A preview alias keeps its URL across uploads**, so a link shared once stays good.
+Publish to one with `npx wrangler versions upload --preview-alias <name>`. Only a push
+to `main` touches production.
+
+**Every preview binds the production database and the real EmailJS account.** A test
+submission on any of them stores a real inquiry and emails Becca.
+
+To ship: merge `redesign` into `main` (it contains the other two) and push. Migration
+`0005_item_photos.sql` is already applied to production, so no database step is
+needed. Expect the deploy about 40 seconds later, and verify by curling the site
+rather than trusting the push.
+
+---
+
 ## Repository structure
 
 ### Real pages (6)
 
 | File | Purpose |
 |---|---|
-| `index.html` | Homepage. Full-screen hero. |
+| `index.html` | Homepage. Full-bleed hero, two service cards, Becca, the offer band, closing. |
 | `about.html` | Becca's bio. |
-| `services.html` | Service overview. |
-| `event-music.html` | Music packages. |
+| `services.html` | Service overview. Orphaned: nothing links to it. |
+| `event-music.html` | Music packages, in a tab switch. |
 | `event-rentals.html` | Rental catalog. The largest and most important page. |
-| `contact.html` | Inquiry form. Depends on EmailJS, see below. |
+| `contact.html` | Booking form. Rental picker renders from `/api/catalog`. Depends on EmailJS, see below. |
+
+On `redesign` every page loads `css/site.css` and `js/site.js` and keeps only its own
+styles inline. Header and footer markup is generated from one template, so all six
+must be edited together.
 
 ### Real assets in the repo
 
@@ -109,8 +144,9 @@ repo. To check production, mirror it over HTTP.
 - `romantic music and intimate wedding rentals.png` — 1366px, used by `index.html`.
   **Do not delete**; it is easy to mistake for junk.
 - `Screenshot 2026-03-25 194905 / 194925 / 194933 / 194941.png` and
-  `Screenshot 2026-03-26 190035.png` — interior page hero backgrounds, still in use.
-  Low resolution, see Known issues.
+  `Screenshot 2026-03-26 190035.png` — interior page hero backgrounds on `main`,
+  700 to 860px and stretched full width. **No page on `redesign` references them**;
+  `img/*.webp` replaced them. Kept in the upload set so old URLs keep working.
 - `CNAME` — contains `www.augustineevents.com`, a hostname that **does not resolve**.
   Vestigial; GitHub Pages is not serving this site. See Deployment.
 - `Photographer photos/Faux Floral Arrangements.jpg` — 1000x1000, 279 KB. Added
@@ -121,6 +157,18 @@ repo. To check production, mirror it over HTTP.
 - `Becca Website.jpg` and `Screenshot 2026-03-25 203402 / 194914.png` — **served in
   production** despite being referenced by no page. Kept in the asset upload set so
   existing URLs keep working.
+- `css/site.css`, `js/site.js` — the shared design system and page behaviour, added
+  2026-09-11 on `redesign`. Loaded by all six pages. See Design system.
+- `js/pricing.js`, `js/catalog.js`, `js/rental-picker.js` — shared by the Worker and
+  the browser. See The rental catalog.
+- `img/*.webp` — six sharp photos added 2026-09-11, 552 KB in total, resized from the
+  photographer's originals (up to 5472px, 7 to 12 MB each) which sit in the repo root
+  and are excluded from the asset upload. Made with Pillow at quality 80, at most
+  1400px wide, per the image convention. They replaced the screenshots used as page
+  heroes and homepage cards.
+- `favicon.svg` — the A monogram: the A from `HeyLovely.ttf` converted to a path
+  (a favicon cannot load a font) inside a fine-line floral wreath. The header and
+  footer carry the same drawing inline in `currentColor`.
 - `wrangler.jsonc` and `.assetsignore` — deploy configuration. See Deployment.
 - `.gitignore` — ignores `*.zip` and `.DS_Store`. Added 2026-09-03 so the 147 MB working
   archive cannot be committed by accident.
@@ -310,12 +358,43 @@ made with `color-mix`, never a new hue.
   again after 2.5 s if `js/site.js` never starts. Reduced motion reveals everything
   immediately. Use `.fade-in` (rise and unblur), `.reveal-clip` (image uncovers),
   `data-stagger` on a parent for one-after-another.
-- **Photos:** interior page heroes put a portrait photo in an arch (`.arch`) rather
-  than stretching it full-bleed. Sharp versions of the photographer originals live in
+- **Photos:** interior page heroes put a photo in an arch (`.arch`) rather than
+  stretching it full-bleed. Sharp versions of the photographer originals live in
   `img/` as WebP, at most 1400px wide.
+  **`.arch.is-framed` is the exception:** it shows a photo whole, at its own
+  proportions, in a softly rounded frame. Both photos of Becca use it, because they
+  were cropped at the top of her head before they reached the site and the arch's
+  curve trimmed her hair. A framed photo must set `--ratio` inline (for example
+  `--ratio: 699 / 754`) or the page reserves no space for it and jumps on load.
 - **Header and footer markup is identical on every page.** Change all six together.
-- Favicon and logo mark are the same five-petal bloom (`favicon.svg`, inline SVG in
-  the header and footer).
+- **Line art (`drawVines` in `js/site.js`).** Each interior `.page-hero` gets three
+  vines: one arches over the heading into the side of the photo's outline, one sweeps
+  under the text into its bottom corner, one drapes onto the top of the arch, with
+  leaves and a small bloom at the junction. The curves are **measured** from the
+  heading and frame at runtime, not drawn by hand, because the frame sits differently
+  at every width; each lands on the outline tangentially so it reads as growing into
+  it. Phones get their own composition, since the photo sits above the text there.
+  Redrawn on resize (without animating) and after `document.fonts.ready`, because the
+  webfont changes the heading's size and so the curves.
+- **The mark is the A monogram** (`favicon.svg`, and the same drawing inline in the
+  header and footer): the A from `HeyLovely.ttf` converted to a path with fontTools,
+  inside a fine-line floral wreath. The letter is enlarged and slightly thickened
+  relative to the wreath so it survives 16px in a browser tab, where the fine lines
+  can only read as texture. Regenerate with the same approach if the mark changes:
+  a favicon cannot load a font, so the glyph must stay a path.
+
+**Page level patterns worth knowing**
+
+- Home: full-bleed hero with a slow push-in, two service cards, Becca in a framed
+  photo, then a photo band carrying three `.offer-card` summaries (Music, Rentals,
+  Both) over the wisteria photograph, then the closing band.
+- Every page ends with the same closing band (`.bg-green`) above the footer
+  (`.bg-dark`), so the two never share a colour.
+- Event Rentals: sticky `.chip-bar` category chips with scroll-spy; item cards in
+  threes; two columns on a phone.
+- Event Music: the two package sets are a tab switch (`[data-tabs]`). A panel hidden
+  at load never scrolled into view, so `select()` reveals its cards when shown, or
+  they would stay invisible. Without JavaScript both sets simply show in sequence.
 
 
 ---
@@ -538,18 +617,39 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | Issue | Notes |
 |---|---|
 | **Contact form still has no field validation** | Partly addressed 2026-09-09. Still true: zero `required` attributes, so a blank form submits, and the estimated total is still computed client-side and posted as text, so it arrives from the client and can be edited before sending. `resolveCart` exists to fix exactly this but **is not yet wired into `/api/inquiries`**. The customer still gets no confirmation email, only Becca and Justin are notified. **No longer true:** submissions are stored in D1, and the endpoint has honeypot, timing, email-shape and rate-limit guards. A lost or spam-filtered email no longer means a lost inquiry. |
-| **Em dash rule is violated site-wide** | **26 em/en dashes** remain across the six pages (was 29; 3 removed 2026-09-05 on lines already being edited). Highest counts: `contact.html` 9, `event-music.html` 6, `event-rentals.html` 4. Includes `<title>` tags. |
+| **Em dash rule is violated site-wide** | **Fixed on `redesign`:** zero em or en dashes in visitor-facing copy across all six pages, dropdown labels and alt text included (the page builder checked each build). Still present on `main` and `booking-catalog`, about 26 of them. |
+| **Both photos of Becca are cropped at the top of her head** | The crops happened before the photos reached the site, so there is nothing above her hair to recover. `.arch.is-framed` shows them whole rather than trimming further. Justin said on 2026-09-11 that uncropped originals exist and he can send them; with those, the arch treatment could be restored. |
 | **`CNAME` points at a dead hostname** | Says `www.augustineevents.com`, which has no DNS record. Vestigial. Delete it or add the record. |
 | **GitHub Pages is configured and broken** | Cert `bad_authz`, expired 2026-08-12, redirects to the non-resolving `www` host. Serves nobody. Recommend deleting the Pages config. |
-| **Interior page heroes are screenshots** | Measured 698-860px wide, used full-bleed. Low source resolution; cannot be fixed by optimizing. Replace with real photography, do not upscale. |
+| **Interior page heroes are screenshots** | **Fixed on `redesign`:** page heroes now put a WebP made from the photographer originals into an arch at roughly 460px wide, rather than stretching a 700px screenshot across the window. Still true on `main`. |
 | **Music package lead line** | Changed by the owners 2026-09-11 on the `redesign` branch. Every package, all six, now leads with "Violin or Voice with Becca, or Piano with Justin" (Solo tiers previously said only "Violin with Becca"). The rest of each package is unchanged. The older ask to title them "Bronze Package, Violin or Voice with Becca" is superseded unless the owners say otherwise. `main` and `booking-catalog` still carry the old wording. |
-| **`services.html` footer is inconsistent** | The other five pages carry a `.footer-credits` line with the photographer credit. `services.html` has a simpler footer with none. |
+| **`services.html` is orphaned** | Its footer inconsistency is gone on `redesign` (all six share one footer), but nothing links to the page: it returns 200 and only its own nav points at it. Either link it or take it down. |
 | **`event-rentals.html` still hardcodes the catalog** | The booking form renders from D1 as of 2026-09-10, but the rentals page cards are still static HTML, so they can drift from D1. Left static on purpose for now: rendering them client-side would take the items out of the HTML search engines read. The fix is server-side rendering (HTMLRewriter in the Worker) or a test that fails when the page and the seed disagree. |
 | **Italian vases still have no photo and no catalog entry** | Resolved as inventory (see below), but they remain `listed = 0`: bundle only, with no card on `event-rentals.html` and no photo. Revisit if Becca wants to rent them separately. |
 | **Three replacement costs are text, not numbers** | In the inventory workbook: dinner plates, beverage dispensers, cornhole boards. Exhibit A of the rental contract pulls that column, and "Out of Stock" is not a chargeable amount. Blocking for contracts (Phase 04), not for anything sooner. |
 | **The inventory workbook needs three corrections** | Beverage urns `Delivery Only` should be **N**; rectangular tablecloths `Qty Available` should be **3**; the Collections tab is missing a row for the live **$250 four-floral** discount. The workbook is Becca's file, so these have to be made there. |
-| **No testimonials, no service area, weak local SEO** | Known gaps, not yet scheduled. |
+| **No testimonials, and local SEO is thin** | No testimonials anywhere; real client quotes are needed before a section can exist, and inventing them is not an option. Service area now appears in the booking form note, the closing bands and the footer on `redesign`. |
 | **`.git` is 157 MB** | Bloated by oversized images in history. Deleting them from the working tree does not shrink it; only a history rewrite does, which changes hashes for anyone with a clone. Separate decision. |
+
+### Owner decisions, 2026-09-11
+
+Taken with Justin while reviewing the `redesign` preview. All are live on that
+branch and on none of the others.
+
+| Decision | Where it landed |
+|---|---|
+| Every music package leads with **"Violin or Voice with Becca, or Piano with Justin"** | Six package cards on `event-music.html`. The Solo tiers previously offered violin only, and piano was not offered at all. Justin plays piano and asked to be added. |
+| Piano is named wherever the site describes the music | Home hero line, home music card, the Music offer card, the footer tagline. |
+| Becca's intro reads **"a professional musician for over 15 years"** | Home and About, plus About's search and share descriptions. It replaced "a professional events planner and violinist". |
+| The label above her intro reads **"Violinist, vocalist, and decorator"** | About page. |
+| Becca approved the redesign on 2026-09-11 | Tweaks still outstanding; do not merge until the owners say so. |
+
+**Copy written for the redesign that the owners have not explicitly approved
+line by line:** the small labels above headings ("What we offer", "Good to know",
+"Let's talk", "The collection", "Live performance", "What we play", "Get in touch"),
+the home hero line, the three offer card summaries, the footer tagline, and the note
+beside the booking form. Every claim in them comes from copy already on the site or
+from the inventory workbook. Flag them if anything reads wrong.
 
 ### Resolved 2026-09-10
 
@@ -694,7 +794,8 @@ the status.
 | Phase | State |
 |---|---|
 | **00** Stop losing inquiries | Done 2026-09-09, except Turnstile. Guards are honeypot, fill time, email shape and per-IP rate limit instead. |
-| **01** Inventory becomes data | **Mostly done 2026-09-10.** Schema, seed, pricing, `GET /api/catalog`, the booking form picker with photos, and server pricing of inquiries. Remaining: `event-rentals.html` still renders from static HTML (see Known issues), and music packages are not catalog items. **`0005_item_photos.sql` must be applied to production before this code deploys.** |
+| **01** Inventory becomes data | **Mostly done 2026-09-10.** Schema, seed, pricing, `GET /api/catalog`, the booking form picker with photos, and server pricing of inquiries. Remaining: `event-rentals.html` still renders its cards from static HTML (see Known issues), and music packages are not catalog items, so `music_price` is still taken from the browser. |
+| **Redesign** | Built 2026-09-11 on `redesign`, approved by the owners, tweaks outstanding, **not merged**. See Branches and previews. |
 | **02** Availability | Not started. Needs the date-overlap query, using the per-item buffers already seeded. |
 | **03** Self-serve booking | Not started. Needs a Durable Object to serialize reservation, plus cron hold expiry. |
 | **04** Contracts and payment | Not started. Blocked on the three text replacement costs and on a deposit and cancellation policy. |
