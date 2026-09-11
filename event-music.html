@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Event Music — Augustine Music & Events</title>
+  <title>Event Music | Augustine Music &amp; Events</title>
   <meta name="description" content="Live violin and vocal music for ceremonies, cocktail hours and receptions, with packages for weddings and events near Nashville, TN." />
   <link rel="canonical" href="https://augustineevents.com/event-music" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -20,341 +20,280 @@
   <meta name="twitter:title" content="Event Music | Augustine Music & Events" />
   <meta name="twitter:description" content="Live violin and vocal music for ceremonies, cocktail hours and receptions, with packages for weddings and events near Nashville, TN." />
   <meta name="twitter:image" content="https://augustineevents.com/og-image.jpg" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/site.css" />
+  <script>
+    // Reveal animations hide content until it scrolls into view. Only do that
+    // once js/site.js is running; if it never starts, show everything.
+    document.documentElement.classList.add('reveal-ready');
+    setTimeout(function () { if (!window.__siteReady) document.documentElement.classList.remove('reveal-ready'); }, 2500);
+  </script>
+  <script src="js/site.js" defer></script>
   <style>
-    @font-face { font-family: 'HeyLovely'; src: url('HeyLovely.ttf') format('truetype'); font-weight: normal; font-style: normal; }
+    .options-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 3vw, 36px); }
+    .option-card { padding: clamp(30px, 3.6vw, 48px); display: grid; gap: 16px; align-content: start; }
+    .option-card h3 { font-size: clamp(1.8rem, 2.6vw, 2.2rem); font-weight: 400; }
+    .option-card .note { color: var(--muted); }
+    .option-list { list-style: none; display: grid; gap: 14px; border-top: 1px solid var(--line); padding-top: 18px; }
+    .option-list li { color: var(--muted); padding-left: 26px; position: relative; }
+    .option-list li::before { content: ''; position: absolute; left: 0; top: 0.72em; width: 12px; height: 1px; background: var(--green); }
+    .option-list strong { color: var(--green-dark); font-weight: 500; }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --green: #4a5e40; --green-dark: #2e3b28; --cream: #f5f2ec; --white: #fff; --text: #2c2c2c; --muted: #5a5a5a; }
-    body { font-family: 'Lato', sans-serif; color: var(--text); }
-
-    /* NAV */
-    header { background: var(--green-dark); padding: 22px 52px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 20; }
-    .logo { font-family: 'HeyLovely', cursive; color: var(--white); font-size: 1.8rem; text-decoration: none; display: flex; align-items: center; }
-    .nav-links { list-style: none; display: flex; gap: 32px; }
-    .nav-links a { color: var(--white); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; transition: opacity 0.2s; }
-    .nav-links a:hover, .nav-links a.active { opacity: 1; }
-    .nav-toggle { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; z-index: 30; }
-    .nav-toggle span { display: block; width: 26px; height: 2px; background: var(--white); }
-
-    /* PAGE HERO */
-    .page-hero {
-      background: url('Screenshot 2026-03-26 190035.png') center / cover no-repeat var(--green-dark);
-      position: relative;
-      height: 580px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+    /* ── packages: a segmented switch between the two sets ── */
+    .tabs { position: relative; display: inline-flex; padding: 5px; border-radius: 999px; background: var(--white); border: 1px solid var(--line); box-shadow: var(--shadow-sm); margin-bottom: clamp(36px, 4vw, 56px); }
+    .tabs [role="tab"] {
+      position: relative; z-index: 1; border: 0; background: none; cursor: pointer;
+      padding: 12px 24px; border-radius: 999px; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--green-dark); transition: color 0.45s var(--ease);
     }
-    .page-hero::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.52); }
-    .page-hero-content { position: relative; z-index: 1; }
-    .page-hero h1 { font-family: 'HeyLovely', cursive; font-size: clamp(3.5rem, 8vw, 6rem); color: var(--white); margin-bottom: 10px; }
-    .page-hero p { color: rgba(255,255,255,0.8); font-size: 1rem; font-weight: 300; max-width: 600px; }
+    .tabs [role="tab"][aria-selected="true"] { color: var(--cream); }
+    .tab-indicator { position: absolute; top: 5px; bottom: 5px; left: 0; border-radius: 999px; background: var(--green-dark); transition: transform 0.6s var(--ease-out), width 0.6s var(--ease-out); }
+    /* Without the script both sets simply show, one after the other. */
+    .tabs:not(.tabs-ready) { display: none; }
+    .pkg-group h3.group-title { text-align: center; font-size: 1.6rem; margin-bottom: 24px; }
+    .tabs-ready ~ .pkg-group h3.group-title { display: none; }
+    .pkg-group + .pkg-group { margin-top: 56px; }
+    .tabs-ready ~ .pkg-group + .pkg-group { margin-top: 0; }
+    @keyframes panelIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .panel-in .pkg-card { animation: panelIn 0.7s var(--ease-out) both; }
+    .panel-in .pkg-card:nth-child(2) { animation-delay: 0.08s; }
+    .panel-in .pkg-card:nth-child(3) { animation-delay: 0.16s; }
 
-    /* INTRO */
-    .intro { background: var(--cream); padding: 72px 10%; text-align: center; }
-    .intro h2 { font-family: 'HeyLovely', cursive; font-size: 3.2rem; color: var(--green-dark); margin-bottom: 24px; }
-    .intro p { font-size: 1.05rem; line-height: 1.9; color: var(--muted); max-width: 760px; margin: 0 auto 28px; }
-    .section-label { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: var(--green); margin-bottom: 12px; }
+    .pkg-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 30px); align-items: stretch; }
+    .pkg-card {
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+      padding: clamp(32px, 3.4vw, 44px) clamp(24px, 2.6vw, 34px);
+      background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+      transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+    }
+    .pkg-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+    .pkg-card.featured { background: var(--green-dark); border-color: var(--green-dark); color: var(--on-dark); }
+    .pkg-tier { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.26em; text-transform: uppercase; color: var(--green); }
+    .pkg-card.featured .pkg-tier { color: var(--on-dark-muted); }
+    .pkg-name { font-family: var(--serif); font-size: 2.3rem; font-weight: 400; line-height: 1.1; color: var(--green-dark); }
+    .pkg-card.featured .pkg-name { color: var(--cream); }
+    .pkg-price { font-family: var(--serif); font-size: 3.2rem; font-weight: 300; line-height: 1; color: var(--green-dark); margin: 10px 0 18px; }
+    .pkg-card.featured .pkg-price { color: var(--cream); }
+    .pkg-includes { list-style: none; width: 100%; display: grid; gap: 0; margin-bottom: 26px; flex: 1; align-content: start; }
+    .pkg-includes li { padding: 11px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.95rem; }
+    .pkg-card.featured .pkg-includes li { border-color: var(--line-on-dark); color: var(--on-dark); }
+    .pkg-footnote { text-align: center; margin-top: 28px; color: var(--muted); font-size: 0.88rem; }
 
-    /* ABOUT STRIP */
-    .about-strip { background: var(--green-dark); padding: 64px 10%; text-align: center; }
-    .about-strip h2 { font-family: 'HeyLovely', cursive; font-size: 3rem; color: var(--white); margin-bottom: 16px; }
-    .about-strip p { color: rgba(255,255,255,0.75); font-size: 1rem; line-height: 1.85; max-width: 720px; margin: 0 auto; }
+    .details .detail-item { background: var(--cream); border-color: transparent; box-shadow: none; }
 
-    /* MUSIC OPTIONS */
-    .music-options { background: var(--white); padding: 72px 10%; }
-    .music-options h2 { font-family: 'HeyLovely', cursive; font-size: 3.2rem; color: var(--green-dark); margin-bottom: 48px; text-align: center; }
-
-    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-
-    .option-card { border: 1px solid #e0dbd2; padding: 40px 36px; }
-    .option-card h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--green-dark); margin-bottom: 12px; }
-    .option-card .note { font-size: 0.9rem; color: var(--muted); line-height: 1.75; margin-bottom: 20px; font-style: italic; }
-    .option-list { list-style: none; display: flex; flex-direction: column; }
-    .option-list li { font-size: 0.92rem; padding: 10px 0; border-bottom: 1px solid #ede9e2; color: var(--muted); display: flex; align-items: flex-start; gap: 10px; }
-    .option-list li:last-child { border-bottom: none; }
-    .option-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 6px; }
-    .option-list li strong { color: var(--text); }
-
-    /* PACKAGES */
-    .packages { background: var(--cream); padding: 72px 10%; }
-    .packages h2 { font-family: 'HeyLovely', cursive; font-size: 3.2rem; color: var(--green-dark); margin-bottom: 8px; text-align: center; }
-    .packages .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 48px; }
-
-    .pkg-group { margin-bottom: 60px; }
-    .pkg-group h3 { font-family: 'HeyLovely', cursive; font-size: 2.4rem; color: var(--green-dark); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--green); display: inline-block; }
-
-    .pkg-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-
-    .pkg-card { background: var(--white); padding: 36px 28px; display: flex; flex-direction: column; gap: 16px; position: relative; }
-    .pkg-card.featured { background: var(--green-dark); }
-
-    .pkg-tier { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: var(--green); }
-    .pkg-card.featured .pkg-tier { color: rgba(255,255,255,0.5); }
-
-    .pkg-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--green-dark); }
-    .pkg-card.featured .pkg-name { color: var(--white); }
-
-    .pkg-price { font-size: 2.2rem; font-weight: 300; color: var(--green-dark); letter-spacing: -0.02em; }
-    .pkg-card.featured .pkg-price { color: var(--white); }
-
-    .pkg-divider { width: 100%; height: 1px; background: #e0dbd2; }
-    .pkg-card.featured .pkg-divider { background: rgba(255,255,255,0.15); }
-
-    .pkg-includes { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-    .pkg-includes li { font-size: 0.88rem; color: var(--muted); display: flex; align-items: center; gap: 10px; }
-    .pkg-card.featured .pkg-includes li { color: rgba(255,255,255,0.75); }
-    .pkg-includes li::before { content: '✓'; color: var(--green); font-size: 0.8rem; flex-shrink: 0; }
-    .pkg-card.featured .pkg-includes li::before { color: rgba(255,255,255,0.6); }
-
-    .btn-green { display: inline-block; padding: 13px 32px; background: var(--green); color: var(--white); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.25s; text-align: center; }
-    .btn-green:hover { background: var(--green-dark); }
-    .btn-outline-white { display: inline-block; padding: 13px 32px; border: 1px solid var(--white); color: var(--white); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.25s; text-align: center; }
-    .btn-outline-white:hover { background: rgba(255,255,255,0.1); }
-
-    /* ADDITIONAL DETAILS */
-    .details { background: var(--white); padding: 72px 10%; }
-    .details h2 { font-family: 'HeyLovely', cursive; font-size: 3rem; color: var(--green-dark); margin-bottom: 36px; text-align: center; }
-    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 800px; margin: 0 auto; }
-    .detail-item { border-left: 3px solid var(--green); padding: 4px 0 4px 20px; }
-    .detail-item h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--green-dark); margin-bottom: 8px; }
-    .detail-item p { font-size: 0.92rem; color: var(--muted); line-height: 1.75; }
-
-    /* CTA */
-    .cta-strip { background: var(--green-dark); padding: 72px 10%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-    .cta-strip h2 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.4rem; color: var(--white); }
-    .cta-strip p { color: rgba(255,255,255,0.72); font-size: 1rem; max-width: 520px; }
-    .contact-row { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
-    .contact-row a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
-    .contact-row a:hover { color: var(--white); }
-
-    /* FOOTER */
-    footer { background: var(--green-dark); padding: 26px 52px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.1); }
-    footer p { color: rgba(255,255,255,0.62); font-size: 0.78rem; }
-    .footer-credits { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
-    .photo-credit-link { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.88); text-decoration: none; padding: 2px 10px 2px 7px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s; vertical-align: middle; }
-    .photo-credit-link::before { content: ""; display: inline-block; width: 13px; height: 13px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,0.75)" stroke="none"/></svg>') center/contain no-repeat; }
-    .photo-credit-link:hover { background: rgba(255,255,255,0.2); color: #fff; }
-    .footer-nav { list-style: none; display: flex; gap: 24px; }
-    .footer-nav a { color: var(--white); text-decoration: none; font-size: 0.76rem; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.5; transition: opacity 0.2s; }
-    .footer-nav a:hover { opacity: 1; }
-
-    /* ANIMATIONS */
-    .fade-in { opacity: 0; transform: translateY(36px); transition: opacity 0.8s ease, transform 0.8s ease; }
-    .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-    /* MOBILE */
-    @media (max-width: 768px) {
-      header { padding: 18px 24px; }
-      .nav-toggle { display: flex; }
-      .nav-links { display: none; position: fixed; inset: 0; background: var(--green-dark); flex-direction: column; align-items: center; justify-content: center; gap: 36px; z-index: 25; }
-      .nav-links.open { display: flex; }
-      .nav-links a { font-size: 1.1rem; opacity: 1; }
-      .intro, .about-strip, .music-options, .packages, .details, .cta-strip { padding: 52px 24px; }
+    @media (max-width: 900px) {
+      .pkg-cards { grid-template-columns: 1fr; max-width: 440px; margin-inline: auto; }
+    }
+    @media (max-width: 760px) {
       .options-grid { grid-template-columns: 1fr; }
-      .pkg-cards { grid-template-columns: 1fr; }
-      .details-grid { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 14px; text-align: center; padding: 28px 24px; }
-      .footer-nav { flex-wrap: wrap; justify-content: center; gap: 16px; }
+      .tabs [role="tab"] { padding: 11px 16px; font-size: 0.64rem; letter-spacing: 0.12em; }
     }
   </style>
-  <noscript>
-    <!-- .fade-in starts at opacity 0 and is revealed by an IntersectionObserver.
-         Without JS that would leave the page blank, so reveal everything up front. -->
-    <style>.fade-in { opacity: 1 !important; transform: none !important; }</style>
-  </noscript>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-  <header>
-    <a href="index.html" class="logo"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; flex-shrink:0;"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>Augustine Music & Events</a>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="about.html">About</a></li>
-      <li><a href="event-rentals.html">Event Rentals</a></li>
-      <li><a href="event-music.html" class="active">Event Music</a></li>
-      <li><a href="contact.html">Book Now</a></li>
-    </ul>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
+  <header class="site-header">
+    <a href="index.html" class="brand" aria-label="Augustine Music and Events, home">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g fill="currentColor" fill-opacity="0.5"><path d="M30 45 C 22 43 15 46 11 54 C 19 56 26 53 30 45 Z"/><path d="M34 45 C 42 43 49 46 53 54 C 45 56 38 53 34 45 Z"/></g><g fill="currentColor"><path transform="rotate(0 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(72 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(144 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(216 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(288 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/></g></svg>
+      <span class="brand-name">Augustine Music &amp; Events</span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="about.html">About</a></li>
+        <li><a href="event-rentals.html">Event Rentals</a></li>
+        <li><a href="event-music.html" aria-current="page">Event Music</a></li>
+        <li><a href="contact.html" class="nav-cta">Book Now</a></li>
+      </ul>
+    </nav>
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span></button>
   </header>
 
-  <div class="page-hero">
-    <div class="page-hero-content">
-      <h1>Event Music</h1>
-      <p>Creating unforgettable musical experiences for your most cherished moments</p>
-    </div>
-  </div>
+  <main id="main">
+    <section class="page-hero">
+      <div class="botanical-watermark" data-botanical style="left: -120px; bottom: -140px;"></div>
+      <div class="wrap">
+        <div class="page-hero-text">
+          <p class="eyebrow rise" style="--d:0">Event Music</p>
+          <h1 class="display rise" style="--d:1">Event <em>Music</em></h1>
+          <div class="rise" style="--d:2"><p class="lede">Creating unforgettable musical experiences for your most cherished moments.</p></div>
+          <div class="btn-row rise" style="--d:3"><a href="#packages" class="btn">See Packages <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a><a href="contact.html" class="btn btn-outline">Book a Date</a></div>
+        </div>
+        <figure class="arch reveal-clip">
+          <img src="img/becca-violin-bw.webp" alt="Becca playing violin on stage, in black and white" fetchpriority="high" style="object-position: 60% 30%;" />
+        </figure>
+      </div>
+    </section>
 
-<section class="music-options fade-in">
-    <h2>Music Options</h2>
-    <div class="options-grid">
-      <div class="option-card">
-        <h3>Wedding Ceremony</h3>
-        <p class="note">One of the unique features of our service is our commitment to learning three specific songs chosen by you. This ensures that your ceremony feels deeply personal and reflective of your journey as a couple. No request is too big or small!</p>
-        <ul class="option-list">
-          <li><strong>Prelude</strong> — 20–30 minutes of music while your guests are being seated</li>
-          <li><strong>Processional</strong> — Bridal Party and Bride Entrance</li>
-          <li><strong>Special Song / Unity Song</strong> — Optional</li>
-          <li><strong>Recessional</strong> — Grand Exit</li>
+    <section class="section bg-white">
+      <div class="wrap">
+        <div class="section-head center">
+          <p class="eyebrow center fade-in">What we play</p>
+          <h2 class="h2 fade-in">Music Options</h2>
+        </div>
+        <div class="options-grid" data-stagger>
+          <div class="option-card card fade-in">
+            <h3>Wedding Ceremony</h3>
+            <p class="note">One of the unique features of our service is our commitment to learning three specific songs chosen by you. This ensures that your ceremony feels deeply personal and reflective of your journey as a couple. No request is too big or small!</p>
+            <ul class="option-list">
+              <li><strong>Prelude:</strong> 20 to 30 minutes of music while your guests are being seated</li>
+              <li><strong>Processional:</strong> Bridal Party and Bride Entrance</li>
+              <li><strong>Special Song / Unity Song:</strong> Optional</li>
+              <li><strong>Recessional:</strong> Grand Exit</li>
+            </ul>
+          </div>
+          <div class="option-card card fade-in">
+            <h3>Cocktail Hour</h3>
+            <p class="note">The perfect backdrop for mingling and celebrating after the ceremony.</p>
+            <ul class="option-list">
+              <li>1 full hour of music in your couple's choice of genre</li>
+              <li>Classical, Pop/Rock, Disney, and more</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-cream" id="packages">
+      <div class="wrap" style="display: grid; justify-items: center;">
+        <div class="section-head center">
+          <p class="eyebrow center fade-in">Our Packages</p>
+          <h2 class="h2 fade-in">Choose the package that <em>best fits your vision</em></h2>
+        </div>
+        <div class="tabs" data-tabs role="tablist" aria-label="Package type">
+          <span class="tab-indicator" aria-hidden="true"></span>
+          <button type="button" role="tab" id="tab-ceremony" aria-controls="panel-ceremony" aria-selected="true">Ceremony Only</button>
+          <button type="button" role="tab" id="tab-cocktail" aria-controls="panel-cocktail" aria-selected="false">Ceremony + Cocktail Hour</button>
+        </div>
+        <div class="pkg-group" id="panel-ceremony" role="tabpanel" aria-labelledby="tab-ceremony" style="width: 100%;">
+          <h3 class="group-title">Ceremony Only</h3>
+          <div class="pkg-cards" data-stagger>
+            <div class="pkg-card fade-in">
+              <div class="pkg-tier">Solo</div>
+              <div class="pkg-name">Bronze</div>
+              <div class="pkg-price">$550</div>
+              <ul class="pkg-includes"><li>Violin with Becca</li><li>Sound Equipment</li><li>Travel*</li></ul>
+              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+            </div>
+            <div class="pkg-card featured fade-in">
+              <div class="pkg-tier">Duo</div>
+              <div class="pkg-name">Silver</div>
+              <div class="pkg-price">$1,100</div>
+              <ul class="pkg-includes"><li>Violin or Voice with Becca</li><li>Piano OR Guitar Accompaniment</li><li>Sound Equipment</li><li>Travel*</li></ul>
+              <a href="contact.html" class="btn btn-light">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+            </div>
+            <div class="pkg-card fade-in">
+              <div class="pkg-tier">Trio</div>
+              <div class="pkg-name">Gold</div>
+              <div class="pkg-price">$1,650</div>
+              <ul class="pkg-includes"><li>Violin or Voice with Becca</li><li>Piano</li><li>Guitar</li><li>Sound Equipment</li><li>Travel*</li></ul>
+              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+            </div>
+          </div>
+        </div>
+        <div class="pkg-group" id="panel-cocktail" role="tabpanel" aria-labelledby="tab-cocktail" style="width: 100%;">
+          <h3 class="group-title">Ceremony + Cocktail Hour</h3>
+          <div class="pkg-cards" data-stagger>
+            <div class="pkg-card fade-in">
+              <div class="pkg-tier">Solo</div>
+              <div class="pkg-name">Emerald</div>
+              <div class="pkg-price">$750</div>
+              <ul class="pkg-includes"><li>Violin with Becca</li><li>Sound Equipment</li><li>Travel*</li></ul>
+              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+            </div>
+            <div class="pkg-card featured fade-in">
+              <div class="pkg-tier">Duo</div>
+              <div class="pkg-name">Sapphire</div>
+              <div class="pkg-price">$1,500</div>
+              <ul class="pkg-includes"><li>Violin or Voice with Becca</li><li>Piano OR Guitar Accompaniment</li><li>Sound Equipment</li><li>Travel*</li></ul>
+              <a href="contact.html" class="btn btn-light">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+            </div>
+            <div class="pkg-card fade-in">
+              <div class="pkg-tier">Trio</div>
+              <div class="pkg-name">Diamond</div>
+              <div class="pkg-price">$2,050</div>
+              <ul class="pkg-includes"><li>Violin or Voice with Becca</li><li>Piano</li><li>Guitar</li><li>Sound Equipment</li><li>Travel*</li></ul>
+              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+            </div>
+          </div>
+        </div>
+        <p class="pkg-footnote fade-in">*Travel is included within 30 minutes of Nashville, TN. See the details below.</p>
+      </div>
+    </section>
+
+    <section class="section bg-white details">
+      <div class="wrap">
+        <div class="section-head center">
+          <p class="eyebrow center fade-in">Good to know</p>
+          <h2 class="h2 fade-in">Additional Details</h2>
+        </div>
+        <div class="details-grid" data-stagger>
+          <div class="detail-item card fade-in">
+            <h4>Non-Refundable Deposit</h4>
+            <p>A deposit of $200 is required to secure your date.</p>
+          </div>
+          <div class="detail-item card fade-in">
+            <h4>Travel Fee*</h4>
+            <p>Travel is included within 30 minutes of Nashville, TN. Each additional hour is $50. Travel exceeding 3 hours will be discussed in consultation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-green closing">
+      <div class="botanical-watermark" data-botanical style="right: -60px; bottom: -80px;"></div>
+      <div class="botanical-watermark" data-botanical style="left: -90px; top: -120px; transform: scaleX(-1) rotate(180deg);"></div>
+      <div class="wrap-narrow">
+        <p class="eyebrow center fade-in">Let's talk</p>
+        <h2 class="display fade-in">Ready to book your date?</h2>
+        <p class="lede fade-in">Reach out and let's start planning the perfect soundtrack for your celebration.</p>
+        <div class="contact-row fade-in">
+          <a href="tel:9063956530">(906) 395-6530</a>
+          <a href="mailto:raugustinemusic@gmail.com">raugustinemusic@gmail.com</a>
+          <a href="https://instagram.com/augustinemusicandevents" target="_blank" rel="noopener">@augustinemusicandevents</a>
+        </div>
+        <div class="btn-row fade-in">
+          <a href="contact.html" class="btn btn-solid-light">Send a Message <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand" aria-label="Augustine Music and Events, home">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g fill="currentColor" fill-opacity="0.5"><path d="M30 45 C 22 43 15 46 11 54 C 19 56 26 53 30 45 Z"/><path d="M34 45 C 42 43 49 46 53 54 C 45 56 38 53 34 45 Z"/></g><g fill="currentColor"><path transform="rotate(0 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(72 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(144 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(216 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/><path transform="rotate(288 32 27)" d="M32 27 C 25.5 21 25.5 11 32 7 C 38.5 11 38.5 21 32 27 Z"/></g></svg>
+          <span class="brand-name">Augustine Music &amp; Events</span>
+        </a>
+        <p class="footer-tagline">Live violin and voice, and a boutique rental collection, for weddings and celebrations in the greater Nashville area.</p>
+      </div>
+      <div class="footer-col">
+        <h2 class="footer-heading">Explore</h2>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="event-rentals.html">Event Rentals</a></li>
+          <li><a href="event-music.html">Event Music</a></li>
+          <li><a href="contact.html">Book Now</a></li>
         </ul>
       </div>
-      <div class="option-card">
-        <h3>Cocktail Hour</h3>
-        <p class="note">The perfect backdrop for mingling and celebrating after the ceremony.</p>
-        <ul class="option-list">
-          <li>1 full hour of music in your couple's choice of genre</li>
-          <li>Classical, Pop/Rock, Disney, and more</li>
+      <div class="footer-col">
+        <h2 class="footer-heading">Say hello</h2>
+        <ul>
+          <li><a href="mailto:raugustinemusic@gmail.com">raugustinemusic@gmail.com</a></li>
+          <li><a href="tel:9063956530">(906) 395-6530</a></li>
+          <li><a href="https://instagram.com/augustinemusicandevents" target="_blank" rel="noopener">@augustinemusicandevents</a></li>
         </ul>
       </div>
     </div>
-  </section>
-
-  <section class="packages fade-in">
-    <h2>Our Packages</h2>
-    <p class="subtitle">Choose the package that best fits your vision</p>
-
-    <div class="pkg-group">
-      <h3>Ceremony Only</h3>
-      <div class="pkg-cards">
-        <div class="pkg-card">
-          <div class="pkg-tier">Solo</div>
-          <div class="pkg-name">Bronze</div>
-          <div class="pkg-price">$550</div>
-          <div class="pkg-divider"></div>
-          <ul class="pkg-includes">
-            <li>Violin with Becca</li>
-            <li>Sound Equipment</li>
-            <li>Travel*</li>
-          </ul>
-          <a href="contact.html" class="btn-green">Book This Package</a>
-        </div>
-        <div class="pkg-card featured">
-          <div class="pkg-tier">Duo</div>
-          <div class="pkg-name">Silver</div>
-          <div class="pkg-price">$1,100</div>
-          <div class="pkg-divider"></div>
-          <ul class="pkg-includes">
-            <li>Violin or Voice with Becca</li>
-            <li>Piano OR Guitar Accompaniment</li>
-            <li>Sound Equipment</li>
-            <li>Travel*</li>
-          </ul>
-          <a href="contact.html" class="btn-outline-white">Book This Package</a>
-        </div>
-        <div class="pkg-card">
-          <div class="pkg-tier">Trio</div>
-          <div class="pkg-name">Gold</div>
-          <div class="pkg-price">$1,650</div>
-          <div class="pkg-divider"></div>
-          <ul class="pkg-includes">
-            <li>Violin or Voice with Becca</li>
-            <li>Piano</li>
-            <li>Guitar</li>
-            <li>Sound Equipment</li>
-            <li>Travel*</li>
-          </ul>
-          <a href="contact.html" class="btn-green">Book This Package</a>
-        </div>
-      </div>
+    <div class="wrap footer-bottom">
+      <p>&copy; 2026 Augustine Music &amp; Events. All rights reserved.</p>
+      <p class="footer-credits">Photography by <a href="https://www.instagram.com/erinelizabeth.photog?igsh=bGJ2ZzkxNmQ1M3Fk" target="_blank" rel="noopener" class="photo-credit-link">@erinelizabeth.photog</a> &nbsp;&middot;&nbsp; Website by Jared Schnitker</p>
     </div>
-
-    <div class="pkg-group">
-      <h3>Ceremony + Cocktail Hour</h3>
-      <div class="pkg-cards">
-        <div class="pkg-card">
-          <div class="pkg-tier">Solo</div>
-          <div class="pkg-name">Emerald</div>
-          <div class="pkg-price">$750</div>
-          <div class="pkg-divider"></div>
-          <ul class="pkg-includes">
-            <li>Violin with Becca</li>
-            <li>Sound Equipment</li>
-            <li>Travel*</li>
-          </ul>
-          <a href="contact.html" class="btn-green">Book This Package</a>
-        </div>
-        <div class="pkg-card featured">
-          <div class="pkg-tier">Duo</div>
-          <div class="pkg-name">Sapphire</div>
-          <div class="pkg-price">$1,500</div>
-          <div class="pkg-divider"></div>
-          <ul class="pkg-includes">
-            <li>Violin or Voice with Becca</li>
-            <li>Piano OR Guitar Accompaniment</li>
-            <li>Sound Equipment</li>
-            <li>Travel*</li>
-          </ul>
-          <a href="contact.html" class="btn-outline-white">Book This Package</a>
-        </div>
-        <div class="pkg-card">
-          <div class="pkg-tier">Trio</div>
-          <div class="pkg-name">Diamond</div>
-          <div class="pkg-price">$2,050</div>
-          <div class="pkg-divider"></div>
-          <ul class="pkg-includes">
-            <li>Violin or Voice with Becca</li>
-            <li>Piano</li>
-            <li>Guitar</li>
-            <li>Sound Equipment</li>
-            <li>Travel*</li>
-          </ul>
-          <a href="contact.html" class="btn-green">Book This Package</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="details fade-in">
-    <h2>Additional Details</h2>
-    <div class="details-grid">
-      <div class="detail-item">
-        <h4>Non-Refundable Deposit</h4>
-        <p>A deposit of $200 is required to secure your date.</p>
-      </div>
-      <div class="detail-item">
-        <h4>Travel Fee*</h4>
-        <p>Travel is included within 30 minutes of Nashville, TN. Each additional hour is $50. Travel exceeding 3 hours will be discussed in consultation.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="cta-strip fade-in">
-    <h2>Ready to book your date?</h2>
-    <p>Reach out and let's start planning the perfect soundtrack for your celebration.</p>
-    <div class="contact-row">
-      <a href="tel:9063956530">(906) 395-6530</a>
-      <a href="mailto:raugustinemusic@gmail.com">raugustinemusic@gmail.com</a>
-      <a href="https://instagram.com/augustinemusicandevents" target="_blank" rel="noopener">@augustinemusicandevents</a>
-    </div>
-    <a href="contact.html" class="btn-outline-white">Send a Message</a>
-  </section>
-
-  <footer>
-    <p>&copy; 2026 Augustine Music & Events. All rights reserved.</p>
-    <p class="footer-social"><a href="https://instagram.com/augustinemusicandevents" target="_blank" rel="noopener" class="photo-credit-link">@augustinemusicandevents</a></p>
-    <p class="footer-credits">Photography by <a href="https://www.instagram.com/erinelizabeth.photog?igsh=bGJ2ZzkxNmQ1M3Fk" target="_blank" rel="noopener" class="photo-credit-link">@erinelizabeth.photog</a> &nbsp;·&nbsp; Website by Jared Schnitker</p>
-    <ul class="footer-nav">
-      <li><a href="about.html">About</a></li>
-      <li><a href="event-rentals.html">Event Rentals</a></li>
-      <li><a href="event-music.html">Event Music</a></li>
-      <li><a href="contact.html">Book Now</a></li>
-    </ul>
   </footer>
-
-  <script>
-    const toggle = document.getElementById('navToggle');
-    const links = document.getElementById('navLinks');
-    toggle.addEventListener('click', function() { links.classList.toggle('open'); });
-    links.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', function() { links.classList.remove('open'); }); });
-
-    const observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.fade-in').forEach(function(el) { observer.observe(el); });
-  </script>
 
 </body>
 </html>

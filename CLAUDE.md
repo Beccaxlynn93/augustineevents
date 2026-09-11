@@ -273,7 +273,14 @@ Roughly 40 files from an accidental browser "Save Page As" commit. Not reference
 
 ## Design system
 
-Defined as CSS custom properties in each page's `:root`. Keep these exact values.
+**Redesigned 2026-09-11 on the `redesign` branch.** One shared system, loaded by
+every page: `css/site.css` (tokens, type, header, buttons, dividers, footer, motion)
+and `js/site.js` (header state, mobile menu, reveals, tabs, scroll-spy). Each page's
+own `<style>` holds only what is unique to it. Before this, every page carried a
+private copy of the nav, footer, buttons and type, about 1,000 duplicated lines.
+
+The six brand colours are unchanged. Anything else in `site.css` is a tint of them
+made with `color-mix`, never a new hue.
 
 ```css
 --green:       #4a5e40;
@@ -288,19 +295,28 @@ Defined as CSS custom properties in each page's `:root`. Keep these exact values
 
 | Role | Font | Notes |
 |---|---|---|
-| Logo / display | `HeyLovely` | Self-hosted TTF, `@font-face` declared inline. License owned. |
-| Headings | `Playfair Display` | Google Fonts, weights 400/600, italics available |
-| Body | `Lato` | Google Fonts, weights 300/400/700 |
+| Logo / accents | `HeyLovely` | Self-hosted TTF. Now used for the logo and small flourishes only. |
+| Headings | `Cormorant Garamond` | Google Fonts, 300 to 600. Set with lining figures (`lining-nums`); its default old-style figures make $1,100 read like $I,IOO. |
+| Body | `Jost` | Google Fonts, 300/400/500. |
+| Home headline | Becca's Canva font | An image, `hero-headline.png`, inside a real `<h1>`. The font lives only in Canva. |
 
-**Patterns already in use**
+**Rules the system enforces**
 
-- Nav: absolute-positioned over the hero, white links, uppercase, `0.82rem`, `letter-spacing: 0.1em`, `opacity: 0.85` rising to `1` on hover
-- Hero: `height: 100vh`, `min-height: 600px`, dark overlay via `::after` at `rgba(0,0,0,0.48)`
-- Sections use a `.section-label` eyebrow above the heading
-- `.fade-in` class drives scroll animations
-- Mobile nav toggle is a three-span hamburger button
+- **No two neighbouring sections share a colour without a line.** Sections carry a
+  `bg-*` class; `.bg-x + .bg-x` gets a hairline automatically as a safety net.
+  Place a `.flourish` (the drawn sprig divider) where a softer break is wanted.
+- **Reveal animations must never blank a page.** Content is hidden only under
+  `html.reveal-ready`, which an inline snippet in each `<head>` adds and removes
+  again after 2.5 s if `js/site.js` never starts. Reduced motion reveals everything
+  immediately. Use `.fade-in` (rise and unblur), `.reveal-clip` (image uncovers),
+  `data-stagger` on a parent for one-after-another.
+- **Photos:** interior page heroes put a portrait photo in an arch (`.arch`) rather
+  than stretching it full-bleed. Sharp versions of the photographer originals live in
+  `img/` as WebP, at most 1400px wide.
+- **Header and footer markup is identical on every page.** Change all six together.
+- Favicon and logo mark are the same five-petal bloom (`favicon.svg`, inline SVG in
+  the header and footer).
 
-Match these conventions when adding markup. Do not introduce Tailwind, CSS frameworks, or a new color palette.
 
 ---
 
@@ -624,14 +640,7 @@ which are what production actually uses.
 
 Also avoid: "link in bio", cliché wedding-industry phrasing, and any claim about packages or pricing not confirmed in the inventory workbook.
 
-**Rental bundles.** A bundle row carries `data-bundle="<name>"` and every item it
-contains carries `data-bundle-member="<name>"`. Checking the bundle clears, disables
-and visually mutes its members, and reveals their `.bundle-included` line; unchecking
-hands them back. This exists so a visitor cannot pay twice for the same pieces, and
-`syncBundles()` must keep running before `syncDeliveryOnly()` in the checkbox handler,
-because clearing a member can change which delivery only items are still selected.
-Adding another bundle needs only these two attributes and a `.bundle-included` span,
-no new JavaScript. Today the only bundle is the brass collection.
+**Rental bundles.** Bundles are data in D1, not markup. A bundle of one item is a volume discount that applies by itself; a bundle of several items is a package the visitor ticks as a unit, which locks and mutes its members so nobody pays twice. `js/rental-picker.js` derives both from the catalog, so adding a bundle means adding rows, never new code. See "The rental catalog".
 
 **Images.** Always include meaningful `alt` text describing the item, not the filename. Keep `loading="lazy"` on catalog images. New photos must be resized to 1400px max width and saved as WebP before committing. Never commit a multi-megabyte image.
 
