@@ -112,9 +112,9 @@
     .bundle-photos img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
     .bundle-photos figure:hover img { transform: scale(1.04); }
     .bundle-photos figcaption {
-      position: absolute; left: 10px; bottom: 10px; display: flex; align-items: baseline; gap: 5px; padding: 5px 12px 6px; border-radius: 999px;
+      position: absolute; left: 8px; bottom: 8px; display: flex; align-items: baseline; gap: 5px; padding: 5px 10px 6px; border-radius: 999px;
       background: color-mix(in srgb, var(--green-dark) 80%, transparent); color: var(--cream);
-      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+      font-size: 0.6rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap;
     }
     /* Counts are set exactly like the words beside them. */
     .bundle-photos figcaption b { font: inherit; }
@@ -124,7 +124,7 @@
     .bp-three { grid-column: 2; grid-row: 2; }
     .bp-nine img { object-position: 50% 78%; }
     /* Its label goes up top, clear of the candelabra's base. */
-    .bp-nine figcaption { top: 10px; bottom: auto; }
+    .bp-nine figcaption { top: 8px; bottom: auto; }
     .bp-vases img { object-position: 40% 50%; }
     .bundle-copy { display: grid; align-content: center; justify-items: start; gap: 14px; padding: clamp(28px, 3.6vw, 52px); }
     .bundle-copy .eyebrow { color: var(--on-dark-muted); }
@@ -132,7 +132,9 @@
     .bundle-price { font-family: var(--serif); font-size: 2.6rem; font-weight: 300; line-height: 1; color: var(--cream); }
     .bundle-list { list-style: none; width: 100%; margin-bottom: 10px; }
     .bundle-list li { padding: 10px 0; border-top: 1px solid var(--line-on-dark); font-size: 0.95rem; }
-    .bundle-list strong { display: inline-block; min-width: 2.4em; font: inherit; color: inherit; }
+    .bundle-list strong { display: inline-block; min-width: 1.4em; font: inherit; color: inherit; }
+    .bundle-list .sep { margin: 0 0.7em 0 0.2em; opacity: 0.6; }
+    .bundle-photos .sep { opacity: 0.7; }
     .bundle-copy .line-art { color: var(--cream); }
     @media (max-width: 1200px) {
       .bundle-feature { grid-template-columns: 1fr; }
@@ -322,10 +324,10 @@
            are only rented as part of it, so this is the one place they appear. -->
       <div class="bundle-feature fade-in">
         <div class="bundle-photos">
-          <figure class="bp-nine"><img src="Photographer photos/9 arm candelabra.jpg" alt="The 9 arm brass candelabra" loading="lazy" width="1059" height="847" /><figcaption><b>A</b> 9 arm candelabra</figcaption></figure>
-          <figure class="bp-vases"><img src="img/italian-vases.webp" alt="Two ornate Italian brass vases holding ivory roses on a wooden table" loading="lazy" width="700" height="1103" /><figcaption><b>3</b> Italian vases</figcaption></figure>
-          <figure class="bp-sticks"><img src="Photographer photos/Single Assorted Brass Candlesticks.jpg" alt="A brass candlestick holder from the collection" loading="lazy" width="885" height="1106" /><figcaption><b>50</b> Candlesticks</figcaption></figure>
-          <figure class="bp-three"><img src="Photographer photos/3 arm candelabra.jpg" alt="Matching 3 arm brass candelabras" loading="lazy" /><figcaption><b>8</b> 3 arm candelabras</figcaption></figure>
+          <figure class="bp-nine"><img src="Photographer photos/9 arm candelabra.jpg" alt="The 9 arm brass candelabra" loading="lazy" width="1059" height="847" /><figcaption><b>1</b><span class="sep" aria-hidden="true">|</span>9 arm candelabra</figcaption></figure>
+          <figure class="bp-vases"><img src="img/italian-vases.webp" alt="Two ornate Italian brass vases holding ivory roses on a wooden table" loading="lazy" width="700" height="1103" /><figcaption><b>3</b><span class="sep" aria-hidden="true">|</span>Italian vases</figcaption></figure>
+          <figure class="bp-sticks"><img src="Photographer photos/Single Assorted Brass Candlesticks.jpg" alt="A brass candlestick holder from the collection" loading="lazy" width="885" height="1106" /><figcaption><b>50</b><span class="sep" aria-hidden="true">|</span>Candlesticks</figcaption></figure>
+          <figure class="bp-three"><img src="Photographer photos/3 arm candelabra.jpg" alt="Matching 3 arm brass candelabras" loading="lazy" /><figcaption><b>8</b><span class="sep" aria-hidden="true">|</span>3 arm candelabras</figcaption></figure>
         </div>
         <div class="bundle-copy has-art">
           <span class="card-art" aria-hidden="true"><svg class="line-art" data-art="candelabra"></svg></span>
@@ -334,10 +336,10 @@
           <p class="bundle-price">$230</p>
           <p>Every brass piece, as one package:</p>
           <ul class="bundle-list">
-            <li><strong>50</strong> brass candlesticks, short, medium and tall</li>
-            <li><strong>8</strong> matching 3 arm candelabras</li>
-            <li><strong>A</strong> 9 arm focal candelabra</li>
-            <li><strong>3</strong> Italian brass vases, 2 small and 1 large</li>
+            <li><strong>50</strong><span class="sep" aria-hidden="true">|</span>brass candlesticks, short, medium and tall</li>
+            <li><strong>8</strong><span class="sep" aria-hidden="true">|</span>matching 3 arm candelabras</li>
+            <li><strong>1</strong><span class="sep" aria-hidden="true">|</span>9 arm focal candelabra</li>
+            <li><strong>3</strong><span class="sep" aria-hidden="true">|</span>Italian brass vases, 2 small and 1 large</li>
           </ul>
           <a href="contact.html" class="btn btn-light">Inquire About Bundle <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
         </div>
