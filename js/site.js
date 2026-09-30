@@ -260,7 +260,6 @@
     var arcB = Math.PI * B.r / 2, arcO = Math.PI * O.r / 2, LB = rimLen(B), LO = rimLen(O);
     var clampY = function (y) { return Math.max(8, Math.min(HH - 10, y)); };
     var bloom = function (vi, i, s) { blooms.push({ vine: vi, i: i, s: s }); };
-    var bottomL = pt(B.x + 10, B.y + B.h + 1.5), bottomR = pt(B.x + B.w - 10, B.y + B.h + 1.5);
 
     // Lands on the heading's frame from the page edge, lies along its top, and
     // one shoot falls back over the near corner and down the side.
@@ -273,23 +272,8 @@
       fall.add(rim(B, arcB * 0.5, 0)).add(drop(B, -1, stacked ? Math.min(40, B.h * 0.12) : B.h * 0.42)).curl(1, 6);
       return fall;
     };
-    // A garland slung under the heading's frame, with a drip from its low point.
-    var garland = function () {
-      // Kept clear of the section's bottom edge, leaves included; the drip only
-      // where there is room for it.
-      var room = HH - bottomL.y - 26, dripping = room > 70;
-      if (room < 8) return;
-      var g = new Vine(), under = swag(bottomL, bottomR, stacked ? 16 : 20, Math.max(4, room - (dripping ? 44 : 0)));
-      vines.push(g);
-      g.add(under);
-      var low = lowest(under);
-      if (!stacked) {
-        var c = pt(O.x + 8, O.y + O.h + 1.5);
-        g.add(swag(bottomR, c, 22, Math.max(4, HH - Math.max(bottomR.y, c.y) - 26)));
-        bloom(vines.indexOf(g), g.here(), 0.85);
-      }
-      if (dripping) vines.push(new Vine({ vine: vines.indexOf(g), i: low }).add(drip(under[low], 26)).curl(1, 5));
-    };
+    // Nothing hangs under the heading: the box is not drawn, so a garland there
+    // would hang from nothing.
 
     if (!stacked) {
       // Side by side. One vine runs the whole width: in from the left edge,
@@ -320,7 +304,6 @@
         vines.push(bud);
         bloom(vines.length - 1, bud.here(), 0.6);
       }
-      garland();
     } else {
       // Phone: the photo sits above the text. One vine drapes over the photo's
       // outline from edge to edge; another lies along the heading's frame.
@@ -337,7 +320,6 @@
       // Out to the right edge too, with a short tendril down the frame's side.
       ledge.add(swag(ledge.p[edgeR], pt(W, clampY(B.y - 20)), 12));
       vines.push(fallP, new Vine({ vine: 1, i: edgeR }).add(drop(B, 1, Math.min(40, B.h * 0.12))).curl(-1, 6));
-      garland();
     }
 
     // Music notes drifting up off the main vine (the Event Music header).
@@ -743,6 +725,16 @@
     }).join('');
   }
   function artSvg(name) { return ART[name] ? partsSvg(ART[name][1]) : ''; }
+  // Keep every drawing's line about 1.1px on screen whatever size it is shown
+  // at. (non-scaling-stroke did this, but Chrome then measures the draw-in dash
+  // in screen pixels, so on high-density screens the drawings stopped short.)
+  function fitStroke(el) {
+    var h = el.getBoundingClientRect().height, vb = el.viewBox && el.viewBox.baseVal;
+    if (h && vb && vb.height) el.style.setProperty('--sw', (1.1 * vb.height / h).toFixed(3));
+  }
+  window.__fitStroke = function (root) {
+    (root || document).querySelectorAll('svg.line-art, svg.category-art').forEach(fitStroke);
+  };
   document.querySelectorAll('svg.line-art[data-art]').forEach(function (el) {
     var a = ART[el.getAttribute('data-art')];
     if (!a) return;
@@ -750,6 +742,12 @@
     el.setAttribute('aria-hidden', 'true');
     el.setAttribute('focusable', 'false');
     el.innerHTML = artSvg(el.getAttribute('data-art'));
+  });
+  window.__fitStroke();
+  var strokeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(strokeTimer);
+    strokeTimer = setTimeout(function () { window.__fitStroke(); }, 150);
   });
   // For page scripts that build markup later.
   window.__lineArt = artSvg;
@@ -808,6 +806,7 @@
           // A panel hidden at load never scrolled into view, so its reveals
           // never fired. Reveal them now or they stay invisible.
           panel.querySelectorAll('.fade-in, .reveal-clip').forEach(function (el) { el.classList.add('visible'); });
+          if (window.__fitStroke) window.__fitStroke(panel);
           // Restart the entrance animation each time a panel is shown.
           panel.classList.remove('panel-in');
           void panel.offsetWidth;

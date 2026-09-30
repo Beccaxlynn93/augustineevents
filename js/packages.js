@@ -86,6 +86,7 @@
     root.classList.remove('is-open');
     void root.offsetWidth;
     root.classList.add('is-open');
+    if (window.__fitStroke) window.__fitStroke(root);
     requestAnimationFrame(function () {
       root.querySelectorAll('.line-art').forEach(function (el) { el.classList.add('is-drawn'); });
     });

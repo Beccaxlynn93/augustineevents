@@ -370,7 +370,7 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 .line-art { overflow: visible; pointer-events: none; color: var(--green); }
 /* Faded as a whole rather than shape by shape, so solid shapes fully hide what is behind them. */
 .line-art { opacity: 0.75; }
-.line-art * { fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.line-art * { fill: none; stroke: currentColor; stroke-width: var(--sw, 1.1); stroke-linecap: round; stroke-linejoin: round; }
 /* Solid shapes are filled with whatever is behind the drawing, so overlapping instruments layer. */
 .line-art .solid { fill: var(--art-bg, none); }
 .reveal-ready .line-art :not(g) { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s var(--ease); }

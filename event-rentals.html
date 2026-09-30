@@ -59,7 +59,7 @@
     .category-line { position: relative; min-width: 140px; }
     .category-art { position: absolute; right: 10px; bottom: 0; height: 64px; width: auto; overflow: visible; pointer-events: none; color: var(--green); }
     #decor .category-art, #outdoor .category-art { height: 76px; }
-    .category-art * { fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: 0.7; }
+    .category-art * { fill: none; stroke: currentColor; stroke-width: var(--sw, 1.1); stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
     .reveal-ready .category-art * { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s var(--ease); }
     .reveal-ready .category-art *:nth-child(3n+2) { transition-delay: 0.15s; }
     .reveal-ready .category-art *:nth-child(3n) { transition-delay: 0.3s; }

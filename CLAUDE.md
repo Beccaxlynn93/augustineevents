@@ -375,7 +375,8 @@ made with `color-mix`, never a new hue.
   2026-09-30); it is only a shape for the vines to follow. On desktop one vine runs the
   **full width**, from the left edge along the top of the heading box, across to the
   photo, over it and out to the right edge, with shoots down the box's left side and
-  the photo's right side and a garland under the box. On phones one vine crosses over
+  the photo's right side. Nothing hangs under the box (removed 2026-09-30: with the box
+  undrawn, a garland there hung from nothing). On phones one vine crosses over
   the photo edge to edge and another over the heading, also edge to edge. The Event
   Music hero has `data-vine-notes`, which adds music notes drifting up off the vine.
   The old watermark branch in the hero's bottom left corner was removed. Everything is
@@ -383,6 +384,11 @@ made with `color-mix`, never a new hue.
   `growVines` grows each stem from its root; side shoots, leaves, blooms and notes
   start as the tip reaches them. Driven by `requestAnimationFrame`, so it waits
   while the tab is hidden.
+- **Line thickness for drawings (`fitStroke` in `js/site.js`).** `.line-art` and
+  `.category-art` set `--sw` from each drawing's on-screen size so lines stay about
+  1.1px. Do not use `vector-effect: non-scaling-stroke` on anything that draws in:
+  Chrome then measures the `pathLength="1"` dash in screen pixels, and on 2x screens
+  the drawings stopped partway (reported by the owners 2026-09-30).
 - **Closing banner vines (`drawBanner` / `layBanner` in `js/site.js`).** Opt-in with
   `data-vines` on a `.closing` section. A cream frame around the banner's text (drawn,
   unlike the heroes'), one vine crossing the whole banner along its top, shoots down
