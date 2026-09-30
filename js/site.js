@@ -615,10 +615,9 @@
   });
 
   // ---- reveals ------------------------------------------------------------
-  var revealables = document.querySelectorAll('.fade-in, .reveal-clip, .flourish, .category-art');
-  var reveal = function (el) {
-    el.classList.add(el.classList.contains('flourish') || el.classList.contains('category-art') ? 'is-drawn' : 'visible');
-  };
+  var revealables = document.querySelectorAll('.fade-in, .reveal-clip, .flourish, .category-art, .line-art');
+  var drawn = /\b(flourish|category-art|line-art)\b/;
+  var reveal = function (el) { el.classList.add(drawn.test(el.getAttribute('class')) ? 'is-drawn' : 'visible'); };
   if (!io || reduceMotion) {
     revealables.forEach(reveal);
   } else {

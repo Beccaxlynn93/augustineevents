@@ -389,6 +389,11 @@ made with `color-mix`, never a new hue.
   top, shoots down both sides and a garland underneath, bolder than the heroes'.
   Grows when scrolled into view; the old watermark branches are hidden there. On a
   phone the frame spans the screen with a 12px margin and the side shoots curl in.
+- **Line illustrations (`.line-art`, styles in `css/site.css`).** Hand-drawn inline
+  SVG, `pathLength="1"` on every shape, drawn in by the reveal observer. On
+  `event-music.html` each option card has one in its top corner: interlocked rings
+  with notes (Wedding Ceremony), two coupes toasting (Cocktail Hour). The rentals
+  page's older `.category-art` works the same way with its own page styles.
 - **Button hover vine (`buttonVine` in `js/site.js`).** On hover or keyboard focus a
   sprig grows around the pill: over the left end with a small bloom and along the
   top, plus a shorter one over the right end. Built on first hover, since a button's

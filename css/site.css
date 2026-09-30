@@ -346,6 +346,16 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 .detail-item h4 { font-size: 1.55rem; font-weight: 500; margin-bottom: 10px; }
 .detail-item p { color: var(--muted); }
 
+/* Small hand-drawn line illustrations (.line-art), drawn in by js/site.js when
+   they scroll into view. Every shape carries pathLength="1". */
+.line-art { overflow: visible; pointer-events: none; color: var(--green); }
+.line-art * { fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: 0.75; }
+.line-art g { opacity: 1; }
+.reveal-ready .line-art :not(g) { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s var(--ease); }
+.reveal-ready .line-art :nth-child(3n+2):not(g) { transition-delay: 0.15s; }
+.reveal-ready .line-art :nth-child(3n):not(g) { transition-delay: 0.3s; }
+.reveal-ready .line-art.is-drawn :not(g) { stroke-dashoffset: 0; }
+
 .closing { text-align: center; overflow: hidden; }
 .closing .wrap-narrow { display: grid; justify-items: center; gap: 22px; position: relative; z-index: 1; }
 .closing .display { font-size: clamp(2.6rem, 5.4vw, 4.6rem); color: var(--cream); }
