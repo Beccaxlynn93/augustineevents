@@ -322,14 +322,82 @@
       garland();
     }
 
+    return finishArt(vines, blooms, 1);
+  }
+
+  // Smooths every vine, sets its leaves (scaled by `k`) and resolves where the
+  // side shoots and blooms sit along their parents.
+  function finishArt(vines, blooms, k) {
     var leaves = [];
     vines.forEach(function (v, vi) {
       v.finish();
-      leaves = leaves.concat(leavesOn(v, vi, v.root ? 36 : 44, v.root ? 15 : 19));
+      leaves = leaves.concat(leavesOn(v, vi, (v.root ? 36 : 44) * k, (v.root ? 15 : 19) * k));
     });
     vines.forEach(function (v) { if (v.root) v.root.at = vines[v.root.vine].at(v.root.i); });
     blooms.forEach(function (b) { var v = vines[b.vine]; b.at = v.at(b.i); b.x = v.p[b.i].x; b.y = v.p[b.i].y; });
     return { vines: vines, leaves: leaves, blooms: blooms };
+  }
+
+  // A closing banner (section[data-vines]): no photo, so the frame around its
+  // text carries everything. One vine crosses the whole banner, swagging in from
+  // the left edge, lying along the frame's top and swagging out to the right
+  // edge; shoots fall down both sides; a garland hangs underneath.
+  function layBanner(W, HH, B, narrow) {
+    var vines = [], blooms = [];
+    var arc = Math.PI * B.r / 2, L = rimLen(B);
+    var clampY = function (y) { return Math.max(8, Math.min(HH - 10, y)); };
+    var main = new Vine();
+    vines.push(main);
+    main.add(swag(pt(0, clampY(B.y - 50)), rimPt(B, arc * 0.5), 30));
+    var landL = main.here();
+    blooms.push({ vine: 0, i: landL, s: 1.3 });
+    main.add(rim(B, arc * 0.5, L / 2));
+    blooms.push({ vine: 0, i: main.here(), s: 1.05 });
+    main.add(rim(B, L / 2, L - arc * 0.5));
+    var landR = main.here();
+    blooms.push({ vine: 0, i: landR, s: 1.3 });
+    main.add(swag(main.p[landR], pt(W, clampY(B.y - 40)), 30));
+
+    // On a phone the frame is near the screen's edges, so the side shoots are
+    // shorter and curl in toward it rather than out past the edge.
+    var turn = narrow ? -1 : 1, R = narrow ? 5 : 8;
+    vines.push(new Vine({ vine: 0, i: landL }).add(rim(B, arc * 0.5, 0)).add(drop(B, -1, B.h * (narrow ? 0.22 : 0.5))).curl(turn, R));
+    vines.push(new Vine({ vine: 0, i: landR }).add(rim(B, L - arc * 0.5, L)).add(drop(B, 1, B.h * (narrow ? 0.16 : 0.38))).curl(-turn, R));
+
+    var room = HH - (B.y + B.h) - 34;
+    if (room > 16) {
+      var a = pt(B.x + 18, B.y + B.h + 1.5), b = pt(B.x + B.w - 18, B.y + B.h + 1.5);
+      var under = swag(a, b, 26, room - (room > 80 ? 50 : 0)), g = new Vine();
+      vines.push(g);
+      g.add(under);
+      var low = lowest(under);
+      if (room > 80) {
+        var bud = new Vine({ vine: vines.length - 1, i: low }).add(drip(under[low], 40));
+        vines.push(bud);
+        blooms.push({ vine: vines.length - 1, i: bud.here(), s: 0.9 });
+      }
+    }
+    return finishArt(vines, blooms, 1.2);
+  }
+
+  function drawBanner(sec, animate) {
+    var inner = sec.firstElementChild;
+    while (inner && !/\bwrap/.test(inner.className)) inner = inner.nextElementSibling;
+    if (!inner) return;
+    var H = sec.getBoundingClientRect(), I = inner.getBoundingClientRect(), W = H.width, HH = H.height;
+    // Offsets, not bounding boxes: the children may still be mid fade-in, shifted.
+    var T = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+    Array.prototype.forEach.call(inner.children, function (c) {
+      if (!c.offsetWidth) return;
+      var x = I.left - H.left + c.offsetLeft, y = I.top - H.top + c.offsetTop;
+      T.l = Math.min(T.l, x); T.r = Math.max(T.r, x + c.offsetWidth);
+      T.t = Math.min(T.t, y); T.b = Math.max(T.b, y + c.offsetHeight);
+    });
+    var narrow = Math.min(T.l, W - T.r) < 60, padY = narrow ? 32 : 40;
+    var B = narrow
+      ? { x: 12, y: T.t - padY, w: W - 24, h: T.b - T.t + 2 * padY, r: 16 }
+      : { x: T.l - 48, y: T.t - padY, w: T.r - T.l + 96, h: T.b - T.t + 2 * padY, r: 18 };
+    paint(sec, B, layBanner(W, HH, B, narrow), animate ? 300 : -1);
   }
 
   function drawVines(hero, animate) {
@@ -355,8 +423,13 @@
     var padB = Math.max(6, Math.min(padY, HH - T.b - 8));
     var B = { x: T.l - padX, y: T.t - padY, w: T.r - T.l + 2 * padX, h: T.b - T.t + padY + padB, r: BOX_R };
     var P = { x: ox + SHIFT, y: oy + SHIFT, w: F.width, h: F.height, r: O.r };
-    var art = layVines(W, HH, B, O, P, stacked);
+    paint(hero, B, layVines(W, HH, B, O, P, stacked), animate ? 0 : -1);
+  }
 
+  // Writes one art set into host's line-art layer. `lead` < 0 draws it complete;
+  // otherwise it grows, `lead` ms further along than a page hero's timing.
+  function paint(hero, B, art, lead) {
+    var W = hero.getBoundingClientRect().width, HH = hero.getBoundingClientRect().height;
     var html = '<path class="frame" d="' + boxPath(B) + '"/>';
     art.vines.forEach(function (v) { html += '<path class="vine" d="' + v.d + '"/>'; });
     art.leaves.forEach(function (l) { html += '<path class="leaf grow" d="' + l.d + '"/>'; });
@@ -372,7 +445,7 @@
     }
     svg.setAttribute('viewBox', '0 0 ' + W.toFixed(0) + ' ' + HH.toFixed(0));
     svg.innerHTML = html;
-    if (animate) growVines(svg, art);
+    if (lead >= 0) growVines(svg, art, lead);
   }
 
   // Grow like a live vine. The heading's frame draws first, since the vines
@@ -387,7 +460,7 @@
   var EASE = 2.2;         // stems ease out: offset = len * (1 - x)^EASE
   function tipTime(s, at) { return s.start + s.dur * (1 - Math.pow(1 - at, 1 / EASE)); }
 
-  function growVines(svg, art) {
+  function growVines(svg, art, lead) {
     var frameEl = svg.querySelector('.frame'), frameLen = frameEl.getTotalLength();
     var stems = [{ el: frameEl, len: frameLen, start: FRAME_START, dur: FRAME_DUR }];
     var free = 0;
@@ -419,7 +492,7 @@
     });
     events.sort(function (a, b) { return a.t - b.t; });
 
-    var t0 = performance.now();
+    var t0 = performance.now() - (lead || 0);
     (function frame(now) {
       if (!svg.isConnected) return;
       var t = now - t0, busy = false;
@@ -445,6 +518,29 @@
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function () { heroes.forEach(function (h) { drawVines(h, false); }); }, 150);
+    });
+  }
+
+  // Closing banners grow their vines when they scroll into view.
+  var banners = Array.prototype.slice.call(document.querySelectorAll('section[data-vines]'));
+  if (banners.length) {
+    var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    var grow = function (sec) {
+      if (sec._vines) return;
+      sec._vines = true;
+      fontsReady.then(function () { drawBanner(sec, !reduceMotion); });
+    };
+    if (!io || reduceMotion) banners.forEach(grow);
+    else {
+      var bannerWatch = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { grow(e.target); bannerWatch.unobserve(e.target); } });
+      }, { threshold: 0.35 });
+      banners.forEach(function (b) { bannerWatch.observe(b); });
+    }
+    var bannerTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(function () { banners.forEach(function (b) { if (b._vines) drawBanner(b, false); }); }, 150);
     });
   }
 

@@ -383,6 +383,12 @@ made with `color-mix`, never a new hue.
   first, then grows each stem from its root at a steady speed; side shoots, leaves
   and blooms start as the tip reaches them. About 3s. Driven by
   `requestAnimationFrame`, so it waits while the tab is hidden.
+- **Closing banner vines (`drawBanner` / `layBanner` in `js/site.js`).** Opt-in with
+  `data-vines` on a `.closing` section; only `event-rentals.html` has it so far. A
+  cream frame around the banner's text, one vine crossing the whole banner along its
+  top, shoots down both sides and a garland underneath, bolder than the heroes'.
+  Grows when scrolled into view; the old watermark branches are hidden there. On a
+  phone the frame spans the screen with a 12px margin and the side shoots curl in.
 - **Button hover vine (`buttonVine` in `js/site.js`).** On hover or keyboard focus a
   sprig grows around the pill: over the left end with a small bloom and along the
   top, plus a shorter one over the right end. Built on first hover, since a button's
