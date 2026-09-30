@@ -161,6 +161,8 @@ must be edited together.
   2026-09-11 on `redesign`. Loaded by all six pages. See Design system.
 - `js/pricing.js`, `js/catalog.js`, `js/rental-picker.js` — shared by the Worker and
   the browser. See The rental catalog.
+- `img/italian-vases.webp` — the large and a small Italian vase, 1121px, 62 KB, added
+  2026-09-30 for the Brass Collection Bundle feature.
 - `img/*.webp` — six sharp photos added 2026-09-11, 552 KB in total, resized from the
   photographer's originals (up to 5472px, 7 to 12 MB each) which sit in the repo root
   and are excluded from the asset upload. Made with Pillow at quality 80, at most
@@ -666,7 +668,7 @@ Updated 2026-09-05. Items resolved that day are listed at the bottom.
 | **Music package lead line** | Changed by the owners 2026-09-11 on the `redesign` branch. Every package, all six, now leads with "Violin or Voice with Becca, or Piano with Justin" (Solo tiers previously said only "Violin with Becca"). The rest of each package is unchanged. The older ask to title them "Bronze Package, Violin or Voice with Becca" is superseded unless the owners say otherwise. `main` and `booking-catalog` still carry the old wording. |
 | **`services.html` is orphaned** | Its footer inconsistency is gone on `redesign` (all six share one footer), but nothing links to the page: it returns 200 and only its own nav points at it. Either link it or take it down. |
 | **`event-rentals.html` still hardcodes the catalog** | The booking form renders from D1 as of 2026-09-10, but the rentals page cards are still static HTML, so they can drift from D1. Left static on purpose for now: rendering them client-side would take the items out of the HTML search engines read. The fix is server-side rendering (HTMLRewriter in the Worker) or a test that fails when the page and the seed disagree. |
-| **Italian vases still have no photo and no catalog entry** | Resolved as inventory (see below), but they remain `listed = 0`: bundle only, with no card on `event-rentals.html` and no photo. Revisit if Becca wants to rent them separately. |
+| **Italian vases are bundle only** | Still `listed = 0` in D1 and have no card of their own. Since 2026-09-30 they are pictured (`img/italian-vases.webp`, from the owners' photo) in the Brass Collection Bundle feature at the end of Décor & Lighting, which shows every piece in the bundle with quantities. D1 has no `photo_url` for them yet; add one if they are ever listed. |
 | **Three replacement costs are text, not numbers** | In the inventory workbook: dinner plates, beverage dispensers, cornhole boards. Exhibit A of the rental contract pulls that column, and "Out of Stock" is not a chargeable amount. Blocking for contracts (Phase 04), not for anything sooner. |
 | **The inventory workbook needs three corrections** | Beverage urns `Delivery Only` should be **N**; rectangular tablecloths `Qty Available` should be **3**; the Collections tab is missing a row for the live **$250 four-floral** discount. The workbook is Becca's file, so these have to be made there. |
 | **No testimonials, and local SEO is thin** | No testimonials anywhere; real client quotes are needed before a section can exist, and inventing them is not an option. Service area now appears in the booking form note, the closing bands and the footer on `redesign`. |
