@@ -91,90 +91,276 @@
   }
   document.querySelectorAll('[data-botanical]').forEach(function (el) { el.innerHTML = branch(); });
 
-  // ---- page-hero vines: flowing lines from the heading into the photo frame --
-  // Measured, not drawn by hand, because the frame sits somewhere different at
-  // every screen size. Each vine arrives at the frame's outline tangentially so
-  // it reads as growing into it. Redrawn (without animating) on resize.
+  // ---- page-hero line art: vines hung on the heading's frame and the photo's --
+  // A fine frame around the heading and the photo's own outline are the
+  // furniture; the vines are laid over them and left to hang. They rest along
+  // the top of each frame, swag across the gaps under their own weight, drop
+  // down the sides and end in curled tendrils. Measured, not drawn by hand,
+  // because the text and the photo sit differently at every screen size.
+  // Redrawn (without animating) on resize.
   var NS = 'http://www.w3.org/2000/svg';
   var SHIFT = 14; // .arch::before is the frame shifted 14px up and left
+  var STEP = 6;   // px between the points a vine is built from
+  var BOX_PAD = 30, BOX_R = 14;
 
-  function bez(c, t) {
-    var u = 1 - t;
-    return [
-      u * u * u * c[0][0] + 3 * u * u * t * c[1][0] + 3 * u * t * t * c[2][0] + t * t * t * c[3][0],
-      u * u * u * c[0][1] + 3 * u * u * t * c[1][1] + 3 * u * t * t * c[2][1] + t * t * t * c[3][1],
-    ];
-  }
-  // How far along the curve's length parameter t sits, 0 to 1, so a leaf can
-  // sprout the moment the growing stem reaches it.
-  function arcFrac(c, t) {
-    var total = 0, upto = 0, prev = c[0], N = 64;
-    for (var k = 1; k <= N; k++) {
-      var q = bez(c, k / N), d = Math.hypot(q[0] - prev[0], q[1] - prev[1]);
-      total += d; if (k / N <= t) upto += d; prev = q;
+  function pt(x, y, mode, n) { return { x: x, y: y, mode: mode, n: n || null }; }
+  function dist(a, b) { return Math.hypot(b.x - a.x, b.y - a.y); }
+  function steps(len) { return Math.max(3, Math.ceil(len / STEP)); }
+
+  // Hangs from a to b under its own weight, dipping about `sag` below the lower
+  // end, and more over a long span, but never more than `room`.
+  function swag(a, b, sag, room) {
+    sag = Math.min(Math.max(sag, Math.abs(b.x - a.x) * 0.12), room || Infinity);
+    var low = Math.max(a.y, b.y) + sag, cx = (a.x + b.x) / 2, cy = (4 * low - a.y - b.y) / 2;
+    var n = steps(dist(a, b) + sag), out = [];
+    for (var k = 0; k <= n; k++) {
+      var t = k / n, u = 1 - t;
+      out.push(pt(u * u * a.x + 2 * u * t * cx + t * t * b.x, u * u * a.y + 2 * u * t * cy + t * t * b.y, 'hang'));
     }
-    return total ? upto / total : 0;
+    return out;
   }
-  function leaf(c, t, side, len, v) {
-    var P = bez(c, t), Q = bez(c, Math.min(1, t + 0.01));
-    var a = Math.atan2(Q[1] - P[1], Q[0] - P[0]) + side * 0.85;
-    var w = len * 0.36, ex = P[0] + Math.cos(a) * len, ey = P[1] + Math.sin(a) * len;
-    var nx = -Math.sin(a) * w, ny = Math.cos(a) * w, mx = (P[0] + ex) / 2, my = (P[1] + ey) / 2;
-    var f = function (n) { return n.toFixed(1); };
-    return '<path class="leaf grow" data-v="' + v + '" data-at="' + arcFrac(c, t).toFixed(3) + '" data-side="' + side +
-      '" data-o="' + f(P[0]) + ' ' + f(P[1]) + '" d="M' + f(P[0]) + ' ' + f(P[1]) + ' Q' + f(mx + nx) + ' ' + f(my + ny) + ' ' + f(ex) + ' ' + f(ey) +
-      ' Q' + f(mx - nx) + ' ' + f(my - ny) + ' ' + f(P[0]) + ' ' + f(P[1]) + '"/>';
+  // The top of a box with rounded corners (r = w/2 makes an arch), measured from
+  // its left side (s = 0) over the top to its right side (s = rimLen). Points sit
+  // just outside it, lifting here and there like a vine lying loose on a ledge.
+  function rimLen(b) { return Math.PI * b.r + b.w - 2 * b.r; }
+  function rimPt(b, s) {
+    var arc = Math.PI * b.r / 2, flat = b.w - 2 * b.r, ang, cx, cy = b.y + b.r;
+    if (s < arc) { ang = Math.PI + s / b.r; cx = b.x + b.r; }
+    else if (s < arc + flat) { ang = 1.5 * Math.PI; cx = b.x + b.r + s - arc; }
+    else { ang = 1.5 * Math.PI + (s - arc - flat) / b.r; cx = b.x + b.w - b.r; }
+    var lift = 1.5 + 2.5 * Math.pow(Math.max(0, Math.sin(s / 11)), 2);
+    var nx = Math.cos(ang), ny = Math.sin(ang);
+    return pt(cx + nx * (b.r + lift), cy + ny * (b.r + lift), 'rest', [nx, ny]);
   }
-  function curve(c) {
-    var f = function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); };
-    return '<path class="draw" d="M' + f(c[0]) + ' C' + f(c[1]) + ', ' + f(c[2]) + ', ' + f(c[3]) + '"/>';
+  function rim(b, from, to) {
+    var n = steps(Math.abs(to - from)), out = [];
+    for (var k = 0; k <= n; k++) out.push(rimPt(b, from + (to - from) * k / n));
+    return out;
   }
-  function bloom(x, y, s) {
+  // Drops down the side of box b (side -1 left, 1 right), bowing slightly away.
+  function drop(b, side, len) {
+    var x0 = side < 0 ? b.x - 1.5 : b.x + b.w + 1.5, y0 = b.y + b.r, n = steps(len), out = [];
+    for (var k = 0; k <= n; k++) {
+      var t = k / n;
+      out.push(pt(x0 + side * 6 * Math.sin(t * Math.PI * 0.8), y0 + len * t, 'hang', [side, 0]));
+    }
+    return out;
+  }
+  // Hangs straight down from a, with a slight sway.
+  function drip(a, len) {
+    var n = steps(len), out = [];
+    for (var k = 0; k <= n; k++) { var t = k / n; out.push(pt(a.x + 4 * Math.sin(t * 3) * t, a.y + len * t, 'hang')); }
+    return out;
+  }
+  // Where a vine lying over frame a should pass onto frame b, which stands out
+  // further from there on (the photo and its offset outline cross like this).
+  function crossover(a, b) {
+    var best = { d: Infinity }, La = rimLen(a), Lb = rimLen(b);
+    for (var i = 0; i <= 40; i++) {
+      var sa = La * (0.5 + 0.5 * i / 40), p = rimPt(a, sa);
+      for (var j = 0; j <= 80; j++) {
+        var sb = Lb * (0.5 + 0.5 * j / 80), d = dist(p, rimPt(b, sb));
+        if (d < best.d) best = { d: d, a: sa, b: sb };
+      }
+    }
+    return best;
+  }
+  function lowest(pts) {
+    return pts.reduce(function (m, q, i) { return q.y > pts[m].y ? i : m; }, 0);
+  }
+
+  function Vine(root) { this.p = []; this.root = root || null; }
+  Vine.prototype.add = function (pts) {
+    var p = this.p;
+    pts.forEach(function (q, i) { if (!(i === 0 && p.length && dist(p[p.length - 1], q) < 1)) p.push(q); });
+    return this;
+  };
+  Vine.prototype.here = function () { return this.p.length - 1; };
+  // A tendril curling in at the tip (turn 1 or -1 picks which way it winds).
+  Vine.prototype.curl = function (turn, R) {
+    var v = this.p[this.p.length - 1], w = this.p[this.p.length - 3] || this.p[0];
+    var dx = v.x - w.x, dy = v.y - w.y, m = Math.hypot(dx, dy) || 1; dx /= m; dy /= m;
+    var cx = v.x - dy * turn * R, cy = v.y + dx * turn * R, a0 = Math.atan2(v.y - cy, v.x - cx);
+    var dir = -Math.sin(a0) * dx + Math.cos(a0) * dy > 0 ? 1 : -1, out = [];
+    for (var k = 1; k <= 24; k++) {
+      var t = k / 24, a = a0 + dir * t * 1.7 * Math.PI, rr = R * (1 - 0.55 * t);
+      out.push(pt(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, 'curl'));
+    }
+    return this.add(out);
+  };
+  Vine.prototype.finish = function () {
+    var p = this.p, S = [0], f = function (n) { return n.toFixed(1); };
+    for (var i = 1; i < p.length; i++) S.push(S[i - 1] + dist(p[i - 1], p[i]));
+    this.S = S; this.len = S[S.length - 1];
+    // Catmull-Rom through the points, so the joins between pieces stay smooth.
+    var d = 'M' + f(p[0].x) + ' ' + f(p[0].y);
+    for (i = 0; i < p.length - 1; i++) {
+      var a = p[i - 1] || p[i], b = p[i], c = p[i + 1], e = p[i + 2] || c;
+      d += ' C' + f(b.x + (c.x - a.x) / 6) + ' ' + f(b.y + (c.y - a.y) / 6) + ', ' +
+        f(c.x - (e.x - b.x) / 6) + ' ' + f(c.y - (e.y - b.y) / 6) + ', ' + f(c.x) + ' ' + f(c.y);
+    }
+    this.d = d;
+    return this;
+  };
+  Vine.prototype.at = function (i) { return this.S[i] / this.len; };
+
+  // Leaves every `gap` px. Where the vine lies on or against a frame they point
+  // away from it; where it hangs they droop a little.
+  function leavesOn(v, vi, gap, size) {
+    var out = [], p = v.p, alt = 1, f = function (n) { return n.toFixed(1); };
+    for (var s = 20, i = 1; s < v.len - 10; s += gap) {
+      while (i < p.length - 2 && v.S[i] < s) i++;
+      var q = p[i];
+      if (q.mode === 'curl') break;
+      var ta = Math.atan2(p[i + 1].y - p[i - 1].y, p[i + 1].x - p[i - 1].x), dir = (alt = -alt);
+      if (q.n) {
+        var out1 = Math.cos(ta + 0.85) * q.n[0] + Math.sin(ta + 0.85) * q.n[1];
+        var out2 = Math.cos(ta - 0.85) * q.n[0] + Math.sin(ta - 0.85) * q.n[1];
+        dir = out1 > out2 ? 1 : -1;
+      }
+      // Leaves on a vine lying along a frame lie flatter than hanging ones.
+      var a = ta + dir * (q.mode === 'rest' ? 0.6 : 0.85);
+      if (q.mode === 'hang') a += 0.3 * Math.atan2(Math.sin(Math.PI / 2 - a), Math.cos(Math.PI / 2 - a));
+      var len = size * (1 - 0.3 * s / v.len) * (alt > 0 ? 1 : 0.88), w = len * 0.36;
+      var ex = q.x + Math.cos(a) * len, ey = q.y + Math.sin(a) * len;
+      var nx = -Math.sin(a) * w, ny = Math.cos(a) * w, mx = (q.x + ex) / 2, my = (q.y + ey) / 2;
+      out.push({ vine: vi, at: v.at(i), dir: dir, x: q.x, y: q.y,
+        d: 'M' + f(q.x) + ' ' + f(q.y) + ' Q' + f(mx + nx) + ' ' + f(my + ny) + ' ' + f(ex) + ' ' + f(ey) +
+          ' Q' + f(mx - nx) + ' ' + f(my - ny) + ' ' + f(q.x) + ' ' + f(q.y) });
+    }
+    return out;
+  }
+  function bloomSvg(x, y, s) {
     var petals = '';
     for (var k = 0; k < 5; k++) {
       petals += '<path transform="rotate(' + k * 72 + ')" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/>';
     }
-    return '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') scale(' + s + ')"><g class="bloom grow" data-bloom>' + petals +
+    return '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') scale(' + s + ')"><g class="bloom grow">' + petals +
       '<circle class="bloom-core" r="2.2"/></g></g>';
+  }
+  function boxPath(b) {
+    var r = b.r, f = function (n) { return n.toFixed(1); };
+    return 'M' + f(b.x + r) + ' ' + f(b.y) + ' H' + f(b.x + b.w - r) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(b.x + b.w) + ' ' + f(b.y + r) +
+      ' V' + f(b.y + b.h - r) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(b.x + b.w - r) + ' ' + f(b.y + b.h) +
+      ' H' + f(b.x + r) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(b.x) + ' ' + f(b.y + b.h - r) +
+      ' V' + f(b.y + r) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(b.x + r) + ' ' + f(b.y) + ' Z';
+  }
+
+  function layVines(W, HH, B, O, P, stacked) {
+    var vines = [], blooms = [];
+    var arcB = Math.PI * B.r / 2, arcO = Math.PI * O.r / 2, LB = rimLen(B), LO = rimLen(O);
+    var clampY = function (y) { return Math.max(8, Math.min(HH - 10, y)); };
+    var bloom = function (vi, i, s) { blooms.push({ vine: vi, i: i, s: s }); };
+    var bottomL = pt(B.x + 10, B.y + B.h + 1.5), bottomR = pt(B.x + B.w - 10, B.y + B.h + 1.5);
+
+    // Lands on the heading's frame from the page edge, lies along its top, and
+    // one shoot falls back over the near corner and down the side.
+    var onBox = function (v, sag) {
+      if (B.x > 24) v.add(swag(pt(0, clampY(B.y - 30)), rimPt(B, arcB * 0.5), sag));
+      var land = Math.max(0, v.here());
+      bloom(vines.indexOf(v), land, 0.95);
+      v.add(rim(B, arcB * 0.5, LB));
+      var fall = new Vine({ vine: vines.indexOf(v), i: land });
+      fall.add(rim(B, arcB * 0.5, 0)).add(drop(B, -1, stacked ? Math.min(40, B.h * 0.12) : B.h * 0.42)).curl(1, 6);
+      return fall;
+    };
+    // A garland slung under the heading's frame, with a drip from its low point.
+    var garland = function () {
+      // Kept clear of the section's bottom edge, leaves included; the drip only
+      // where there is room for it.
+      var room = HH - bottomL.y - 26, dripping = room > 70;
+      if (room < 8) return;
+      var g = new Vine(), under = swag(bottomL, bottomR, stacked ? 16 : 20, Math.max(4, room - (dripping ? 44 : 0)));
+      vines.push(g);
+      g.add(under);
+      var low = lowest(under);
+      if (!stacked) {
+        var c = pt(O.x + 8, O.y + O.h + 1.5);
+        g.add(swag(bottomR, c, 22, Math.max(4, HH - Math.max(bottomR.y, c.y) - 26)));
+        bloom(vines.indexOf(g), g.here(), 0.85);
+      }
+      if (dripping) vines.push(new Vine({ vine: vines.indexOf(g), i: low }).add(drip(under[low], 26)).curl(1, 5));
+    };
+
+    if (!stacked) {
+      // Side by side. One vine lies along the top of the heading's frame, swags
+      // across to the photo, rests over the top of its outline and hangs down
+      // the far side.
+      var main = new Vine();
+      vines.push(main);
+      var fall = onBox(main, 24);
+      var toPhoto = swag(main.p[main.here()], rimPt(O, arcO * 0.5), 28), base = main.here();
+      main.add(toPhoto);
+      var sagAt = base + lowest(toPhoto);
+      bloom(0, main.here(), 1.15);
+      // Over the outline's top, then onto the photo itself where it stands out
+      // further, and down the photo's right edge (the outline's is behind it).
+      var x = crossover(O, P);
+      main.add(rim(O, arcO * 0.5, x.a)).add(rim(P, x.b, rimLen(P))).add(drop(P, 1, P.h * 0.3)).curl(-1, 7);
+      vines.push(fall);
+      if (O.x - (B.x + B.w) > 50) {
+        var bud = new Vine({ vine: 0, i: sagAt }).add(drip(main.p[sagAt], 34));
+        vines.push(bud);
+        bloom(vines.length - 1, bud.here(), 0.6);
+      }
+      garland();
+    } else {
+      // Phone: the photo sits above the text. One vine drapes over the photo's
+      // outline from edge to edge; another lies along the heading's frame.
+      var over = new Vine();
+      vines.push(over);
+      over.add(swag(pt(0, clampY(O.y + O.h * 0.22)), rimPt(O, arcO * 0.5), 20));
+      bloom(0, over.here(), 1.05);
+      var xo = crossover(O, P);
+      over.add(rim(O, arcO * 0.5, xo.a)).add(rim(P, xo.b, rimLen(P)))
+        .add(swag(rimPt(P, rimLen(P)), pt(W, clampY(P.y + P.h * 0.3)), 20));
+      var ledge = new Vine();
+      vines.push(ledge);
+      var fallP = onBox(ledge, 18);
+      ledge.add(drop(B, 1, Math.min(40, B.h * 0.12))).curl(-1, 6);
+      vines.push(fallP);
+      garland();
+    }
+
+    var leaves = [];
+    vines.forEach(function (v, vi) {
+      v.finish();
+      leaves = leaves.concat(leavesOn(v, vi, v.root ? 36 : 44, v.root ? 15 : 19));
+    });
+    vines.forEach(function (v) { if (v.root) v.root.at = vines[v.root.vine].at(v.root.i); });
+    blooms.forEach(function (b) { var v = vines[b.vine]; b.at = v.at(b.i); b.x = v.p[b.i].x; b.y = v.p[b.i].y; });
+    return { vines: vines, leaves: leaves, blooms: blooms };
   }
 
   function drawVines(hero, animate) {
     var fig = hero.querySelector('.arch'), text = hero.querySelector('.page-hero-text');
     if (!fig || !text) return;
-    var H = hero.getBoundingClientRect(), F = fig.getBoundingClientRect(), T = text.getBoundingClientRect();
+    var H = hero.getBoundingClientRect(), F = fig.getBoundingClientRect();
     var W = H.width, HH = H.height;
-    var o = { x: F.left - H.left - SHIFT, y: F.top - H.top - SHIFT, w: F.width, h: F.height };
+    // The text's own extent, not its grid column, which can be much wider.
+    var T = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+    Array.prototype.forEach.call(text.children, function (c) {
+      var R = c.getBoundingClientRect();
+      if (!R.width) return;
+      T.l = Math.min(T.l, R.left - H.left); T.r = Math.max(T.r, R.right - H.left);
+      T.t = Math.min(T.t, R.top - H.top); T.b = Math.max(T.b, R.bottom - H.top);
+    });
     var framed = fig.classList.contains('is-framed');
-    var r = framed ? 18 : o.w / 2;
-    var tx = T.left - H.left, tr = T.right - H.left, ty = T.top - H.top, tb = T.bottom - H.top;
-    var sideL = [o.x, o.y + r], sideR = [o.x + o.w, o.y + r];
-    var apex = [o.x + o.w / 2, o.y], cornerBL = [o.x + 6, o.y + o.h], cornerBR = [o.x + o.w - 6, o.y + o.h];
-    var clampY = function (y) { return Math.max(8, Math.min(HH - 10, y)); };
-    var parts = [];
+    var ox = F.left - H.left - SHIFT, oy = F.top - H.top - SHIFT;
+    var O = { x: ox, y: oy, w: F.width, h: F.height, r: framed ? 14 : F.width / 2 };
+    var stacked = F.bottom <= T.t + H.top + 2;
+    // On a phone the text nearly fills the width; keep room for vines at the sides.
+    var padX = Math.max(8, Math.min(BOX_PAD, stacked ? Math.min(T.l, W - T.r) - 16 : Math.min(T.l - 6, (ox - T.r) / 2)));
+    var padY = Math.max(10, Math.min(BOX_PAD, stacked ? (T.t - (oy + SHIFT + F.height)) / 2 : BOX_PAD));
+    var padB = Math.max(6, Math.min(padY, HH - T.b - 8));
+    var B = { x: T.l - padX, y: T.t - padY, w: T.r - T.l + 2 * padX, h: T.b - T.t + padY + padB, r: BOX_R };
+    var P = { x: ox + SHIFT, y: oy + SHIFT, w: F.width, h: F.height, r: O.r };
+    var art = layVines(W, HH, B, O, P, stacked);
 
-    if (F.bottom <= T.top + 2) {
-      // Phone: the photo sits above the text. Vines grow from the frame's
-      // lower corners out toward the heading, and one climbs into its side.
-      var cl = [cornerBL, [cornerBL[0] - 70, cornerBL[1]], [8, clampY(ty - 40)], [0, clampY(ty + 26)]];
-      var cr = [cornerBR, [cornerBR[0] + 70, cornerBR[1]], [W - 8, clampY(ty - 40)], [W, clampY(ty + 26)]];
-      var cs = [[0, clampY(o.y + o.h * 0.8)], [o.x * 0.1, clampY(o.y + o.h * 0.5)], [sideL[0], sideL[1] - 60], sideL];
-      parts.push(curve(cl), curve(cr), curve(cs));
-      parts.push(leaf(cl, 0.45, 1, 18, 0), leaf(cl, 0.7, -1, 15, 0), leaf(cr, 0.45, -1, 18, 1), leaf(cr, 0.7, 1, 15, 1), leaf(cs, 0.4, 1, 15, 2));
-      parts.push(bloom(sideL[0], sideL[1], 1.05));
-    } else {
-      // Side by side: one vine arches over the heading and flows down into the
-      // frame's side, one sweeps under the text into its bottom corner, and a
-      // third drapes onto the top of the arch.
-      var over = [[0, clampY(ty - 18)], [tx + (tr - tx) * 0.5, clampY(ty - 120)], [sideL[0], clampY(sideL[1] - 140)], sideL];
-      var under = [[0, clampY(tb + 44)], [tx + (tr - tx) * 0.55, clampY(tb + 120)], [cornerBL[0] - 150, cornerBL[1]], cornerBL];
-      var start = [tr + (o.x - tr) * 0.25, clampY(ty - 60)];
-      var drape = [start, [start[0] + 20, clampY(apex[1] + 70)], [apex[0] - 110, apex[1]], apex];
-      parts.push(curve(over), curve(under), curve(drape));
-      parts.push(leaf(over, 0.26, 1, 22, 0), leaf(over, 0.42, -1, 20, 0), leaf(over, 0.6, 1, 19, 0), leaf(over, 0.78, -1, 16, 0));
-      parts.push(leaf(under, 0.3, -1, 20, 1), leaf(under, 0.5, 1, 19, 1), leaf(under, 0.72, -1, 16, 1));
-      parts.push(leaf(drape, 0.35, 1, 15, 2), leaf(drape, 0.62, -1, 14, 2));
-      parts.push(bloom(sideL[0], sideL[1], 1.25), bloom(start[0], start[1], 0.8));
-    }
+    var html = '<path class="frame" d="' + boxPath(B) + '"/>';
+    art.vines.forEach(function (v) { html += '<path class="vine" d="' + v.d + '"/>'; });
+    art.leaves.forEach(function (l) { html += '<path class="leaf grow" d="' + l.d + '"/>'; });
+    art.blooms.forEach(function (b) { html += bloomSvg(b.x, b.y, b.s); });
 
     var svg = hero.querySelector('svg.hero-vines');
     if (!svg) {
@@ -185,35 +371,53 @@
       hero.insertBefore(svg, hero.firstChild);
     }
     svg.setAttribute('viewBox', '0 0 ' + W.toFixed(0) + ' ' + HH.toFixed(0));
-    svg.innerHTML = parts.join('');
-
-    if (!animate) return;
-    growVines(svg);
+    svg.innerHTML = html;
+    if (animate) growVines(svg, art);
   }
 
-  // Grow like a live vine: each stem draws out from its root, and every leaf
-  // unfurls from its base only once the tip has passed it. Blooms open last.
-  var GROW_START = 600;  // ms; lets the photo appear first
-  var GROW_STAGGER = 180; // ms between the stems setting off
-  var GROW_SPEED = 0.75;  // px per ms, so long and short stems grow alike
-  var LEAF_LAG = 60;      // ms after the tip passes before a leaf sprouts
-  function growVines(svg) {
-    var stems = Array.prototype.map.call(svg.querySelectorAll('.draw'), function (p, i) {
-      var len = p.getTotalLength();
-      p.style.transition = 'none'; p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
-      return { el: p, len: len, start: GROW_START + i * GROW_STAGGER, dur: Math.max(650, Math.min(1400, len / GROW_SPEED)) };
+  // Grow like a live vine. The heading's frame draws first, since the vines
+  // need something to lie on; then each stem grows out from where it starts,
+  // side shoots set off when the stem reaches them, every leaf unfurls from its
+  // base once the tip has passed it, and blooms open just behind the tip.
+  var FRAME_START = 250, FRAME_DUR = 700;
+  var GROW_START = 800;   // ms; the frame is mostly drawn and the photo is in
+  var GROW_STAGGER = 220; // ms between independent vines setting off
+  var GROW_SPEED = 0.95;  // px per ms, so long and short stems grow alike
+  var LEAF_LAG = 60, BLOOM_LAG = 120; // ms after the tip passes
+  var EASE = 2.2;         // stems ease out: offset = len * (1 - x)^EASE
+  function tipTime(s, at) { return s.start + s.dur * (1 - Math.pow(1 - at, 1 / EASE)); }
+
+  function growVines(svg, art) {
+    var frameEl = svg.querySelector('.frame'), frameLen = frameEl.getTotalLength();
+    var stems = [{ el: frameEl, len: frameLen, start: FRAME_START, dur: FRAME_DUR }];
+    var free = 0;
+    Array.prototype.forEach.call(svg.querySelectorAll('.vine'), function (el, i) {
+      var v = art.vines[i], len = el.getTotalLength(), dur = Math.max(450, Math.min(1700, len / GROW_SPEED));
+      // Parents come before their shoots, so a parent's timing is always known here.
+      var start = v.root ? tipTime(stems[v.root.vine + 1], v.root.at) : GROW_START + GROW_STAGGER * free++;
+      stems.push({ el: el, len: len, start: start, dur: dur });
     });
-    var leaves = Array.prototype.map.call(svg.querySelectorAll('.leaf'), function (g) {
-      var s = stems[+g.dataset.v];
-      g.style.transformBox = 'view-box'; g.style.transformOrigin = g.dataset.o.replace(' ', 'px ') + 'px';
-      g.style.transition = 'none';
-      g.style.transform = 'rotate(' + (g.dataset.side * -35) + 'deg) scale(0)'; g.style.opacity = '0';
-      // The stem eases out, so invert that easing to find when the tip gets here.
-      return { el: g, at: s ? s.start + s.dur * (1 - Math.pow(1 - g.dataset.at, 1 / 2.2)) + LEAF_LAG : 0, done: false };
+    stems.forEach(function (s) {
+      s.el.style.transition = 'none'; s.el.style.strokeDasharray = s.len; s.el.style.strokeDashoffset = s.len;
     });
-    var end = stems.reduce(function (m, s) { return Math.max(m, s.start + s.dur); }, GROW_START);
-    var blooms = svg.querySelectorAll('[data-bloom]');
-    Array.prototype.forEach.call(blooms, function (b) { b.style.transform = 'scale(0)'; b.style.opacity = '0'; });
+
+    var events = [];
+    Array.prototype.forEach.call(svg.querySelectorAll('.leaf'), function (el, i) {
+      var l = art.leaves[i];
+      el.style.transition = 'none'; el.style.transformBox = 'view-box';
+      el.style.transformOrigin = l.x.toFixed(1) + 'px ' + l.y.toFixed(1) + 'px';
+      el.style.transform = 'rotate(' + (l.dir * -35) + 'deg) scale(0)'; el.style.opacity = '0';
+      events.push({ t: tipTime(stems[l.vine + 1], l.at) + LEAF_LAG, go: function () {
+        el.style.transition = 'transform .55s cubic-bezier(.34, 1.45, .64, 1), opacity .25s ease-out';
+        el.style.transform = ''; el.style.opacity = '';
+      } });
+    });
+    Array.prototype.forEach.call(svg.querySelectorAll('.bloom'), function (el, i) {
+      var b = art.blooms[i];
+      el.style.transform = 'scale(0)'; el.style.opacity = '0';
+      events.push({ t: tipTime(stems[b.vine + 1], b.at) + BLOOM_LAG, go: function () { el.style.transform = ''; el.style.opacity = ''; } });
+    });
+    events.sort(function (a, b) { return a.t - b.t; });
 
     var t0 = performance.now();
     (function frame(now) {
@@ -221,23 +425,11 @@
       var t = now - t0, busy = false;
       stems.forEach(function (s) {
         var x = Math.max(0, Math.min(1, (t - s.start) / s.dur));
-        s.el.style.strokeDashoffset = s.len * Math.pow(1 - x, 2.2);
+        s.el.style.strokeDashoffset = s.len * Math.pow(1 - x, EASE);
         if (x < 1) busy = true;
       });
-      leaves.forEach(function (l) {
-        if (l.done) return;
-        if (t < l.at) { busy = true; return; }
-        l.done = true;
-        l.el.style.transition = 'transform .55s cubic-bezier(.34, 1.45, .64, 1), opacity .25s ease-out';
-        l.el.style.transform = ''; l.el.style.opacity = '';
-      });
-      if (t >= end) {
-        Array.prototype.forEach.call(blooms, function (b, i) {
-          b.style.transitionDelay = (i * 0.12) + 's'; b.style.transform = ''; b.style.opacity = '';
-        });
-        return;
-      }
-      if (busy) requestAnimationFrame(frame);
+      while (events.length && events[0].t <= t) events.shift().go();
+      if (busy || events.length) requestAnimationFrame(frame);
     })(t0);
   }
 

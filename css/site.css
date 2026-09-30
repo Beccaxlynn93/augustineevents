@@ -264,10 +264,12 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
   padding-top: calc(var(--header-h) + clamp(28px, 5vw, 64px));
   padding-bottom: clamp(56px, 7vw, 96px);
 }
-/* Flowing vines drawn by js/site.js from the heading area into the photo's
-   outline. Behind the content, and thin enough never to compete with text. */
+/* Line art drawn by js/site.js: a fine frame around the heading, with vines
+   hung over it and the photo's outline. Behind the content, and thin enough
+   never to compete with text. */
 .hero-vines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; color: var(--green); }
 .hero-vines path { fill: none; stroke: currentColor; stroke-width: 1.15; stroke-linecap: round; stroke-linejoin: round; opacity: 0.5; }
+.hero-vines .frame { stroke: var(--line-strong); stroke-width: 1; opacity: 1; }
 .hero-vines .leaf { stroke-width: 1; opacity: 0.48; fill: currentColor; fill-opacity: 0.06; }
 .hero-vines .bloom { fill: currentColor; stroke: none; opacity: 0.62; }
 .hero-vines .bloom-core { fill: var(--cream); stroke: none; opacity: 1; }

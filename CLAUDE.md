@@ -367,15 +367,22 @@ made with `color-mix`, never a new hue.
   curve trimmed her hair. A framed photo must set `--ratio` inline (for example
   `--ratio: 699 / 754`) or the page reserves no space for it and jumps on load.
 - **Header and footer markup is identical on every page.** Change all six together.
-- **Line art (`drawVines` in `js/site.js`).** Each interior `.page-hero` gets three
-  vines: one arches over the heading into the side of the photo's outline, one sweeps
-  under the text into its bottom corner, one drapes onto the top of the arch, with
-  leaves and a small bloom at the junction. The curves are **measured** from the
-  heading and frame at runtime, not drawn by hand, because the frame sits differently
-  at every width; each lands on the outline tangentially so it reads as growing into
-  it. Phones get their own composition, since the photo sits above the text there.
-  Redrawn on resize (without animating) and after `document.fonts.ready`, because the
-  webfont changes the heading's size and so the curves.
+- **Line art (`drawVines` in `js/site.js`).** Each interior `.page-hero` gets a fine
+  frame around the heading text (drawn in the SVG, sized to the text's own extent, not
+  its grid column) and vines hung over it and the photo's outline as if under
+  gravity: they rest along the top of each frame, swag across gaps (sag grows with
+  the span, capped by the room left in the section), drop down the sides and end in
+  curled tendrils. Leaves point away from a surface the vine lies on and droop where
+  it hangs. Desktop: one vine from the page edge along the heading's frame, across
+  to the photo, over its top and down its right edge, plus a shoot down the frame's
+  left side and a garland under it. Phone (photo above text): a vine over the photo
+  edge to edge, one along the top of the heading's frame with short tendrils at its
+  corners; the garland is dropped when the text runs to the section's bottom. All
+  **measured** at runtime, redrawn on resize (without animating) and after
+  `document.fonts.ready`. The entrance animation (`growVines`) draws the frame
+  first, then grows each stem from its root at a steady speed; side shoots, leaves
+  and blooms start as the tip reaches them. About 3s. Driven by
+  `requestAnimationFrame`, so it waits while the tab is hidden.
 - **The mark is the A monogram** (`favicon.svg`, and the same drawing inline in the
   header and footer): the A from `HeyLovely.ttf` converted to a path with fontTools,
   inside a fine-line floral wreath. The letter is enlarged and slightly thickened
