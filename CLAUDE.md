@@ -383,6 +383,18 @@ made with `color-mix`, never a new hue.
   first, then grows each stem from its root at a steady speed; side shoots, leaves
   and blooms start as the tip reaches them. About 3s. Driven by
   `requestAnimationFrame`, so it waits while the tab is hidden.
+- **Button hover vine (`buttonVine` in `js/site.js`).** On hover or keyboard focus a
+  sprig grows around the pill: over the left end with a small bloom and along the
+  top, plus a shorter one over the right end. Built on first hover, since a button's
+  size is only known then, and switched with a `.vine-on` class rather than `:hover`
+  so the first hover animates. Skipped on touch. Buttons no longer use
+  `overflow: hidden`; the hover fill is clipped by its own `clip-path` instead, so
+  the vine can grow outside the pill. Cream on the dark-background button styles.
+- **Rental category drawings (`.category-art` in `event-rentals.html`).** A small
+  line drawing stands on the right end of each category's rule and draws itself in
+  when scrolled into view: basket, fork, plate on a stand and knife (Tableware);
+  candelabra and candlestick (Décor); a draped round table (Linens); the fringe
+  umbrella (Outdoor). Hand-drawn inline SVG, `pathLength="1"` on every shape.
 - **The mark is the A monogram** (`favicon.svg`, and the same drawing inline in the
   header and footer): the A from `HeyLovely.ttf` converted to a path with fontTools,
   inside a fine-line floral wreath. The letter is enlarged and slightly thickened

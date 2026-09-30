@@ -448,9 +448,81 @@
     });
   }
 
+  // ---- buttons: a sprig of vine grows around the pill on hover --------------
+  // Wraps the left end with a small bloom and runs a little along the top, with
+  // a shorter sprig over the right end; the same leaves and tendrils as the
+  // hero vines. Built on first hover (a button's size is only known then) and
+  // grown by a class rather than :hover, so the very first hover animates too.
+  var BV_PAD = 14; // room around the pill for leaves
+  function pillPt(w, h, s) {
+    var r = h / 2, L = w - h, P = 2 * L + 2 * Math.PI * r, a, nx, ny, x, y;
+    var d = 3.5 + 1.5 * Math.pow(Math.max(0, Math.sin(s / 7)), 2);
+    s = ((s % P) + P) % P;
+    if (s < L) { x = r + s; y = -d; nx = 0; ny = -1; }
+    else if (s < L + Math.PI * r) {
+      a = -Math.PI / 2 + (s - L) / r; nx = Math.cos(a); ny = Math.sin(a); x = w - r + nx * (r + d); y = r + ny * (r + d);
+    } else if (s < 2 * L + Math.PI * r) { x = w - r - (s - L - Math.PI * r); y = h + d; nx = 0; ny = 1; }
+    else {
+      a = Math.PI / 2 + (s - 2 * L - Math.PI * r) / r; nx = Math.cos(a); ny = Math.sin(a); x = r + nx * (r + d); y = r + ny * (r + d);
+    }
+    return pt(x + BV_PAD, y + BV_PAD, 'rest', [nx, ny]);
+  }
+  function buttonVine(w, h) {
+    var r = h / 2, L = w - h, P = 2 * L + 2 * Math.PI * r;
+    var run = function (a, b) {
+      var n = Math.max(4, Math.ceil((b - a) / 4)), out = [];
+      for (var k = 0; k <= n; k++) out.push(pillPt(w, h, a + (b - a) * k / n));
+      return out;
+    };
+    var from = 2 * L + Math.PI * r - 14;
+    var stems = [
+      new Vine().add(run(from, P + L * 0.35)).curl(-1, 3.5).finish(),
+      new Vine().add(run(L * 0.78, L + Math.PI * r * 0.62)).curl(-1, 3).finish(),
+    ];
+    var GROW = 0.6, SECOND = 0.15; // s: stem growth, and the second sprig's head start delay
+    var html = '';
+    stems.forEach(function (v, i) {
+      html += '<path class="bv-stem" pathLength="1" style="--d:' + (i * SECOND) + 's" d="' + v.d + '"/>';
+    });
+    stems.forEach(function (v, i) {
+      leavesOn(v, i, 15, 8).forEach(function (l) {
+        html += '<path class="bv-leaf" style="--d:' + (i * SECOND + l.at * GROW + 0.04).toFixed(2) + 's;transform-origin:' +
+          l.x.toFixed(1) + 'px ' + l.y.toFixed(1) + 'px" d="' + l.d + '"/>';
+      });
+    });
+    var b = pillPt(w, h, 2 * L + 1.5 * Math.PI * r), at = (14 + Math.PI * r / 2) / stems[0].len;
+    html += '<g class="bv-bloom" style="--d:' + (at * GROW + 0.1).toFixed(2) + 's;transform-origin:' + b.x.toFixed(1) + 'px ' + b.y.toFixed(1) + 'px">' +
+      bloomSvg(b.x, b.y, 0.55) + '</g>';
+    var W = w + 2 * BV_PAD, H = h + 2 * BV_PAD;
+    return '<svg class="btn-vine" aria-hidden="true" focusable="false" width="' + W.toFixed(0) + '" height="' + H.toFixed(0) +
+      '" viewBox="0 0 ' + W.toFixed(0) + ' ' + H.toFixed(0) + '">' + html + '</svg>';
+  }
+  var canHover = window.matchMedia('(hover: hover)').matches;
+  document.querySelectorAll('.btn, .btn-green, .btn-outline, .btn-outline-white, .btn-light').forEach(function (el) {
+    var on = function (e) {
+      if (e.type === 'pointerenter' && (!canHover || e.pointerType === 'touch')) return;
+      var w = el.offsetWidth, h = el.offsetHeight, svg = el.querySelector('.btn-vine');
+      if (!w || !h) return;
+      if (!svg || el._bvSize !== w + 'x' + h) {
+        if (svg) svg.remove();
+        el.insertAdjacentHTML('beforeend', buttonVine(w, h));
+        el._bvSize = w + 'x' + h;
+        el.querySelector('.btn-vine').getBoundingClientRect(); // start from the bare state
+      }
+      el.classList.add('vine-on');
+    };
+    var off = function () { el.classList.remove('vine-on'); };
+    el.addEventListener('pointerenter', on);
+    el.addEventListener('pointerleave', off);
+    el.addEventListener('focus', function (e) { if (el.matches(':focus-visible')) on(e); });
+    el.addEventListener('blur', off);
+  });
+
   // ---- reveals ------------------------------------------------------------
-  var revealables = document.querySelectorAll('.fade-in, .reveal-clip, .flourish');
-  var reveal = function (el) { el.classList.add(el.classList.contains('flourish') ? 'is-drawn' : 'visible'); };
+  var revealables = document.querySelectorAll('.fade-in, .reveal-clip, .flourish, .category-art');
+  var reveal = function (el) {
+    el.classList.add(el.classList.contains('flourish') || el.classList.contains('category-art') ? 'is-drawn' : 'visible');
+  };
   if (!io || reduceMotion) {
     revealables.forEach(reveal);
   } else {
