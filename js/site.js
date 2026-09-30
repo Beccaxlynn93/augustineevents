@@ -105,13 +105,24 @@
       u * u * u * c[0][1] + 3 * u * u * t * c[1][1] + 3 * u * t * t * c[2][1] + t * t * t * c[3][1],
     ];
   }
-  function leaf(c, t, side, len) {
+  // How far along the curve's length parameter t sits, 0 to 1, so a leaf can
+  // sprout the moment the growing stem reaches it.
+  function arcFrac(c, t) {
+    var total = 0, upto = 0, prev = c[0], N = 64;
+    for (var k = 1; k <= N; k++) {
+      var q = bez(c, k / N), d = Math.hypot(q[0] - prev[0], q[1] - prev[1]);
+      total += d; if (k / N <= t) upto += d; prev = q;
+    }
+    return total ? upto / total : 0;
+  }
+  function leaf(c, t, side, len, v) {
     var P = bez(c, t), Q = bez(c, Math.min(1, t + 0.01));
     var a = Math.atan2(Q[1] - P[1], Q[0] - P[0]) + side * 0.85;
     var w = len * 0.36, ex = P[0] + Math.cos(a) * len, ey = P[1] + Math.sin(a) * len;
     var nx = -Math.sin(a) * w, ny = Math.cos(a) * w, mx = (P[0] + ex) / 2, my = (P[1] + ey) / 2;
     var f = function (n) { return n.toFixed(1); };
-    return '<path class="leaf grow" d="M' + f(P[0]) + ' ' + f(P[1]) + ' Q' + f(mx + nx) + ' ' + f(my + ny) + ' ' + f(ex) + ' ' + f(ey) +
+    return '<path class="leaf grow" data-v="' + v + '" data-at="' + arcFrac(c, t).toFixed(3) + '" data-side="' + side +
+      '" data-o="' + f(P[0]) + ' ' + f(P[1]) + '" d="M' + f(P[0]) + ' ' + f(P[1]) + ' Q' + f(mx + nx) + ' ' + f(my + ny) + ' ' + f(ex) + ' ' + f(ey) +
       ' Q' + f(mx - nx) + ' ' + f(my - ny) + ' ' + f(P[0]) + ' ' + f(P[1]) + '"/>';
   }
   function curve(c) {
@@ -123,7 +134,7 @@
     for (var k = 0; k < 5; k++) {
       petals += '<path transform="rotate(' + k * 72 + ')" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/>';
     }
-    return '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') scale(' + s + ')"><g class="bloom grow">' + petals +
+    return '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') scale(' + s + ')"><g class="bloom grow" data-bloom>' + petals +
       '<circle class="bloom-core" r="2.2"/></g></g>';
   }
 
@@ -148,7 +159,7 @@
       var cr = [cornerBR, [cornerBR[0] + 70, cornerBR[1]], [W - 8, clampY(ty - 40)], [W, clampY(ty + 26)]];
       var cs = [[0, clampY(o.y + o.h * 0.8)], [o.x * 0.1, clampY(o.y + o.h * 0.5)], [sideL[0], sideL[1] - 60], sideL];
       parts.push(curve(cl), curve(cr), curve(cs));
-      parts.push(leaf(cl, 0.45, 1, 18), leaf(cl, 0.7, -1, 15), leaf(cr, 0.45, -1, 18), leaf(cr, 0.7, 1, 15), leaf(cs, 0.4, 1, 15));
+      parts.push(leaf(cl, 0.45, 1, 18, 0), leaf(cl, 0.7, -1, 15, 0), leaf(cr, 0.45, -1, 18, 1), leaf(cr, 0.7, 1, 15, 1), leaf(cs, 0.4, 1, 15, 2));
       parts.push(bloom(sideL[0], sideL[1], 1.05));
     } else {
       // Side by side: one vine arches over the heading and flows down into the
@@ -159,9 +170,9 @@
       var start = [tr + (o.x - tr) * 0.25, clampY(ty - 60)];
       var drape = [start, [start[0] + 20, clampY(apex[1] + 70)], [apex[0] - 110, apex[1]], apex];
       parts.push(curve(over), curve(under), curve(drape));
-      parts.push(leaf(over, 0.26, 1, 22), leaf(over, 0.42, -1, 20), leaf(over, 0.6, 1, 19), leaf(over, 0.78, -1, 16));
-      parts.push(leaf(under, 0.3, -1, 20), leaf(under, 0.5, 1, 19), leaf(under, 0.72, -1, 16));
-      parts.push(leaf(drape, 0.35, 1, 15), leaf(drape, 0.62, -1, 14));
+      parts.push(leaf(over, 0.26, 1, 22, 0), leaf(over, 0.42, -1, 20, 0), leaf(over, 0.6, 1, 19, 0), leaf(over, 0.78, -1, 16, 0));
+      parts.push(leaf(under, 0.3, -1, 20, 1), leaf(under, 0.5, 1, 19, 1), leaf(under, 0.72, -1, 16, 1));
+      parts.push(leaf(drape, 0.35, 1, 15, 2), leaf(drape, 0.62, -1, 14, 2));
       parts.push(bloom(sideL[0], sideL[1], 1.25), bloom(start[0], start[1], 0.8));
     }
 
@@ -177,20 +188,57 @@
     svg.innerHTML = parts.join('');
 
     if (!animate) return;
-    var lines = svg.querySelectorAll('.draw'), growers = svg.querySelectorAll('.grow');
-    Array.prototype.forEach.call(lines, function (p) {
+    growVines(svg);
+  }
+
+  // Grow like a live vine: each stem draws out from its root, and every leaf
+  // unfurls from its base only once the tip has passed it. Blooms open last.
+  var GROW_START = 600;  // ms; lets the photo appear first
+  var GROW_STAGGER = 180; // ms between the stems setting off
+  var GROW_SPEED = 0.75;  // px per ms, so long and short stems grow alike
+  var LEAF_LAG = 60;      // ms after the tip passes before a leaf sprouts
+  function growVines(svg) {
+    var stems = Array.prototype.map.call(svg.querySelectorAll('.draw'), function (p, i) {
       var len = p.getTotalLength();
-      p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+      p.style.transition = 'none'; p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+      return { el: p, len: len, start: GROW_START + i * GROW_STAGGER, dur: Math.max(650, Math.min(1400, len / GROW_SPEED)) };
     });
-    Array.prototype.forEach.call(growers, function (g) { g.style.transform = 'scale(0)'; g.style.opacity = '0'; });
-    requestAnimationFrame(function () { requestAnimationFrame(function () {
-      Array.prototype.forEach.call(lines, function (p, i) {
-        p.style.transitionDelay = (0.7 + i * 0.25) + 's'; p.style.strokeDashoffset = '0';
+    var leaves = Array.prototype.map.call(svg.querySelectorAll('.leaf'), function (g) {
+      var s = stems[+g.dataset.v];
+      g.style.transformBox = 'view-box'; g.style.transformOrigin = g.dataset.o.replace(' ', 'px ') + 'px';
+      g.style.transition = 'none';
+      g.style.transform = 'rotate(' + (g.dataset.side * -35) + 'deg) scale(0)'; g.style.opacity = '0';
+      // The stem eases out, so invert that easing to find when the tip gets here.
+      return { el: g, at: s ? s.start + s.dur * (1 - Math.pow(1 - g.dataset.at, 1 / 2.2)) + LEAF_LAG : 0, done: false };
+    });
+    var end = stems.reduce(function (m, s) { return Math.max(m, s.start + s.dur); }, GROW_START);
+    var blooms = svg.querySelectorAll('[data-bloom]');
+    Array.prototype.forEach.call(blooms, function (b) { b.style.transform = 'scale(0)'; b.style.opacity = '0'; });
+
+    var t0 = performance.now();
+    (function frame(now) {
+      if (!svg.isConnected) return;
+      var t = now - t0, busy = false;
+      stems.forEach(function (s) {
+        var x = Math.max(0, Math.min(1, (t - s.start) / s.dur));
+        s.el.style.strokeDashoffset = s.len * Math.pow(1 - x, 2.2);
+        if (x < 1) busy = true;
       });
-      Array.prototype.forEach.call(growers, function (g, i) {
-        g.style.transitionDelay = (1.6 + i * 0.09) + 's'; g.style.transform = ''; g.style.opacity = '';
+      leaves.forEach(function (l) {
+        if (l.done) return;
+        if (t < l.at) { busy = true; return; }
+        l.done = true;
+        l.el.style.transition = 'transform .55s cubic-bezier(.34, 1.45, .64, 1), opacity .25s ease-out';
+        l.el.style.transform = ''; l.el.style.opacity = '';
       });
-    }); });
+      if (t >= end) {
+        Array.prototype.forEach.call(blooms, function (b, i) {
+          b.style.transitionDelay = (i * 0.12) + 's'; b.style.transform = ''; b.style.opacity = '';
+        });
+        return;
+      }
+      if (busy) requestAnimationFrame(frame);
+    })(t0);
   }
 
   var heroes = document.querySelectorAll('.page-hero');
