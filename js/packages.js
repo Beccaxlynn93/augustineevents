@@ -18,13 +18,12 @@
       window.__lineArt(name) + '</svg>';
   };
 
-  // Every line below is taken from the packages as the site has always listed them.
+  // Who plays, as the owners worded it on 2026-09-30.
   var PLAYERS = {
-    Solo: ['Violin or voice with Becca, or piano with Justin'],
-    Duo: ['Violin or voice with Becca, or piano with Justin', 'Piano or guitar accompaniment'],
-    Trio: ['Violin or voice with Becca, or piano with Justin', 'Piano', 'Guitar'],
+    Solo: ['Violin and/or voice with Becca (comes with custom piano backing tracks)', 'Piano with Justin'],
+    Duo: ['Violin or voice with Becca', 'Piano or guitar with Justin'],
+    Trio: ['Violin or voice with Becca', 'Piano', 'Guitar'],
   };
-  var INSTRUMENTS = { Solo: ['violin'], Duo: ['violin', 'piano'], Trio: ['violin', 'piano', 'guitar'] };
   var CEREMONY = [
     ['Prelude', '20 to 30 minutes of music while your guests are being seated'],
     ['Processional', 'Bridal party and bride entrance'],
@@ -50,11 +49,11 @@
         '<a class="btn" href="contact.html?package=' + encodeURIComponent(name) + '">Book ' + esc(name) + ' ' + ARROW + '</a>' +
       '</div>' +
       '<div class="pkg-detail-cols">' +
-        '<section class="pkg-col"><div class="pkg-col-art">' + INSTRUMENTS[tier].map(art).join('') + '</div>' +
+        '<section class="pkg-col"><div class="pkg-col-art">' + art('ens-' + tier.toLowerCase()) + '</div>' +
           '<h4>Who plays</h4>' + list(PLAYERS[tier]) + '</section>' +
         '<section class="pkg-col"><div class="pkg-col-art">' + art('notes') + '</div>' +
           '<h4>Your ceremony</h4><ol class="pkg-timeline">' + timeline + '</ol>' +
-          '<p class="pkg-note">We learn three songs chosen by you, so your ceremony feels personal to the two of you.</p>' +
+          '<p class="pkg-note">We learn up to four songs chosen by you, so your ceremony feels personal to the two of you.</p>' +
           (coverage === 'cocktail'
             ? '<h4>Cocktail hour</h4>' + list(['1 full hour of music in your choice of genre', 'Classical, pop/rock, Disney, and more'])
             : '') +

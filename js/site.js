@@ -230,6 +230,15 @@
     }
     return out;
   }
+  // A note floating just above the vine, tilted a little either way.
+  function noteSvg(x, y, kind, s, tilt) {
+    var g = kind === 'pair'
+      ? '<ellipse cx="0" cy="0" rx="3.4" ry="2.4" transform="rotate(-20)"/><ellipse cx="10" cy="-3" rx="3.4" ry="2.4" transform="rotate(-20 10 -3)"/>' +
+        '<path d="M3.1 -0.8 V-16 M13.1 -3.8 V-19"/><path class="beam" d="M3.1 -16 L13.1 -19"/>'
+      : '<ellipse cx="0" cy="0" rx="3.4" ry="2.4" transform="rotate(-20)"/><path d="M3.1 -0.8 V-16 C 5 -12, 9 -11, 8.5 -5.5"/>';
+    return '<g transform="translate(' + (x + 2).toFixed(1) + ' ' + (y - 16).toFixed(1) + ') rotate(' + tilt + ') scale(' + s + ')">' +
+      '<g class="bloom grow note">' + g + '</g></g>';
+  }
   function bloomSvg(x, y, s) {
     var petals = '';
     for (var k = 0; k < 5; k++) {
@@ -246,7 +255,7 @@
       ' V' + f(b.y + r) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(b.x + r) + ' ' + f(b.y) + ' Z';
   }
 
-  function layVines(W, HH, B, O, P, stacked) {
+  function layVines(W, HH, B, O, P, stacked, notes) {
     var vines = [], blooms = [];
     var arcB = Math.PI * B.r / 2, arcO = Math.PI * O.r / 2, LB = rimLen(B), LO = rimLen(O);
     var clampY = function (y) { return Math.max(8, Math.min(HH - 10, y)); };
@@ -283,9 +292,10 @@
     };
 
     if (!stacked) {
-      // Side by side. One vine lies along the top of the heading's frame, swags
-      // across to the photo, rests over the top of its outline and hangs down
-      // the far side.
+      // Side by side. One vine runs the whole width: in from the left edge,
+      // along the top of the heading's frame, across to the photo, over the top
+      // of its outline and out to the right edge, with a shoot hanging down the
+      // photo's far side.
       var main = new Vine();
       vines.push(main);
       var fall = onBox(main, 24);
@@ -296,8 +306,15 @@
       // Over the outline's top, then onto the photo itself where it stands out
       // further, and down the photo's right edge (the outline's is behind it).
       var x = crossover(O, P);
-      main.add(rim(O, arcO * 0.5, x.a)).add(rim(P, x.b, rimLen(P))).add(drop(P, 1, P.h * 0.3)).curl(-1, 7);
-      vines.push(fall);
+      main.add(rim(O, arcO * 0.5, x.a)).add(rim(P, x.b, rimLen(P)));
+      var overP = main.here();
+      if (W - (P.x + P.w) > 30) {
+        main.add(swag(main.p[overP], pt(W, clampY(P.y + P.h * 0.22)), 26));
+        vines.push(fall, new Vine({ vine: 0, i: overP }).add(drop(P, 1, P.h * 0.3)).curl(-1, 7));
+      } else {
+        main.add(drop(P, 1, P.h * 0.3)).curl(-1, 7);
+        vines.push(fall);
+      }
       if (O.x - (B.x + B.w) > 50) {
         var bud = new Vine({ vine: 0, i: sagAt }).add(drip(main.p[sagAt], 34));
         vines.push(bud);
@@ -316,12 +333,21 @@
         .add(swag(rimPt(P, rimLen(P)), pt(W, clampY(P.y + P.h * 0.3)), 20));
       var ledge = new Vine();
       vines.push(ledge);
-      var fallP = onBox(ledge, 18);
-      ledge.add(drop(B, 1, Math.min(40, B.h * 0.12))).curl(-1, 6);
-      vines.push(fallP);
+      var fallP = onBox(ledge, 18), edgeR = ledge.here();
+      // Out to the right edge too, with a short tendril down the frame's side.
+      ledge.add(swag(ledge.p[edgeR], pt(W, clampY(B.y - 20)), 12));
+      vines.push(fallP, new Vine({ vine: 1, i: edgeR }).add(drop(B, 1, Math.min(40, B.h * 0.12))).curl(-1, 6));
       garland();
     }
 
+    // Music notes drifting up off the main vine (the Event Music header).
+    // On a phone they sit on the vine above the heading instead, clear of the header bar.
+    if (notes) {
+      var nv = stacked ? 1 : 0, spots = stacked ? [0.22, 0.5, 0.78] : [0.08, 0.24, 0.42, 0.6, 0.76, 0.92];
+      spots.forEach(function (f, k) {
+        blooms.push({ vine: nv, i: Math.round(f * (vines[nv].p.length - 1)), note: k % 3 === 1 ? 'pair' : 'eighth', s: (stacked ? 0.8 : 1) * (k % 2 ? 0.9 : 1.1) });
+      });
+    }
     return finishArt(vines, blooms, 1);
   }
 
@@ -423,7 +449,7 @@
     var padB = Math.max(6, Math.min(padY, HH - T.b - 8));
     var B = { x: T.l - padX, y: T.t - padY, w: T.r - T.l + 2 * padX, h: T.b - T.t + padY + padB, r: BOX_R };
     var P = { x: ox + SHIFT, y: oy + SHIFT, w: F.width, h: F.height, r: O.r };
-    paint(hero, B, layVines(W, HH, B, O, P, stacked), animate ? 0 : -1);
+    paint(hero, B, layVines(W, HH, B, O, P, stacked, hero.hasAttribute('data-vine-notes')), animate ? 0 : -1);
   }
 
   // Writes one art set into host's line-art layer. `lead` < 0 draws it complete;
@@ -433,7 +459,7 @@
     var html = '<path class="frame" d="' + boxPath(B) + '"/>';
     art.vines.forEach(function (v) { html += '<path class="vine" d="' + v.d + '"/>'; });
     art.leaves.forEach(function (l) { html += '<path class="leaf grow" d="' + l.d + '"/>'; });
-    art.blooms.forEach(function (b) { html += bloomSvg(b.x, b.y, b.s); });
+    art.blooms.forEach(function (b, k) { html += b.note ? noteSvg(b.x, b.y, b.note, b.s, k % 2 ? 12 : -10) : bloomSvg(b.x, b.y, b.s); });
 
     var svg = hero.querySelector('svg.hero-vines');
     if (!svg) {
@@ -622,24 +648,43 @@
     return ['e ' + x + ' ' + y + ' 3.6 2.6 -20', 'M' + (x + 3.3) + ' ' + (y - 1) + ' V' + (y - h)].concat(flag ?
       ['M' + (x + 3.3) + ' ' + (y - h) + ' C ' + (x + 5.3) + ' ' + (y - h + 4.5) + ', ' + (x + 10) + ' ' + (y - h + 5.5) + ', ' + (x + 9) + ' ' + (y - h + 12)] : []);
   };
+  // Instruments, drawn once and placed into the package scenes. A shape that
+  // starts with "!" is solid: filled with the colour behind it (--art-bg), so
+  // an instrument in front hides the lines of the one behind it.
+  var VIOLIN = [
+    '!M32 44 C 40 44, 47 46, 48.5 52 C 49.5 57, 46 61, 44 63 C 42 67, 42 73, 44 77 C 49 80, 52.5 86, 52.5 94 C 52.5 106, 43 114, 32 114 C 21 114, 11.5 106, 11.5 94 C 11.5 86, 15 80, 20 77 C 22 73, 22 67, 20 63 C 18 61, 14.5 57, 15.5 52 C 17 46, 24 44, 32 44 Z',
+    '!M30 18 L28 80 Q32 82 36 80 L34 18 Z', '!M30 18 L29.5 9 H34.5 L34 18 Z',
+    'M29.5 9 C 28 5, 30 1.5, 33 1.8 C 36 2.1, 37 5.5, 35 7.2 C 33.5 8.4, 31.5 7.2, 32.2 5.6',
+    'M29.6 11.5 H26.5 M29.8 15.5 H27 M34.4 12.5 H37.5 M34.2 16.5 H37',
+    'M24.5 71 C 23 76, 26.5 80, 24 86', 'M39.5 71 C 41 76, 37.5 80, 40 86',
+    'c 24.7 70.6 0.9', 'c 23.8 86.4 0.9', 'c 39.3 70.6 0.9', 'c 40.2 86.4 0.9',
+    'M27 88.5 Q32 86.8 37 88.5', 'M31 18 V100 M33 18 V100', '!M29 99 L30 108 Q32 109.5 34 108 L35 99 Z', 'M32 114 V116.5',
+  ];
+  var BOW = ['M53 117 L61 5', 'M55.8 116 L62.6 11', '!M51.5 110 L56.5 110.8 L55.8 116 L50.8 115.2 Z', 'M61 5 L63 4 L62.6 11'];
+  var GUITAR = [
+    '!M30 54 C 40 54, 47 57, 47 64 C 47 69, 43 72, 43 76 C 43 80, 52 84, 52 98 C 52 112, 42 120, 30 120 C 18 120, 8 112, 8 98 C 8 84, 17 80, 17 76 C 17 72, 13 69, 13 64 C 13 57, 20 54, 30 54 Z',
+    '!M27.5 14 H32.5 V70 H27.5 Z', 'c 30 78 6.5', 'c 30 78 8.4',
+    'M37 86 C 43 88, 44 94, 40.5 96 C 37.5 97.5, 35.5 93, 37 86 Z', '!M22.5 102 H37.5 V106 H22.5 Z',
+    'M27.5 20 H32.5 M27.5 26 H32.5 M27.5 31.5 H32.5 M27.5 36.5 H32.5 M27.5 41 H32.5 M27.5 45 H32.5',
+    '!M27 14 L25.5 2.5 Q30 0.5 34.5 2.5 L33 14 Z', 'c 23.6 5.5 1.3', 'c 23.9 10 1.3', 'c 36.4 5.5 1.3', 'c 36.1 10 1.3',
+    'M29 14 V104 M31 14 V104',
+  ];
+  var PIANO = [
+    '!M9 14 H81 V56 H9 Z', '!M6 10 H84 V14 H6 Z', 'M17 44 V26 Q17 20 23 20 H67 Q73 20 73 26 V44',
+    'M35 37.5 Q40 35.5 45 37.5 Q50 35.5 55 37.5 V47 Q50 45 45 47 Q40 45 35 47 Z', 'M45 37.5 V47',
+    'M37.5 40 H42.5 M37.5 42 H42.5 M37.5 44 H42.5 M47.5 40 H52.5 M47.5 42 H52.5 M47.5 44 H52.5', 'M28 48.5 H62',
+    '!M9 66 H81 V92 H9 Z', 'M17 70 H73 V86 H17 Z', '!M3 56 H87 V61 H3 Z', '!M3 61 H87 V66 H3 Z', 'M9 61 V66 M15 61 V66 M21 61 V66 M27 61 V66 M33 61 V66 M39 61 V66 M45 61 V66 M51 61 V66 M57 61 V66 M63 61 V66 M69 61 V66 M75 61 V66 M81 61 V66',
+    '!M5 92 H15 V95 H5 Z', '!M75 92 H85 V95 H75 Z', 'M38.5 91 H41.5 M43.5 91 H46.5 M48.5 91 H51.5',
+  ];
+  var at = function (transform, parts) { return { g: transform, parts: parts }; };
   var ART = {
-    violin: ['0 0 60 96', [
-      'M4 86 L52 4', 'M7 88 L55 6.5', 'M4 86 l3 2 l-2 3.5 l-3 -2 z',
-      'M30 30 C 38 30, 42 33, 42 39 C 42 44, 37 45, 37 49 C 37 53, 44 54, 44 62 C 44 71, 37 76, 30 76 C 23 76, 16 71, 16 62 C 16 54, 23 53, 23 49 C 23 45, 18 44, 18 39 C 18 33, 22 30, 30 30 Z',
-      'M28 12 L27.5 50 H32.5 L32 12', 'M28 12 C 27 8, 28 4, 31 4 C 34 4, 35 7, 33 9 C 31.5 10.5, 29.5 9, 30.5 7.5',
-      'M24.5 52 C 23 55, 26 58, 24 61', 'M35.5 52 C 37 55, 34 58, 36 61', 'M26 60 H34', 'M29 14 V66 M31 14 V66',
-      'M28 66 L29 73 H31 L32 66 Z',
-    ]],
-    piano: ['0 0 100 72', [
-      'M8 38 H70 C 86 38, 94 44, 94 50 C 94 54, 90 56, 84 56 H8 Z', 'M10 37 L84 15', 'M58 37 L57 22',
-      'M2 40 H14 V47 H2 Z', 'M5 40 V47 M8 40 V47 M11 40 V47',
-      'M14 56 V70 M82 56 V70', 'M44 56 V64 M48 56 V64 M42 66 H50',
-    ]],
-    guitar: ['0 0 50 100', [
-      'M25 44 C 32 44, 36 48, 35 54 C 34.5 58, 32 59, 32 62 C 32 65, 40 67, 40 78 C 40 90, 32 96, 25 96 C 18 96, 10 90, 10 78 C 10 67, 18 65, 18 62 C 18 59, 15.5 58, 15 54 C 14 48, 18 44, 25 44 Z',
-      'c 25 66 5', 'M20 83 H30', 'M23 44 V8 M27 44 V8', 'M23 15 H27 M23 22 H27 M23 29 H27 M23 36 H27',
-      'M22.5 8 L21 1 H29 L27.5 8 Z', 'M21.5 3 H18 M21.8 6 H18 M28.5 3 H32 M28.2 6 H32', 'M24.3 8 V83 M25.7 8 V83',
-    ]],
+    violin: ['0 0 66 122', [at('translate(0 2)', VIOLIN.concat(BOW))]],
+    piano: ['0 0 90 97', [at('translate(0 1)', PIANO)]],
+    guitar: ['0 0 60 124', [at('translate(0 2)', GUITAR)]],
+    // The music packages, each as one small scene.
+    'ens-solo': ['0 0 66 122', [at('translate(0 2)', VIOLIN.concat(BOW))]],
+    'ens-duo': ['0 0 118 124', [at('translate(4 4) rotate(9 32 116)', VIOLIN), at('translate(56 1) rotate(-9 30 120)', GUITAR)]],
+    'ens-trio': ['0 0 178 124', [at('translate(40 27)', PIANO), at('translate(2 4) rotate(-4 32 116)', VIOLIN), at('translate(112 2) rotate(5 30 120)', GUITAR)]],
     candelabra: ['0 0 72 84', [
       'M20 83 H52', 'M24 83 C 26 77, 46 77, 48 83', 'M36 78 V44', 'e 36 66 3.5 2', 'e 36 54 2.5 1.6',
       'M36 50 C 30 56, 14 54, 14 40', 'M36 50 C 42 56, 58 54, 58 40', 'M36 44 V34',
@@ -683,17 +728,21 @@
       'M16 38 C 24 30, 36 34, 46 26', 'M24 32 c -2 -4 1 -7 4 -6 c 0 4 -2 6 -4 6', 'M36 32 c 1 -4 5 -5 7 -3 c -2 3 -5 4 -7 3',
     ]],
   };
-  function artSvg(name) {
-    var a = ART[name];
-    if (!a) return '';
-    return a[1].map(function (d) {
-      var n = d.split(' ');
-      if (n[0] === 'c') return '<circle pathLength="1" cx="' + n[1] + '" cy="' + n[2] + '" r="' + n[3] + '"/>';
-      if (n[0] === 'e') return '<ellipse pathLength="1" cx="' + n[1] + '" cy="' + n[2] + '" rx="' + n[3] + '" ry="' + n[4] + '"' +
-        (n[5] ? ' transform="rotate(' + n[5] + ' ' + n[1] + ' ' + n[2] + ')"' : '') + '/>';
-      return '<path pathLength="1" d="' + d + '"/>';
+  function shapeSvg(d) {
+    var solid = d.charAt(0) === '!';
+    if (solid) d = d.slice(1);
+    var cls = solid ? ' class="solid"' : '', n = d.split(' ');
+    if (n[0] === 'c') return '<circle pathLength="1"' + cls + ' cx="' + n[1] + '" cy="' + n[2] + '" r="' + n[3] + '"/>';
+    if (n[0] === 'e') return '<ellipse pathLength="1"' + cls + ' cx="' + n[1] + '" cy="' + n[2] + '" rx="' + n[3] + '" ry="' + n[4] + '"' +
+      (n[5] ? ' transform="rotate(' + n[5] + ' ' + n[1] + ' ' + n[2] + ')"' : '') + '/>';
+    return '<path pathLength="1"' + cls + ' d="' + d + '"/>';
+  }
+  function partsSvg(list) {
+    return list.map(function (it) {
+      return typeof it === 'string' ? shapeSvg(it) : '<g transform="' + it.g + '">' + partsSvg(it.parts) + '</g>';
     }).join('');
   }
+  function artSvg(name) { return ART[name] ? partsSvg(ART[name][1]) : ''; }
   document.querySelectorAll('svg.line-art[data-art]').forEach(function (el) {
     var a = ART[el.getAttribute('data-art')];
     if (!a) return;

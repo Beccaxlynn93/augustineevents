@@ -290,6 +290,11 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 .hero-vines .leaf { stroke-width: 1; opacity: 0.48; fill: currentColor; fill-opacity: 0.06; }
 .hero-vines .bloom { fill: currentColor; stroke: none; opacity: 0.62; }
 .hero-vines .bloom-core { fill: var(--cream); stroke: none; opacity: 1; }
+/* On the page heroes the frame is only a shape for the vines to follow, not drawn. */
+.page-hero .hero-vines .frame { visibility: hidden; }
+.hero-vines .note { opacity: 0.7; }
+.hero-vines .note path { fill: none; stroke: currentColor; stroke-width: 1.2; opacity: 1; }
+.hero-vines .note .beam { stroke-width: 2.4; }
 .hero-vines .grow { transform-box: fill-box; transform-origin: center; transition: transform .7s cubic-bezier(.34, 1.45, .64, 1), opacity .4s var(--ease); }
 .page-hero .wrap { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(36px, 6vw, 96px); align-items: center; }
 .page-hero-text { display: grid; gap: 24px; justify-items: start; }
@@ -363,8 +368,11 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 /* Small hand-drawn line illustrations (.line-art), drawn in by js/site.js when
    they scroll into view. Every shape carries pathLength="1". */
 .line-art { overflow: visible; pointer-events: none; color: var(--green); }
-.line-art * { fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: 0.75; }
-.line-art g { opacity: 1; }
+/* Faded as a whole rather than shape by shape, so solid shapes fully hide what is behind them. */
+.line-art { opacity: 0.75; }
+.line-art * { fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+/* Solid shapes are filled with whatever is behind the drawing, so overlapping instruments layer. */
+.line-art .solid { fill: var(--art-bg, none); }
 .reveal-ready .line-art :not(g) { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s var(--ease); }
 .reveal-ready .line-art :nth-child(3n+2):not(g) { transition-delay: 0.15s; }
 .reveal-ready .line-art :nth-child(3n):not(g) { transition-delay: 0.3s; }

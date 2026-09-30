@@ -369,38 +369,46 @@ made with `color-mix`, never a new hue.
   curve trimmed her hair. A framed photo must set `--ratio` inline (for example
   `--ratio: 699 / 754`) or the page reserves no space for it and jumps on load.
 - **Header and footer markup is identical on every page.** Change all six together.
-- **Line art (`drawVines` in `js/site.js`).** Each interior `.page-hero` gets a fine
-  frame around the heading text (drawn in the SVG, sized to the text's own extent, not
-  its grid column) and vines hung over it and the photo's outline as if under
-  gravity: they rest along the top of each frame, swag across gaps (sag grows with
-  the span, capped by the room left in the section), drop down the sides and end in
-  curled tendrils. Leaves point away from a surface the vine lies on and droop where
-  it hangs. Desktop: one vine from the page edge along the heading's frame, across
-  to the photo, over its top and down its right edge, plus a shoot down the frame's
-  left side and a garland under it. Phone (photo above text): a vine over the photo
-  edge to edge, one along the top of the heading's frame with short tendrils at its
-  corners; the garland is dropped when the text runs to the section's bottom. All
-  **measured** at runtime, redrawn on resize (without animating) and after
-  `document.fonts.ready`. The entrance animation (`growVines`) draws the frame
-  first, then grows each stem from its root at a steady speed; side shoots, leaves
-  and blooms start as the tip reaches them. About 3s. Driven by
-  `requestAnimationFrame`, so it waits while the tab is hidden.
+- **Line art (`drawVines` in `js/site.js`).** Each interior `.page-hero` gets vines hung
+  as if under gravity over two shapes: the photo's outline, and a rounded box around
+  the heading text. The box is **not drawn** (the owners asked for it removed on
+  2026-09-30); it is only a shape for the vines to follow. On desktop one vine runs the
+  **full width**, from the left edge along the top of the heading box, across to the
+  photo, over it and out to the right edge, with shoots down the box's left side and
+  the photo's right side and a garland under the box. On phones one vine crosses over
+  the photo edge to edge and another over the heading, also edge to edge. The Event
+  Music hero has `data-vine-notes`, which adds music notes drifting up off the vine.
+  The old watermark branch in the hero's bottom left corner was removed. Everything is
+  **measured** at runtime and redrawn on resize and after `document.fonts.ready`.
+  `growVines` grows each stem from its root; side shoots, leaves, blooms and notes
+  start as the tip reaches them. Driven by `requestAnimationFrame`, so it waits
+  while the tab is hidden.
 - **Closing banner vines (`drawBanner` / `layBanner` in `js/site.js`).** Opt-in with
-  `data-vines` on a `.closing` section. A
-  cream frame around the banner's text, one vine crossing the whole banner along its
-  top, shoots down both sides and a garland underneath, bolder than the heroes'.
-  Grows when scrolled into view; the old watermark branches are hidden there. On a
-  phone the frame spans the screen with a 12px margin and the side shoots curl in.
+  `data-vines` on a `.closing` section. A cream frame around the banner's text (drawn,
+  unlike the heroes'), one vine crossing the whole banner along its top, shoots down
+  both sides and a garland underneath, bolder than the heroes'. Grows when scrolled
+  into view; the old watermark branches are hidden there. On a phone the frame spans
+  the screen with a 12px margin and the side shoots curl in.
 - **Line illustrations (`.line-art`).** Hand-drawn inline SVG in the site's fine line,
   drawn in by the reveal observer. Most come from the named library `ART` in
   `js/site.js`: write `<svg class="line-art" data-art="violin"></svg>` and it is
   filled in (violin, piano, guitar, candelabra, vase, notes, calendar, road,
-  envelope, tag, van). A card with `.has-art` takes one in a `.card-art` span in its
+  envelope, tag, van, and the package scenes `ens-solo`, `ens-duo`, `ens-trio`). The
+  instruments are drawn once (`VIOLIN`, `GUITAR`, `PIANO`, `BOW`) and placed into
+  scenes; a shape starting with `!` is filled with `--art-bg`, so a front instrument
+  hides the one behind it. Set `--art-bg` to the background colour wherever scenes
+  overlap. A card with `.has-art` takes one in a `.card-art` span in its
   top corner. Placed on the home service and offer cards, beside Becca's signature
   (home and about), the contact sidebar, the Additional Details cards (music and
   rentals) and the music packages. The rings and toast on the music option cards and
   the rentals category drawings are written inline in their pages instead.
-- **Music packages (`js/packages.js`).** Package cards are buttons; choosing one
+- **Music packages (`js/packages.js`).** Prices and wording per the owners, 2026-09-30:
+  Trio is $2,000 (Gold, ceremony only) and $2,500 (Diamond, with cocktail hour), and
+  "up to four songs" chosen by the couple are learned. Who plays: Solo is violin
+  and/or voice with Becca (with custom piano backing tracks) or piano with Justin; Duo
+  is violin or voice with Becca and piano or guitar with Justin; Trio is violin or
+  voice with Becca, with piano and guitar (the owners' note for Trio was cut short, so
+  confirm). Package cards are buttons; choosing one
   opens `#pkg-detail` with who plays, the ceremony programme, cocktail hour where it
   applies, what else is included and the deposit, all taken from the site's existing
   copy. The panel sits under the row, or under the card once they stack; switching

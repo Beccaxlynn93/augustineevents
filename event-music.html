@@ -85,11 +85,12 @@
     .pkg-includes li { padding: 11px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.95rem; }
     .pkg-card.featured .pkg-includes li { border-color: var(--line-on-dark); color: var(--on-dark); }
     /* Package cards are buttons: choosing one opens #pkg-detail (js/packages.js). */
+    .pkg-card, .pkg-detail-inner { --art-bg: var(--white); }
+    .pkg-card.featured, .pkg-card.is-selected { --art-bg: var(--green-dark); }
     button.pkg-card { position: relative; width: 100%; font: inherit; color: inherit; cursor: pointer; }
     button.pkg-card:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
-    .pkg-ensemble { display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 62px; margin-bottom: 14px; }
+    .pkg-ensemble { display: flex; align-items: flex-end; justify-content: center; height: 112px; margin-bottom: 16px; }
     .pkg-ensemble .line-art { height: 100%; width: auto; }
-    .pkg-ensemble .line-art[data-art="piano"] { height: 66%; }
     .pkg-summary { color: var(--muted); font-size: 0.95rem; line-height: 1.55; max-width: 26ch; flex: 1; margin-bottom: 20px; }
     .pkg-more { display: none; }
     .pkg-ready .pkg-more {
@@ -125,9 +126,8 @@
     .pkg-detail-name { font-family: var(--serif); font-size: clamp(2.1rem, 3.2vw, 2.8rem); font-weight: 400; line-height: 1.1; color: var(--green-dark); }
     .pkg-detail-price { font-weight: 300; color: var(--green); margin-left: 10px; }
     .pkg-detail-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(26px, 3.4vw, 48px); }
-    .pkg-col-art { display: flex; align-items: flex-end; gap: 4px; height: 52px; margin-bottom: 16px; }
+    .pkg-col-art { display: flex; align-items: flex-end; gap: 4px; height: 76px; margin-bottom: 16px; }
     .pkg-col-art .line-art { height: 100%; width: auto; }
-    .pkg-col-art .line-art[data-art="piano"] { height: 68%; }
     .pkg-col h4 { font-family: var(--serif); font-size: 1.4rem; font-weight: 500; color: var(--green-dark); margin-bottom: 10px; }
     .pkg-col * + h4 { margin-top: 26px; }
     .pkg-col ul { list-style: none; }
@@ -181,8 +181,7 @@
   </header>
 
   <main id="main">
-    <section class="page-hero">
-      <div class="botanical-watermark" data-botanical style="left: -120px; bottom: -140px;"></div>
+    <section class="page-hero" data-vine-notes>
       <div class="wrap">
         <div class="page-hero-text">
           <p class="eyebrow rise" style="--d:0">Event Music</p>
@@ -206,7 +205,7 @@
           <div class="option-card card fade-in">
             <svg class="line-art option-art" viewBox="0 0 120 80" aria-hidden="true" focusable="false"><circle pathLength="1" cx="46" cy="50" r="21"/><circle pathLength="1" cx="46" cy="50" r="17.5"/><circle pathLength="1" cx="70" cy="46" r="21"/><circle pathLength="1" cx="70" cy="46" r="17.5"/><path pathLength="1" d="M64.5 21 L67 16.5 H73 L75.5 21 L70 27 Z"/><path pathLength="1" d="M64.5 21 H75.5"/><path pathLength="1" d="M67 16.5 L70 27 L73 16.5"/><path pathLength="1" d="M82 12 V19 M78.5 15.5 H85.5"/><ellipse pathLength="1" cx="13" cy="40" rx="3.8" ry="2.7" transform="rotate(-20 13 40)"/><path pathLength="1" d="M16.5 39 V16"/><path pathLength="1" d="M16.5 16 C 18.5 20.5, 23.5 21.5, 22.5 28"/><ellipse pathLength="1" cx="96" cy="38" rx="3.6" ry="2.6" transform="rotate(-20 96 38)"/><ellipse pathLength="1" cx="109" cy="34" rx="3.6" ry="2.6" transform="rotate(-20 109 34)"/><path pathLength="1" d="M99.4 37 V16"/><path pathLength="1" d="M112.4 33 V12"/><path pathLength="1" d="M99.4 16 L112.4 12"/><path pathLength="1" d="M99.4 20.5 L112.4 16.5"/></svg>
             <h3>Wedding Ceremony</h3>
-            <p class="note">One of the unique features of our service is our commitment to learning three specific songs chosen by you. This ensures that your ceremony feels deeply personal and reflective of your journey as a couple. No request is too big or small!</p>
+            <p class="note">One of the unique features of our service is our commitment to learning up to four specific songs chosen by you. This ensures that your ceremony feels deeply personal and reflective of your journey as a couple. No request is too big or small!</p>
             <ul class="option-list">
               <li><strong>Prelude:</strong> 20 to 30 minutes of music while your guests are being seated</li>
               <li><strong>Processional:</strong> Bridal Party and Bride Entrance</li>
@@ -242,27 +241,27 @@
           <h3 class="group-title">Ceremony Only</h3>
           <div class="pkg-cards" data-stagger>
             <button type="button" class="pkg-card fade-in" data-package="Bronze" data-tier="Solo" data-coverage="ceremony" aria-expanded="false" aria-controls="pkg-detail">
-              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg></span>
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="ens-solo"></svg></span>
               <span class="pkg-tier">Solo</span>
               <span class="pkg-name">Bronze</span>
               <span class="pkg-price">$550</span>
-              <span class="pkg-summary">Violin or voice with Becca, or piano with Justin</span>
+              <span class="pkg-summary">Violin and/or voice with Becca, or piano with Justin</span>
               <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
             </button>
             <button type="button" class="pkg-card featured fade-in" data-package="Silver" data-tier="Duo" data-coverage="ceremony" aria-expanded="false" aria-controls="pkg-detail">
-              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg></span>
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="ens-duo"></svg></span>
               <span class="pkg-tier">Duo</span>
               <span class="pkg-name">Silver</span>
               <span class="pkg-price">$1,100</span>
-              <span class="pkg-summary">Becca or Justin, with piano or guitar accompaniment</span>
+              <span class="pkg-summary">Violin or voice with Becca, and piano or guitar with Justin</span>
               <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
             </button>
             <button type="button" class="pkg-card fade-in" data-package="Gold" data-tier="Trio" data-coverage="ceremony" aria-expanded="false" aria-controls="pkg-detail">
-              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg><svg class="line-art" data-art="guitar"></svg></span>
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="ens-trio"></svg></span>
               <span class="pkg-tier">Trio</span>
               <span class="pkg-name">Gold</span>
-              <span class="pkg-price">$1,650</span>
-              <span class="pkg-summary">Becca or Justin, with piano and guitar</span>
+              <span class="pkg-price">$2,000</span>
+              <span class="pkg-summary">Violin or voice with Becca, with piano and guitar</span>
               <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
             </button>
           </div>
@@ -271,27 +270,27 @@
           <h3 class="group-title">Ceremony + Cocktail Hour</h3>
           <div class="pkg-cards" data-stagger>
             <button type="button" class="pkg-card fade-in" data-package="Emerald" data-tier="Solo" data-coverage="cocktail" aria-expanded="false" aria-controls="pkg-detail">
-              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg></span>
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="ens-solo"></svg></span>
               <span class="pkg-tier">Solo</span>
               <span class="pkg-name">Emerald</span>
               <span class="pkg-price">$750</span>
-              <span class="pkg-summary">Violin or voice with Becca, or piano with Justin</span>
+              <span class="pkg-summary">Violin and/or voice with Becca, or piano with Justin</span>
               <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
             </button>
             <button type="button" class="pkg-card featured fade-in" data-package="Sapphire" data-tier="Duo" data-coverage="cocktail" aria-expanded="false" aria-controls="pkg-detail">
-              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg></span>
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="ens-duo"></svg></span>
               <span class="pkg-tier">Duo</span>
               <span class="pkg-name">Sapphire</span>
               <span class="pkg-price">$1,500</span>
-              <span class="pkg-summary">Becca or Justin, with piano or guitar accompaniment</span>
+              <span class="pkg-summary">Violin or voice with Becca, and piano or guitar with Justin</span>
               <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
             </button>
             <button type="button" class="pkg-card fade-in" data-package="Diamond" data-tier="Trio" data-coverage="cocktail" aria-expanded="false" aria-controls="pkg-detail">
-              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg><svg class="line-art" data-art="guitar"></svg></span>
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="ens-trio"></svg></span>
               <span class="pkg-tier">Trio</span>
               <span class="pkg-name">Diamond</span>
-              <span class="pkg-price">$2,050</span>
-              <span class="pkg-summary">Becca or Justin, with piano and guitar</span>
+              <span class="pkg-price">$2,500</span>
+              <span class="pkg-summary">Violin or voice with Becca, with piano and guitar</span>
               <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
             </button>
           </div>
