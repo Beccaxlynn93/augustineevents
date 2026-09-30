@@ -253,6 +253,7 @@
             <li><span>Instagram</span><a href="https://instagram.com/augustinemusicandevents" target="_blank" rel="noopener">@augustinemusicandevents</a></li>
             <li><span>Service area</span><p>Greater Nashville, TN</p></li>
           </ul>
+          <div class="aside-art" aria-hidden="true"><svg class="line-art" data-art="envelope"></svg></div>
         </aside>
         <div class="form-card fade-in">
       <form>
@@ -543,6 +544,20 @@
           alert('Something went wrong. Please email raugustinemusic@gmail.com directly.');
         });
     });
+
+    // Arriving from a package's "Book this package" (contact.html?package=Silver):
+    // start the form on Event Music with that package chosen.
+    (function () {
+      const wanted = new URLSearchParams(location.search).get('package');
+      if (!wanted) return;
+      const option = Array.from(musicPackageSelect.options)
+        .find(o => o.text.toLowerCase().startsWith(wanted.toLowerCase() + ','));
+      if (!option) return;
+      if (!packageType.value) packageType.value = 'music';
+      packageType.dispatchEvent(new Event('change'));
+      musicPackageSelect.value = option.value;
+      musicPackageSelect.dispatchEvent(new Event('change'));
+    })();
     </script>
 </body>
 </html>

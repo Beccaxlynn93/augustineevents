@@ -384,16 +384,27 @@ made with `color-mix`, never a new hue.
   and blooms start as the tip reaches them. About 3s. Driven by
   `requestAnimationFrame`, so it waits while the tab is hidden.
 - **Closing banner vines (`drawBanner` / `layBanner` in `js/site.js`).** Opt-in with
-  `data-vines` on a `.closing` section; only `event-rentals.html` has it so far. A
+  `data-vines` on a `.closing` section. A
   cream frame around the banner's text, one vine crossing the whole banner along its
   top, shoots down both sides and a garland underneath, bolder than the heroes'.
   Grows when scrolled into view; the old watermark branches are hidden there. On a
   phone the frame spans the screen with a 12px margin and the side shoots curl in.
-- **Line illustrations (`.line-art`, styles in `css/site.css`).** Hand-drawn inline
-  SVG, `pathLength="1"` on every shape, drawn in by the reveal observer. On
-  `event-music.html` each option card has one in its top corner: interlocked rings
-  with notes (Wedding Ceremony), two coupes toasting (Cocktail Hour). The rentals
-  page's older `.category-art` works the same way with its own page styles.
+- **Line illustrations (`.line-art`).** Hand-drawn inline SVG in the site's fine line,
+  drawn in by the reveal observer. Most come from the named library `ART` in
+  `js/site.js`: write `<svg class="line-art" data-art="violin"></svg>` and it is
+  filled in (violin, piano, guitar, candelabra, vase, notes, calendar, road,
+  envelope, tag, van). A card with `.has-art` takes one in a `.card-art` span in its
+  top corner. Placed on the home service and offer cards, beside Becca's signature
+  (home and about), the contact sidebar, the Additional Details cards (music and
+  rentals) and the music packages. The rings and toast on the music option cards and
+  the rentals category drawings are written inline in their pages instead.
+- **Music packages (`js/packages.js`).** Package cards are buttons; choosing one
+  opens `#pkg-detail` with who plays, the ceremony programme, cocktail hour where it
+  applies, what else is included and the deposit, all taken from the site's existing
+  copy. The panel sits under the row, or under the card once they stack; switching
+  tabs keeps the same ensemble open. "Book" links to `contact.html?package=Name`,
+  which starts the form on Event Music with that package chosen.
+- **Closing banners** all carry `data-vines` now (home, about, music, rentals).
 - **Button hover vine (`buttonVine` in `js/site.js`).** On hover or keyboard focus a
   sprig grows around the pill: over the left end with a small bloom and along the
   top, plus a shorter one over the right end. Built on first hover, since a button's

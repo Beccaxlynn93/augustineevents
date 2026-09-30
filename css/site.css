@@ -346,6 +346,20 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 .detail-item h4 { font-size: 1.55rem; font-weight: 500; margin-bottom: 10px; }
 .detail-item p { color: var(--muted); }
 
+/* A card's illustration sits in its top corner (.has-art on the card), clear of the heading. */
+.has-art { position: relative; }
+.card-art { position: absolute; top: clamp(20px, 2.4vw, 30px); right: clamp(20px, 2.4vw, 30px); display: flex; align-items: flex-end; gap: 2px; height: 58px; pointer-events: none; }
+.card-art .line-art { height: 100%; width: auto; }
+.card-art .line-art[data-art="piano"], .card-art .line-art[data-art="van"] { height: 72%; }
+.has-art > h3, .has-art > h4, .has-art > .h3, .has-art > .service-card-kicker { padding-right: 78px; }
+.has-art > .card-art:has(svg + svg) ~ h3, .has-art > .card-art:has(svg + svg) ~ .service-card-kicker { padding-right: 110px; }
+/* Becca's signature, with a violin and a vase of flowers beside it. */
+.signature-row { display: flex; align-items: flex-end; gap: 22px; }
+.signature-art { display: flex; align-items: flex-end; gap: 4px; height: 64px; }
+.signature-art .line-art { height: 100%; width: auto; }
+.aside-art { margin-top: 32px; height: 70px; }
+.aside-art .line-art { height: 100%; width: auto; }
+
 /* Small hand-drawn line illustrations (.line-art), drawn in by js/site.js when
    they scroll into view. Every shape carries pathLength="1". */
 .line-art { overflow: visible; pointer-events: none; color: var(--green); }

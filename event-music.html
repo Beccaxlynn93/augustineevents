@@ -31,6 +31,7 @@
     setTimeout(function () { if (!window.__siteReady) document.documentElement.classList.remove('reveal-ready'); }, 2500);
   </script>
   <script src="js/site.js" defer></script>
+  <script src="js/packages.js" defer></script>
   <style>
     .options-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 3vw, 36px); }
     .option-card { padding: clamp(30px, 3.6vw, 48px); display: grid; gap: 16px; align-content: start; }
@@ -73,16 +74,80 @@
       transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
     }
     .pkg-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
-    .pkg-card.featured { background: var(--green-dark); border-color: var(--green-dark); color: var(--on-dark); }
+    .pkg-card.featured, .pkg-card.is-selected { background: var(--green-dark); border-color: var(--green-dark); color: var(--on-dark); }
     .pkg-tier { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.26em; text-transform: uppercase; color: var(--green); }
-    .pkg-card.featured .pkg-tier { color: var(--on-dark-muted); }
+    .pkg-card.featured .pkg-tier, .pkg-card.is-selected .pkg-tier { color: var(--on-dark-muted); }
     .pkg-name { font-family: var(--serif); font-size: 2.3rem; font-weight: 400; line-height: 1.1; color: var(--green-dark); }
-    .pkg-card.featured .pkg-name { color: var(--cream); }
+    .pkg-card.featured .pkg-name, .pkg-card.is-selected .pkg-name { color: var(--cream); }
     .pkg-price { font-family: var(--serif); font-size: 3.2rem; font-weight: 300; line-height: 1; color: var(--green-dark); margin: 10px 0 18px; }
-    .pkg-card.featured .pkg-price { color: var(--cream); }
+    .pkg-card.featured .pkg-price, .pkg-card.is-selected .pkg-price { color: var(--cream); }
     .pkg-includes { list-style: none; width: 100%; display: grid; gap: 0; margin-bottom: 26px; flex: 1; align-content: start; }
     .pkg-includes li { padding: 11px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.95rem; }
     .pkg-card.featured .pkg-includes li { border-color: var(--line-on-dark); color: var(--on-dark); }
+    /* Package cards are buttons: choosing one opens #pkg-detail (js/packages.js). */
+    button.pkg-card { position: relative; width: 100%; font: inherit; color: inherit; cursor: pointer; }
+    button.pkg-card:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+    .pkg-ensemble { display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 62px; margin-bottom: 14px; }
+    .pkg-ensemble .line-art { height: 100%; width: auto; }
+    .pkg-ensemble .line-art[data-art="piano"] { height: 66%; }
+    .pkg-summary { color: var(--muted); font-size: 0.95rem; line-height: 1.55; max-width: 26ch; flex: 1; margin-bottom: 20px; }
+    .pkg-more { display: none; }
+    .pkg-ready .pkg-more {
+      display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding-top: 16px; border-top: 1px solid var(--line);
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green-dark);
+    }
+    .pkg-plus { position: relative; width: 11px; height: 11px; transition: transform 0.45s var(--ease-out); }
+    .pkg-plus::before, .pkg-plus::after { content: ''; position: absolute; left: 0; top: 5px; width: 11px; height: 1px; background: currentColor; }
+    .pkg-plus::after { transform: rotate(90deg); }
+    .pkg-card:hover .pkg-plus { transform: rotate(90deg); }
+    .pkg-card.is-selected .pkg-plus { transform: rotate(45deg); }
+    .pkg-card.featured .pkg-summary, .pkg-card.is-selected .pkg-summary { color: var(--on-dark); }
+    .pkg-card.is-selected .pkg-more { color: var(--cream); border-color: var(--line-on-dark); }
+    .pkg-card.featured .line-art, .pkg-card.is-selected .line-art { color: var(--cream); }
+    /* A notch under the chosen card, pointing at its details. */
+    .pkg-card.is-selected::after {
+      content: ''; position: absolute; left: 50%; bottom: -9px; width: 18px; height: 18px;
+      background: var(--green-dark); transform: translateX(-50%) rotate(45deg); border-radius: 0 0 3px 0;
+    }
+
+    .pkg-detail { width: 100%; margin-top: 30px; }
+    .pkg-detail.is-open .pkg-detail-inner { animation: detailIn 0.6s var(--ease-out) both; }
+    @keyframes detailIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+    .pkg-detail-inner {
+      text-align: left; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md); padding: clamp(26px, 3.4vw, 48px);
+    }
+    .pkg-detail-head {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 18px 28px;
+      padding-bottom: 24px; margin-bottom: 30px; border-bottom: 1px solid var(--line);
+    }
+    .pkg-detail-head .eyebrow { margin-bottom: 8px; }
+    .pkg-detail-name { font-family: var(--serif); font-size: clamp(2.1rem, 3.2vw, 2.8rem); font-weight: 400; line-height: 1.1; color: var(--green-dark); }
+    .pkg-detail-price { font-weight: 300; color: var(--green); margin-left: 10px; }
+    .pkg-detail-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(26px, 3.4vw, 48px); }
+    .pkg-col-art { display: flex; align-items: flex-end; gap: 4px; height: 52px; margin-bottom: 16px; }
+    .pkg-col-art .line-art { height: 100%; width: auto; }
+    .pkg-col-art .line-art[data-art="piano"] { height: 68%; }
+    .pkg-col h4 { font-family: var(--serif); font-size: 1.4rem; font-weight: 500; color: var(--green-dark); margin-bottom: 10px; }
+    .pkg-col * + h4 { margin-top: 26px; }
+    .pkg-col ul { list-style: none; }
+    .pkg-col ul li { padding: 10px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.95rem; }
+    .pkg-col p { color: var(--muted); font-size: 0.95rem; }
+    .pkg-timeline { list-style: none; position: relative; padding-left: 24px; }
+    .pkg-timeline::before { content: ''; position: absolute; left: 4px; top: 12px; bottom: 22px; width: 1px; background: var(--line-strong); }
+    .pkg-timeline li { position: relative; padding: 6px 0 10px; display: grid; gap: 2px; }
+    .pkg-timeline li::before {
+      content: ''; position: absolute; left: -24px; top: 11px; width: 9px; height: 9px; border-radius: 50%;
+      border: 1px solid var(--green); background: var(--white);
+    }
+    .pkg-timeline strong { font-weight: 500; color: var(--green-dark); font-size: 0.95rem; }
+    .pkg-timeline span { color: var(--muted); font-size: 0.9rem; }
+    .pkg-note { margin-top: 12px; font-size: 0.92rem; font-style: italic; }
+    @media (max-width: 900px) {
+      .pkg-detail { margin-top: 4px; margin-bottom: 8px; }
+      .pkg-detail-cols { grid-template-columns: 1fr; }
+    }
+
     .pkg-footnote { text-align: center; margin-top: 28px; color: var(--muted); font-size: 0.88rem; }
 
     .details .detail-item { background: var(--cream); border-color: transparent; box-shadow: none; }
@@ -176,55 +241,62 @@
         <div class="pkg-group" id="panel-ceremony" role="tabpanel" aria-labelledby="tab-ceremony" style="width: 100%;">
           <h3 class="group-title">Ceremony Only</h3>
           <div class="pkg-cards" data-stagger>
-            <div class="pkg-card fade-in">
-              <div class="pkg-tier">Solo</div>
-              <div class="pkg-name">Bronze</div>
-              <div class="pkg-price">$550</div>
-              <ul class="pkg-includes"><li>Violin or Voice with Becca, or Piano with Justin</li><li>Sound Equipment</li><li>Travel*</li></ul>
-              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
-            </div>
-            <div class="pkg-card featured fade-in">
-              <div class="pkg-tier">Duo</div>
-              <div class="pkg-name">Silver</div>
-              <div class="pkg-price">$1,100</div>
-              <ul class="pkg-includes"><li>Violin or Voice with Becca, or Piano with Justin</li><li>Piano OR Guitar Accompaniment</li><li>Sound Equipment</li><li>Travel*</li></ul>
-              <a href="contact.html" class="btn btn-light">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
-            </div>
-            <div class="pkg-card fade-in">
-              <div class="pkg-tier">Trio</div>
-              <div class="pkg-name">Gold</div>
-              <div class="pkg-price">$1,650</div>
-              <ul class="pkg-includes"><li>Violin or Voice with Becca, or Piano with Justin</li><li>Piano</li><li>Guitar</li><li>Sound Equipment</li><li>Travel*</li></ul>
-              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
-            </div>
+            <button type="button" class="pkg-card fade-in" data-package="Bronze" data-tier="Solo" data-coverage="ceremony" aria-expanded="false" aria-controls="pkg-detail">
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg></span>
+              <span class="pkg-tier">Solo</span>
+              <span class="pkg-name">Bronze</span>
+              <span class="pkg-price">$550</span>
+              <span class="pkg-summary">Violin or voice with Becca, or piano with Justin</span>
+              <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
+            </button>
+            <button type="button" class="pkg-card featured fade-in" data-package="Silver" data-tier="Duo" data-coverage="ceremony" aria-expanded="false" aria-controls="pkg-detail">
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg></span>
+              <span class="pkg-tier">Duo</span>
+              <span class="pkg-name">Silver</span>
+              <span class="pkg-price">$1,100</span>
+              <span class="pkg-summary">Becca or Justin, with piano or guitar accompaniment</span>
+              <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
+            </button>
+            <button type="button" class="pkg-card fade-in" data-package="Gold" data-tier="Trio" data-coverage="ceremony" aria-expanded="false" aria-controls="pkg-detail">
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg><svg class="line-art" data-art="guitar"></svg></span>
+              <span class="pkg-tier">Trio</span>
+              <span class="pkg-name">Gold</span>
+              <span class="pkg-price">$1,650</span>
+              <span class="pkg-summary">Becca or Justin, with piano and guitar</span>
+              <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
+            </button>
           </div>
         </div>
         <div class="pkg-group" id="panel-cocktail" role="tabpanel" aria-labelledby="tab-cocktail" style="width: 100%;">
           <h3 class="group-title">Ceremony + Cocktail Hour</h3>
           <div class="pkg-cards" data-stagger>
-            <div class="pkg-card fade-in">
-              <div class="pkg-tier">Solo</div>
-              <div class="pkg-name">Emerald</div>
-              <div class="pkg-price">$750</div>
-              <ul class="pkg-includes"><li>Violin or Voice with Becca, or Piano with Justin</li><li>Sound Equipment</li><li>Travel*</li></ul>
-              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
-            </div>
-            <div class="pkg-card featured fade-in">
-              <div class="pkg-tier">Duo</div>
-              <div class="pkg-name">Sapphire</div>
-              <div class="pkg-price">$1,500</div>
-              <ul class="pkg-includes"><li>Violin or Voice with Becca, or Piano with Justin</li><li>Piano OR Guitar Accompaniment</li><li>Sound Equipment</li><li>Travel*</li></ul>
-              <a href="contact.html" class="btn btn-light">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
-            </div>
-            <div class="pkg-card fade-in">
-              <div class="pkg-tier">Trio</div>
-              <div class="pkg-name">Diamond</div>
-              <div class="pkg-price">$2,050</div>
-              <ul class="pkg-includes"><li>Violin or Voice with Becca, or Piano with Justin</li><li>Piano</li><li>Guitar</li><li>Sound Equipment</li><li>Travel*</li></ul>
-              <a href="contact.html" class="btn">Book This Package <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
-            </div>
+            <button type="button" class="pkg-card fade-in" data-package="Emerald" data-tier="Solo" data-coverage="cocktail" aria-expanded="false" aria-controls="pkg-detail">
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg></span>
+              <span class="pkg-tier">Solo</span>
+              <span class="pkg-name">Emerald</span>
+              <span class="pkg-price">$750</span>
+              <span class="pkg-summary">Violin or voice with Becca, or piano with Justin</span>
+              <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
+            </button>
+            <button type="button" class="pkg-card featured fade-in" data-package="Sapphire" data-tier="Duo" data-coverage="cocktail" aria-expanded="false" aria-controls="pkg-detail">
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg></span>
+              <span class="pkg-tier">Duo</span>
+              <span class="pkg-name">Sapphire</span>
+              <span class="pkg-price">$1,500</span>
+              <span class="pkg-summary">Becca or Justin, with piano or guitar accompaniment</span>
+              <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
+            </button>
+            <button type="button" class="pkg-card fade-in" data-package="Diamond" data-tier="Trio" data-coverage="cocktail" aria-expanded="false" aria-controls="pkg-detail">
+              <span class="pkg-ensemble" aria-hidden="true"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="piano"></svg><svg class="line-art" data-art="guitar"></svg></span>
+              <span class="pkg-tier">Trio</span>
+              <span class="pkg-name">Diamond</span>
+              <span class="pkg-price">$2,050</span>
+              <span class="pkg-summary">Becca or Justin, with piano and guitar</span>
+              <span class="pkg-more">See what's included <span class="pkg-plus" aria-hidden="true"></span></span>
+            </button>
           </div>
         </div>
+        <div class="pkg-detail" id="pkg-detail" role="region" aria-label="Package details" hidden></div>
         <p class="pkg-footnote fade-in">*Travel is included within 30 minutes of Nashville, TN. See the details below.</p>
       </div>
     </section>
@@ -236,11 +308,13 @@
           <h2 class="h2 fade-in">Additional Details</h2>
         </div>
         <div class="details-grid" data-stagger>
-          <div class="detail-item card fade-in">
+          <div class="detail-item card has-art fade-in">
+            <span class="card-art" aria-hidden="true"><svg class="line-art" data-art="calendar"></svg></span>
             <h4>Non-Refundable Deposit</h4>
             <p>A deposit of $200 is required to secure your date.</p>
           </div>
-          <div class="detail-item card fade-in">
+          <div class="detail-item card has-art fade-in">
+            <span class="card-art" aria-hidden="true"><svg class="line-art" data-art="road"></svg></span>
             <h4>Travel Fee*</h4>
             <p>Travel is included within 30 minutes of Nashville, TN. Each additional hour is $50. Travel exceeding 3 hours will be discussed in consultation.</p>
           </div>
@@ -248,7 +322,7 @@
       </div>
     </section>
 
-    <section class="section bg-green closing">
+    <section class="section bg-green closing" data-vines>
       <div class="botanical-watermark" data-botanical style="right: -60px; bottom: -80px;"></div>
       <div class="botanical-watermark" data-botanical style="left: -90px; top: -120px; transform: scaleX(-1) rotate(180deg);"></div>
       <div class="wrap-narrow">

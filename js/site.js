@@ -614,6 +614,98 @@
     el.addEventListener('blur', off);
   });
 
+  // ---- line illustrations: <svg class="line-art" data-art="violin"> ----------
+  // Small hand-drawn pictures in the site's fine line, filled in here by name
+  // and drawn in by the reveal observer below. Shapes: "M…" is a path,
+  // "c cx cy r" a circle, "e cx cy rx ry [rotate]" an ellipse.
+  var NOTE = function (x, y, h, flag) {
+    return ['e ' + x + ' ' + y + ' 3.6 2.6 -20', 'M' + (x + 3.3) + ' ' + (y - 1) + ' V' + (y - h)].concat(flag ?
+      ['M' + (x + 3.3) + ' ' + (y - h) + ' C ' + (x + 5.3) + ' ' + (y - h + 4.5) + ', ' + (x + 10) + ' ' + (y - h + 5.5) + ', ' + (x + 9) + ' ' + (y - h + 12)] : []);
+  };
+  var ART = {
+    violin: ['0 0 60 96', [
+      'M4 86 L52 4', 'M7 88 L55 6.5', 'M4 86 l3 2 l-2 3.5 l-3 -2 z',
+      'M30 30 C 38 30, 42 33, 42 39 C 42 44, 37 45, 37 49 C 37 53, 44 54, 44 62 C 44 71, 37 76, 30 76 C 23 76, 16 71, 16 62 C 16 54, 23 53, 23 49 C 23 45, 18 44, 18 39 C 18 33, 22 30, 30 30 Z',
+      'M28 12 L27.5 50 H32.5 L32 12', 'M28 12 C 27 8, 28 4, 31 4 C 34 4, 35 7, 33 9 C 31.5 10.5, 29.5 9, 30.5 7.5',
+      'M24.5 52 C 23 55, 26 58, 24 61', 'M35.5 52 C 37 55, 34 58, 36 61', 'M26 60 H34', 'M29 14 V66 M31 14 V66',
+      'M28 66 L29 73 H31 L32 66 Z',
+    ]],
+    piano: ['0 0 100 72', [
+      'M8 38 H70 C 86 38, 94 44, 94 50 C 94 54, 90 56, 84 56 H8 Z', 'M10 37 L84 15', 'M58 37 L57 22',
+      'M2 40 H14 V47 H2 Z', 'M5 40 V47 M8 40 V47 M11 40 V47',
+      'M14 56 V70 M82 56 V70', 'M44 56 V64 M48 56 V64 M42 66 H50',
+    ]],
+    guitar: ['0 0 50 100', [
+      'M25 44 C 32 44, 36 48, 35 54 C 34.5 58, 32 59, 32 62 C 32 65, 40 67, 40 78 C 40 90, 32 96, 25 96 C 18 96, 10 90, 10 78 C 10 67, 18 65, 18 62 C 18 59, 15.5 58, 15 54 C 14 48, 18 44, 25 44 Z',
+      'c 25 66 5', 'M20 83 H30', 'M23 44 V8 M27 44 V8', 'M23 15 H27 M23 22 H27 M23 29 H27 M23 36 H27',
+      'M22.5 8 L21 1 H29 L27.5 8 Z', 'M21.5 3 H18 M21.8 6 H18 M28.5 3 H32 M28.2 6 H32', 'M24.3 8 V83 M25.7 8 V83',
+    ]],
+    candelabra: ['0 0 72 84', [
+      'M20 83 H52', 'M24 83 C 26 77, 46 77, 48 83', 'M36 78 V44', 'e 36 66 3.5 2', 'e 36 54 2.5 1.6',
+      'M36 50 C 30 56, 14 54, 14 40', 'M36 50 C 42 56, 58 54, 58 40', 'M36 44 V34',
+      'M9 40 H19', 'M53 40 H63', 'M31 34 H41',
+      'M11.5 40 V20 H16.5 V40', 'M55.5 40 V20 H60.5 V40', 'M33.5 34 V12 H38.5 V34',
+      'M14 17 C 11.8 14, 13 10.5, 14 8.5 C 15 10.5, 16.2 14, 14 17 Z',
+      'M58 17 C 55.8 14, 57 10.5, 58 8.5 C 59 10.5, 60.2 14, 58 17 Z',
+      'M36 9 C 33.8 6, 35 2.5, 36 0.8 C 37 2.5, 38.2 6, 36 9 Z',
+    ]],
+    vase: ['0 0 52 70', [
+      'M17 68 H33 C 36 60, 38 52, 33 44 V38 H17 V44 C 12 52, 14 60, 17 68 Z', 'M15 38 H35',
+      'M25 38 C 24 28, 18 22, 12 17', 'M25 38 V10', 'M25 38 C 27 28, 33 24, 40 19',
+      'c 12 15.5 3.2', 'c 25 8 3.4', 'c 41 17.5 3.2', 'c 12 15.5 1.1', 'c 25 8 1.2', 'c 41 17.5 1.1',
+      'M20.5 28 c -6 -1 -8 -5 -7 -8 c 4 1 7 4 7 8', 'M29.5 30 c 5 -2 8 -6 7 -9 c -4 1 -7 5 -7 9',
+    ]],
+    notes: ['0 0 64 56', [].concat(NOTE(12, 46, 32), NOTE(32, 40, 32), ['M15.3 14 L35.3 8', 'M15.3 19.5 L35.3 13.5'], NOTE(52, 30, 22, true))],
+    calendar: ['0 0 70 70', [
+      'M8 14 H62 Q64 14 64 16 V62 Q64 64 62 64 H8 Q6 64 6 62 V16 Q6 14 8 14 Z', 'M6 26 H64', 'M20 8 V20 M50 8 V20',
+      'M14 36 h6 M28 36 h6 M42 36 h6 M14 46 h6 M28 46 h6 M14 56 h6 M28 56 h6',
+      'M49 51 C 46 47, 41 49, 43 53 L49 58.5 L55 53 C 57 49, 52 47, 49 51 Z',
+    ]],
+    road: ['0 0 80 72', [
+      'M40 44 C 30 32, 28 28, 28 22 C 28 15, 33.5 10, 40 10 C 46.5 10, 52 15, 52 22 C 52 28, 50 32, 40 44 Z', 'c 40 22 4.5',
+      'M4 70 C 18 62, 30 58, 36 50', 'M76 70 C 62 62, 50 58, 44 50', 'M40 70 V65 M40 60 V56.5 M40 53 V51',
+      'M10 50 C 10 44, 14 42, 16 40 M16 40 C 18 44, 18 48, 14 50 M13 50 V56',
+      'M66 46 C 66 40, 70 38, 72 36 M72 36 C 74 40, 74 44, 70 46 M69 46 V52',
+    ]],
+    envelope: ['0 0 92 64', [
+      'M6 14 H74 V58 H6 Z', 'M6 14 L40 38 L74 14', 'M6 58 L32 32 M74 58 L48 32',
+      'M40 43 C 37.5 39.5, 33 41, 35 44.5 L40 49 L45 44.5 C 47 41, 42.5 39.5, 40 43 Z',
+      'M70 14 C 74 8, 80 5, 88 3', 'M77 7 c 1 -4 5 -6 8 -5 c -1 4 -5 6 -8 5', 'M83 4 c -1 -3 0 -3 1 -3',
+    ]],
+    tag: ['0 0 72 60', [
+      'M24 10 H60 Q64 10 64 14 V46 Q64 50 60 50 H24 L8 30 Z', 'c 21 30 3',
+      'M18 30 C 11 30, 4 22, 6 14 C 8 8, 14 8, 14 3',
+      'M49 23 C 47 20, 39 20, 39 25 C 39 30, 49 29, 49 35 C 49 40, 41 40, 39 37', 'M44 18 V42',
+    ]],
+    van: ['0 0 100 62', [
+      'M6 46 V18 Q6 14 10 14 H62 V46', 'M62 22 H78 L92 36 V46 Q92 48 90 48 H84', 'M66 26 H77 L86 35 H66 Z',
+      'M6 46 Q6 48 8 48 H17 M31 48 H69', 'c 24 48 7', 'c 24 48 2.5', 'c 76 48 7', 'c 76 48 2.5',
+      'M16 38 C 24 30, 36 34, 46 26', 'M24 32 c -2 -4 1 -7 4 -6 c 0 4 -2 6 -4 6', 'M36 32 c 1 -4 5 -5 7 -3 c -2 3 -5 4 -7 3',
+    ]],
+  };
+  function artSvg(name) {
+    var a = ART[name];
+    if (!a) return '';
+    return a[1].map(function (d) {
+      var n = d.split(' ');
+      if (n[0] === 'c') return '<circle pathLength="1" cx="' + n[1] + '" cy="' + n[2] + '" r="' + n[3] + '"/>';
+      if (n[0] === 'e') return '<ellipse pathLength="1" cx="' + n[1] + '" cy="' + n[2] + '" rx="' + n[3] + '" ry="' + n[4] + '"' +
+        (n[5] ? ' transform="rotate(' + n[5] + ' ' + n[1] + ' ' + n[2] + ')"' : '') + '/>';
+      return '<path pathLength="1" d="' + d + '"/>';
+    }).join('');
+  }
+  document.querySelectorAll('svg.line-art[data-art]').forEach(function (el) {
+    var a = ART[el.getAttribute('data-art')];
+    if (!a) return;
+    el.setAttribute('viewBox', a[0]);
+    el.setAttribute('aria-hidden', 'true');
+    el.setAttribute('focusable', 'false');
+    el.innerHTML = artSvg(el.getAttribute('data-art'));
+  });
+  // For page scripts that build markup later.
+  window.__lineArt = artSvg;
+  window.__lineArtBox = function (name) { return ART[name] ? ART[name][0] : '0 0 60 60'; };
+
   // ---- reveals ------------------------------------------------------------
   var revealables = document.querySelectorAll('.fade-in, .reveal-clip, .flourish, .category-art, .line-art');
   var drawn = /\b(flourish|category-art|line-art)\b/;
