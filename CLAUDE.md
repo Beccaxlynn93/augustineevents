@@ -2,6 +2,10 @@
 
 Context and working instructions for Claude Code on this repository.
 
+Project overview and dated history live in Justin's Obsidian vault (the "brain"):
+Mac: `~/Documents/Obsidian/ClaudeVault/Projects/Augustine Music/Augustine Website.md`.
+This file holds the technical detail; update the vault note at the end of a session.
+
 > **Verified 2026-09-11** against the repo, the live site, the Cloudflare API, the
 > Workers Builds configuration, and the production D1 database.
 >
