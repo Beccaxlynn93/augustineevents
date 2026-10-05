@@ -205,6 +205,34 @@
   <!-- Deferred by being a module. Not load-bearing: if it fails, the picker
        shows a fallback and the form still submits. -->
   <script type="module" src="/js/rental-picker.js"></script>
+  <!-- Meta Pixel: identical on every page, just before </head>. The ID is on two
+       lines here (PIXEL_ID and the noscript image). See CLAUDE.md "Meta Pixel". -->
+  <script>
+    (function () {
+      var PIXEL_ID = '1082518351350657';
+      // Every Pixel event on the site goes through metaTrack, so a blocked or
+      // missing Pixel is a silent no-op. Never pass it names, emails, phone
+      // numbers or any form field values.
+      window.metaTrack = function (event, params) {
+        try { if (typeof window.fbq === 'function') window.fbq('track', event, params || {}); } catch (e) {}
+      };
+      if (!/^\d+$/.test(PIXEL_ID)) return; // not configured yet: load nothing
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+      document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      // Only the events we send: no automatic button-click or page-metadata collection.
+      fbq('set', 'autoConfig', false, PIXEL_ID);
+      fbq('init', PIXEL_ID);
+      fbq('track', 'PageView');
+      // Pages that are a catalog say so on <html data-meta-category="...">.
+      var category = document.documentElement.getAttribute('data-meta-category');
+      if (category) fbq('track', 'ViewContent', { content_category: category });
+    })();
+  </script>
+  <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1082518351350657&amp;ev=PageView&amp;noscript=1" /></noscript>
+  <!-- End Meta Pixel -->
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -255,7 +283,7 @@
           <div class="aside-art" aria-hidden="true"><svg class="line-art" data-art="envelope"></svg></div>
         </aside>
         <div class="form-card fade-in">
-      <form>
+      <form method="post">
         <!-- Not a real field. Left in the DOM but off screen, out of the tab
              order and hidden from assistive tech, so only automation fills it. -->
         <div class="hp-field" aria-hidden="true">
@@ -507,6 +535,16 @@
       btn.textContent = 'Sending...';
       btn.disabled = true;
 
+      // What the Lead event may say: which package and which kind of booking,
+      // never anything the visitor typed.
+      function trackLead() {
+        if (!window.metaTrack) return;
+        var type = packageTypeEl.value;
+        var params = { content_category: type === 'music' ? 'Music' : type === 'rentals' ? 'Rentals' : type === 'both' ? 'Both' : 'Unspecified' };
+        if (musicEl.value !== '0') params.content_name = musicLabel.split(',')[0];
+        window.metaTrack('Lead', params);
+      }
+
       // Record the inquiry independently of the email. This is deliberately
       // fire and forget: if it fails, times out, or the endpoint is down, the
       // visitor never sees it and the email is unaffected. The email remains
@@ -525,7 +563,14 @@
             headers: { 'Content-Type': 'application/json' },
             body: body,
             keepalive: true
-          }).catch(function () {});
+          }).then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (res) {
+              // Meta Pixel Lead, only for an inquiry the Worker actually stored. It
+              // answers screened-out spam with a bare {ok: true}, so "notified"
+              // (present only once a row is written) is the real success signal.
+              if (res && res.ok && 'notified' in res) trackLead();
+            })
+            .catch(function () {});
         } catch (e) {
           /* never let capture affect the visitor */
         }

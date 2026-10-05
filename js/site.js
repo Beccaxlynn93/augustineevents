@@ -753,6 +753,13 @@
   window.__lineArt = artSvg;
   window.__lineArtBox = function (name) { return ART[name] ? ART[name][0] : '0 0 60 60'; };
 
+  // ---- Meta Pixel: Contact on any email or phone link ------------------------
+  // Sends only which kind of link it was, never the address or number.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="mailto:"], a[href^="tel:"]');
+    if (a && window.metaTrack) window.metaTrack('Contact', { content_category: a.href.indexOf('tel:') === 0 ? 'Phone' : 'Email' });
+  });
+
   // ---- reveals ------------------------------------------------------------
   var revealables = document.querySelectorAll('.fade-in, .reveal-clip, .flourish, .category-art, .line-art');
   var drawn = /\b(flourish|category-art|line-art)\b/;

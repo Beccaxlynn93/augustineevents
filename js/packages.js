@@ -80,6 +80,9 @@
       c.setAttribute('aria-expanded', String(on));
     });
     current = card;
+    if (window.metaTrack) {
+      window.metaTrack('ViewContent', { content_name: card.getAttribute('data-package'), content_category: 'Music' });
+    }
     root.innerHTML = render(card);
     place(card);
     root.hidden = false;

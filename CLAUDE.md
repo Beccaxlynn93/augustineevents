@@ -460,6 +460,56 @@ made with `color-mix`, never a new hue.
 
 ---
 
+## Meta Pixel
+
+Added 2026-10-04 on `redesign` (approved by Justin) to measure Meta ads. Browser
+Pixel only; no Conversions API yet.
+
+**Pixel ID: `1082518351350657`**, named "Augustine Events – Website" in Events
+Manager. It appears twice in each of the six pages (the `PIXEL_ID` line and the
+`<noscript>` image); change both if it ever changes. If `PIXEL_ID` is not all digits
+the snippet loads nothing and every event is a no-op.
+
+**Where the code is.** One identical block in each real page's `<head>`, just before
+`</head>`, between `<!-- Meta Pixel ... -->` and `<!-- End Meta Pixel -->`. It loads
+`fbevents.js` async, defines `window.metaTrack(event, params)`, and every event on the
+site goes through `metaTrack`, which no-ops when `fbq` is missing (ad blockers, no ID).
+The `saved_resource*.html` and `Augustine Music Packages.html` files are not served
+(`.assetsignore`) and have no Pixel.
+
+| Event | Fires when | Parameters | Code |
+|---|---|---|---|
+| `PageView` | every page load | none | head block |
+| `ViewContent` | `event-rentals.html` / `event-music.html` load | `content_category`: `Rentals` / `Music`, from `<html data-meta-category>` | head block |
+| `ViewContent` | a music package's details panel opens (click, or the tabs carrying an open package across) | `content_name`: package (e.g. `Silver`), `content_category`: `Music` | `js/packages.js` `open()` |
+| `Contact` | any `mailto:` or `tel:` link is clicked, any page | `content_category`: `Email` / `Phone` only | `js/site.js` |
+| `Lead` | the contact form's inquiry is **stored by the Worker** | `content_category`: `Music` / `Rentals` / `Both` (Package Type); `content_name`: music package name if one is chosen | `contact.html` `trackLead()` |
+
+**The Lead success signal.** `POST /api/inquiries` answers screened-out spam with a bare
+`{ok: true}` (so bots learn nothing), and a stored inquiry with `{ok: true, notified: …}`.
+Lead fires only when `notified` is present. If that response shape ever changes, change
+`trackLead`'s condition with it. Lead does not depend on EmailJS: an inquiry the Worker
+stores counts even if the EmailJS send failed, since the Worker notifies Becca itself.
+
+**Privacy rules.** Never pass names, emails, phone numbers or any form value to
+`metaTrack`. The snippet sets `autoConfig` off, so Meta does not collect button clicks or
+page metadata on its own. **In Events Manager, keep Automatic Advanced Matching off**: it
+reads form fields in the browser and is controlled there, not in this code. The contact
+form is `method="post"` so it can never put fields into the URL (which the Pixel reports)
+if its script fails. The only query string the site uses is `contact.html?package=Name`.
+
+**Content Security Policy.** None exists (no meta tag, no `_headers`, the Worker sets
+none). If one is ever added, it must allow `connect.facebook.net` (script) and
+`www.facebook.com` (img and connect), or the Pixel fails silently.
+
+**Testing.** Never submit the real form on a preview without asking Justin: previews use
+the production database and EmailJS, so a test emails Becca. If he agrees, put
+"TEST - ignore" in the message. Event logic can be tested without sending anything: with
+no ID set, define `window.fbq = function () { console.log(arguments) }` in the console
+and stub `window.emailjs.send` and `window.fetch` before dispatching the form's submit
+event. With the real ID: Events Manager > Data sources > the Pixel > Test events, enter
+the preview URL, and use the Meta Pixel Helper Chrome extension, page by page.
+
 ## Deployment
 
 **Verified 2026-09-05** against the Cloudflare API, the Workers Builds config, and
@@ -817,6 +867,7 @@ Also avoid: "link in bio", cliché wedding-industry phrasing, and any claim abou
 - If the owners supply draft copy, refine it rather than replacing it
 - Ask before changing prices, package names, or inventory counts; these are decided elsewhere
 - Do not add analytics, tracking scripts, chat widgets, or third-party embeds without asking
+  (the Meta Pixel was asked for on 2026-10-04; see "Meta Pixel")
 - Do not commit secrets. There are none in this repo today and it should stay that way.
 - **Verify deploy assumptions against the live site, not against this file.** This document was confidently wrong about hosting for its entire prior existence.
 
