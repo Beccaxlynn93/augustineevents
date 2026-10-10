@@ -33,6 +33,7 @@
     setTimeout(function () { if (!window.__siteReady) document.documentElement.classList.remove('reveal-ready'); }, 2500);
   </script>
   <script src="js/site.js" defer></script>
+  <script src="js/tablescapes-art.js" defer></script>
   <script src="js/tablescapes.js" defer></script>
   <!-- Meta Pixel: identical on every page, just before </head>. The ID is on two
        lines here (PIXEL_ID and the noscript image). See CLAUDE.md "Meta Pixel". -->
@@ -85,7 +86,12 @@
 
   <main id="main" class="tb" data-theme="fall">
     <section class="tb-show" aria-label="Tablescape showcase">
-      <div class="wrap">
+      <div class="tb-bgs" aria-hidden="true"><div class="tb-bg tb-bg-fall is-on" data-look="fall" aria-hidden="true"></div>
+      <div class="tb-bg tb-bg-winter" data-look="winter" aria-hidden="true"></div></div>
+      <div class="tb-art-layer" aria-hidden="true"></div>
+      <div class="tb-ring" aria-hidden="true"></div>
+      <canvas class="tb-fx" aria-hidden="true"></canvas>
+      <div class="wrap tb-wrap">
         <div class="tb-head">
           <div class="tb-title">
             <p class="eyebrow rise" style="--d:0">Designed for your table</p>

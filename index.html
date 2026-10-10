@@ -72,6 +72,18 @@
     .service-card:hover .text-link { background-size: 100% 1px; }
     .service-card:hover .text-link .arrow { transform: translateX(5px); }
 
+    .service-card--feature { grid-column: 1 / -1; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); grid-template-rows: none; background: color-mix(in srgb, var(--green-dark) 38%, black); border-color: transparent; color: var(--cream); }
+    .feature-media { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; aspect-ratio: auto; min-height: 340px; }
+    .feature-media img { min-height: 100%; }
+    .service-card--feature .service-card-body { align-content: center; }
+    .service-card--feature .service-card-kicker { color: var(--on-dark); }
+    .service-card--feature .h3 { color: var(--cream); font-size: clamp(2rem, 3.4vw, 2.9rem); }
+    .service-card--feature .service-card-body p:not(.service-card-kicker) { color: var(--on-dark); }
+    .service-card--feature .feature-price { color: var(--cream) !important; }
+    .service-card--feature .feature-price strong { font-family: var(--serif); font-size: 1.5em; font-weight: 400; }
+    .service-card--feature .text-link { color: var(--cream); }
+    .service-card--feature .line-art { color: var(--cream); }
+
     /* ── about ── */
     .about-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(40px, 7vw, 110px); align-items: center; }
     .about-copy { display: grid; gap: 22px; justify-items: start; }
@@ -109,6 +121,10 @@
     }
     @media (max-width: 900px) {
       .offer-cards { grid-template-columns: 1fr; max-width: 520px; }
+    }
+    @media (max-width: 900px) {
+      .service-card--feature { grid-template-columns: 1fr; }
+      .feature-media { min-height: 0; aspect-ratio: 16 / 9; }
     }
     @media (max-width: 700px) {
       .service-cards { grid-template-columns: 1fr; }
@@ -184,9 +200,23 @@
       <div class="wrap">
         <div class="section-head center">
           <p class="eyebrow center fade-in">What we offer</p>
-          <h2 class="h2 fade-in">Music and rentals, <em>together or on their own</em></h2>
+          <h2 class="h2 fade-in">Tablescapes, rentals and music, <em>together or on their own</em></h2>
         </div>
         <div class="service-cards" data-stagger>
+          <a class="service-card service-card--feature fade-in" href="custom-tablescapes.html">
+            <div class="service-card-media feature-media media-zoom">
+              <img src="img/tablescape-fall-3.webp" alt="A brass candelabra with burnt orange taper candles and a white pumpkin, from our Fall Harvest tablescape" loading="lazy" width="1400" height="933" />
+              <img src="img/tablescape-winter-1.webp" alt="A long table lit by dozens of taper candles, from our Winter tablescape" loading="lazy" width="1400" height="934" />
+            </div>
+            <div class="service-card-body has-art">
+              <span class="card-art" aria-hidden="true"><svg class="line-art" data-art="candelabra"></svg></span>
+              <p class="service-card-kicker">Custom Tablescapes</p>
+              <h3 class="h3">A table designed around your event</h3>
+              <p>Fall Harvest, Winter or something entirely your own. We style the whole table, from linens and candlelight to the last sprig of greenery, using pieces from our rental collection.</p>
+              <p class="feature-price">Starting at <strong>$2,000</strong> for a table that seats 16.</p>
+              <span class="text-link">Explore custom tablescapes <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span>
+            </div>
+          </a>
           <a class="service-card fade-in" href="event-rentals.html">
             <div class="service-card-media media-zoom">
               <img src="img/candelabra-table.webp" alt="A reception table set with brass candelabras, taper candles and white florals" loading="lazy" width="1000" height="1500" />
@@ -194,7 +224,7 @@
             <div class="service-card-body has-art">
               <span class="card-art" aria-hidden="true"><svg class="line-art" data-art="candelabra"></svg></span>
               <p class="service-card-kicker">Event Rentals</p>
-              <h3 class="h3">Tablescapes, brass and florals</h3>
+              <h3 class="h3">Brass, linens and florals to rent</h3>
               <p>Boutique Rental Collection: Tablescapes, arches, chandeliers, etc. Personalized styling for intimate, garden-inspired weddings and dinner parties.</p>
               <span class="text-link">View the collection <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span>
             </div>

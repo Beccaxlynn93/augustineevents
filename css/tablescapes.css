@@ -5,17 +5,19 @@
   --tb-line: var(--line-on-dark);
   --tb-accent: var(--cream);
   --tb-flame: color-mix(in srgb, var(--cream) 62%, #e8962e);
+  --tb-art: color-mix(in srgb, var(--cream) 80%, transparent);
   background: var(--tb-bg);
   color: var(--tb-fg);
   transition: background-color 1.4s var(--ease), color 1.4s var(--ease);
 }
 .tb[data-theme="winter"] {
-  --tb-bg: color-mix(in srgb, var(--cream) 82%, var(--green));
-  --tb-fg: var(--green-dark);
-  --tb-muted: var(--muted);
-  --tb-line: var(--line-strong);
-  --tb-accent: var(--green);
-  --tb-flame: color-mix(in srgb, var(--cream) 15%, #e8962e);
+  --tb-bg: color-mix(in srgb, var(--green-dark) 26%, #0a1320);
+  --tb-fg: color-mix(in srgb, var(--cream) 90%, white);
+  --tb-muted: color-mix(in srgb, var(--on-dark) 80%, #a9bdd2);
+  --tb-line: color-mix(in srgb, var(--cream) 20%, transparent);
+  --tb-accent: color-mix(in srgb, var(--cream) 70%, #bcd3ea);
+  --tb-flame: color-mix(in srgb, var(--cream) 22%, #e8962e);
+  --tb-art: color-mix(in srgb, var(--cream) 62%, #bcd3ea);
 }
 .tb :is(h1, h2, .eyebrow) { color: var(--tb-fg); transition: color 1.4s var(--ease); }
 .tb .display em, .tb .h2 em { color: var(--tb-accent); transition: color 1.4s var(--ease); }
@@ -23,7 +25,6 @@
 .tb .closing { color: var(--on-dark); }
 .tb .closing :is(h2, .eyebrow) { color: var(--cream); }
 
-.tb-show { padding: calc(var(--header-h) + clamp(24px, 4vw, 56px)) 0 clamp(40px, 6vw, 80px); }
 .tb-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 32px; margin-bottom: clamp(20px, 3vw, 36px); }
 .tb-toggle { display: inline-flex; border: 1px solid var(--tb-line); border-radius: 999px; padding: 4px; transition: border-color 1.4s var(--ease); }
 .tb-toggle button {
@@ -104,4 +105,50 @@
 @media (max-width: 760px) {
   .tb-stage { grid-template-columns: 1fr; }
   .tb-side { display: none; }
+}
+
+/* ── full-viewport showcase ───────────────────────────────────────────── */
+.tb-show { position: relative; isolation: isolate; overflow: hidden; min-height: 100svh; display: flex; align-items: center; padding: calc(var(--header-h) + 8px) 0 clamp(20px, 3vw, 36px); }
+.tb-wrap { position: relative; z-index: 3; width: min(1080px, 100% - 2 * var(--gutter)); }
+.tb-bgs { position: absolute; inset: 0; z-index: 0; isolation: isolate; pointer-events: none; }
+.tb-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; clip-path: circle(0 at var(--cx, 50%) var(--cy, 55%)); }
+.tb-bg.is-on { clip-path: circle(150% at var(--cx, 50%) var(--cy, 55%)); transition: clip-path 1.7s cubic-bezier(.5, 0, .2, 1); }
+.tb-bg-fall { background: radial-gradient(120% 95% at 50% 58%, color-mix(in srgb, var(--green-dark) 58%, black) 0%, color-mix(in srgb, var(--green-dark) 26%, black) 68%, color-mix(in srgb, var(--green-dark) 10%, black) 100%); }
+.tb-bg-winter { background: radial-gradient(55% 50% at 86% 10%, color-mix(in srgb, var(--cream) 9%, #0e1d2c) 0%, transparent 70%), radial-gradient(120% 100% at 50% 62%, #0b1620 0%, #050a10 72%, #02050a 100%); }
+
+.tb-art-layer { position: absolute; inset: 0; z-index: 1; pointer-events: none; transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.04); will-change: transform; }
+.tb-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
+.tb-art path { fill: none; stroke: var(--tb-art); stroke-width: var(--sw, 1.5); stroke-linecap: butt; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0.8; transition: stroke-dashoffset 0.8s ease var(--r, 0s); }
+.tb-art.is-on path { stroke-dashoffset: 0; transition: stroke-dashoffset var(--du, 1.4s) cubic-bezier(.45, .1, .25, 1) calc(var(--d, 0s) + var(--lead, 0.35s)); }
+.tb-art[data-look="fall"] { --tb-art: color-mix(in srgb, var(--cream) 80%, transparent); --tb-flame: color-mix(in srgb, var(--cream) 62%, #e8962e); }
+.tb-art[data-look="winter"] { --tb-art: color-mix(in srgb, var(--cream) 62%, #bcd3ea); }
+.tb-art path.am { stroke: var(--tb-flame); opacity: 0.95; }
+.tb-art path.sn { opacity: 0.95; }
+.tb-art path.lf.fl { transform-box: fill-box; transform-origin: center; animation: tb-bob 7s ease-in-out infinite alternate; }
+.tb-art path.tw { transform-box: fill-box; transform-origin: center; animation: tb-twinkle 3.4s ease-in-out infinite; }
+@keyframes tb-bob { to { transform: translateY(14px) rotate(8deg); } }
+@keyframes tb-twinkle { 0%, 100% { opacity: 0.95; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+
+.tb-ring { position: absolute; z-index: 2; left: var(--cx, 50%); top: var(--cy, 55%); width: calc(var(--R, 1000px) * 2); height: calc(var(--R, 1000px) * 2); margin: calc(var(--R, 1000px) * -1) 0 0 calc(var(--R, 1000px) * -1); border-radius: 50%; pointer-events: none; opacity: 0; transform: scale(0);
+  border: 1.5px solid color-mix(in srgb, var(--tb-flame) 75%, transparent); box-shadow: 0 0 44px 8px color-mix(in srgb, var(--tb-flame) 30%, transparent); }
+.tb-ring.go { animation: tb-ring-s 1.7s cubic-bezier(.5, 0, .2, 1) forwards, tb-ring-o 1.7s linear forwards; }
+@keyframes tb-ring-s { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes tb-ring-o { 0% { opacity: 0.95; } 100% { opacity: 0; } }
+.tb-frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3; box-shadow: inset 0 0 0 0 transparent; }
+.tb-frame.flash::after { animation: tb-flash 1.6s ease-out; }
+@keyframes tb-flash { 0% { box-shadow: inset 0 0 140px 30px color-mix(in srgb, var(--tb-flame) 55%, transparent); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
+.tb-fx { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+
+.tb-slides { max-height: max(340px, min(66svh, calc(100svh - 300px))); }
+.tb-stage { grid-template-columns: clamp(56px, 8vw, 108px) minmax(0, 1fr) clamp(56px, 8vw, 108px); }
+
+@media (max-width: 760px) {
+  .tb-show { align-items: center; }
+  .tb-slides { max-height: none; }
+  .tb-stage { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-bg, .tb-bg.is-on, .tb-art path, .tb-art.is-on path { transition-duration: 0.01s !important; transition-delay: 0s !important; }
+  .tb-art path.fl, .tb-art path.tw, .tb-ring, .tb-frame::after { animation: none !important; }
+  .tb-fx { display: none; }
 }
