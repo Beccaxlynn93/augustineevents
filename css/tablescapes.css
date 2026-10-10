@@ -91,10 +91,17 @@
   .tb-slide.is-active img { transform: none; }
 }
 
-.tb-candles { margin-top: clamp(40px, 6vw, 72px); display: flex; justify-content: center; }
 .tb .tb-candles-art { width: min(520px, 90%); height: auto; color: var(--tb-fg); opacity: 1; overflow: visible; transition: color 1.4s var(--ease); }
 .tb .tb-candles-art .tb-glow { fill: url(#tbGlow); stroke: none; stroke-dasharray: none; opacity: 0.9; transform-box: fill-box; transform-origin: center; animation: tb-glow 3.6s ease-in-out infinite; animation-delay: calc(var(--i) * -0.7s); }
 .tb .tb-candles-art .tb-flame { fill: var(--tb-flame); stroke: var(--tb-flame); stroke-width: 1.2; transform-box: fill-box; transform-origin: 50% 100%; animation: tb-flicker 2.4s ease-in-out infinite; animation-delay: calc(var(--i) * -0.5s); }
 @keyframes tb-flicker { 0%, 100% { transform: scale(1, 1) rotate(0); } 30% { transform: scale(0.94, 1.08) rotate(-2deg); } 60% { transform: scale(1.04, 0.95) rotate(1.5deg); } }
 @keyframes tb-glow { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
 @media (prefers-reduced-motion: reduce) { .tb .tb-candles-art .tb-glow, .tb .tb-candles-art .tb-flame { animation: none; } }
+
+.tb-stage { display: grid; grid-template-columns: clamp(64px, 9vw, 128px) minmax(0, 1fr) clamp(64px, 9vw, 128px); gap: clamp(10px, 1.6vw, 24px); align-items: end; }
+.tb-side { display: flex; align-items: flex-end; }
+.tb .tb-side .tb-candles-art { width: 100%; }
+@media (max-width: 760px) {
+  .tb-stage { grid-template-columns: 1fr; }
+  .tb-side { display: none; }
+}
