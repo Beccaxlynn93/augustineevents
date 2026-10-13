@@ -465,8 +465,8 @@ made with `color-mix`, never a new hue.
 Added 2026-10-04 on `redesign` (approved by Justin) to measure Meta ads. Browser
 Pixel only; no Conversions API yet.
 
-**Pixel ID: `1082518351350657`**, named "Augustine Events – Website" in Events
-Manager. It appears twice in each of the six pages (the `PIXEL_ID` line and the
+**Pixel ID: `3496689010498212`**, named "Augustine Events – Website" in Events
+Manager. (Replaced 2026-10-13: the first Pixel, `1082518351350657`, was a test Pixel owned by a personal ad account; this one is owned by the business portfolio and assigned to its ad account.) It appears twice in each of the seven pages (the `PIXEL_ID` line and the
 `<noscript>` image); change both if it ever changes. If `PIXEL_ID` is not all digits
 the snippet loads nothing and every event is a no-op.
 
