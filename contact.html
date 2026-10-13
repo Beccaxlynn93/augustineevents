@@ -305,6 +305,7 @@
             <option value="music">Event Music</option>
             <option value="rentals">Event Rentals</option>
             <option value="both">Both</option>
+            <option value="tablescapes">Custom Tablescapes</option>
           </select>
         </label>
 
@@ -469,7 +470,7 @@
       const val = this.value;
       musicField.classList.toggle('visible', val === 'music' || val === 'both');
       rentalsField.classList.toggle('visible', val === 'rentals' || val === 'both');
-      estimatedTotal.classList.toggle('visible', val !== '');
+      estimatedTotal.classList.toggle('visible', val !== '' && val !== 'tablescapes');
       deliveryRow.style.display = (val === 'rentals' || val === 'both') ? 'flex' : 'none';
       syncDeliveryOnly();
       calcTotal();
@@ -542,7 +543,7 @@
       function trackLead() {
         if (!window.metaTrack) return;
         var type = packageTypeEl.value;
-        var params = { content_category: type === 'music' ? 'Music' : type === 'rentals' ? 'Rentals' : type === 'both' ? 'Both' : 'Unspecified' };
+        var params = { content_category: type === 'music' ? 'Music' : type === 'rentals' ? 'Rentals' : type === 'both' ? 'Both' : type === 'tablescapes' ? 'Tablescapes' : 'Unspecified' };
         if (musicEl.value !== '0') params.content_name = musicLabel.split(',')[0];
         window.metaTrack('Lead', params);
       }
@@ -590,6 +591,13 @@
           alert('Something went wrong. Please email raugustinemusic@gmail.com directly.');
         });
     });
+
+    // Arriving from the Custom Tablescapes page (contact.html?type=tablescapes).
+    (function () {
+      if (new URLSearchParams(location.search).get('type') !== 'tablescapes') return;
+      packageType.value = 'tablescapes';
+      packageType.dispatchEvent(new Event('change'));
+    })();
 
     // Arriving from a package's "Book this package" (contact.html?package=Silver):
     // start the form on Event Music with that package chosen.

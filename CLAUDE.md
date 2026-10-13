@@ -483,7 +483,7 @@ The `saved_resource*.html` and `Augustine Music Packages.html` files are not ser
 | `ViewContent` | `event-rentals.html` / `event-music.html` load | `content_category`: `Rentals` / `Music`, from `<html data-meta-category>` | head block |
 | `ViewContent` | a music package's details panel opens (click, or the tabs carrying an open package across) | `content_name`: package (e.g. `Silver`), `content_category`: `Music` | `js/packages.js` `open()` |
 | `Contact` | any `mailto:` or `tel:` link is clicked, any page | `content_category`: `Email` / `Phone` only | `js/site.js` |
-| `Lead` | the contact form's inquiry is **stored by the Worker** | `content_category`: `Music` / `Rentals` / `Both` (Package Type); `content_name`: music package name if one is chosen | `contact.html` `trackLead()` |
+| `Lead` | the contact form's inquiry is **stored by the Worker** | `content_category`: `Music` / `Rentals` / `Both` / `Tablescapes` (Package Type); `content_name`: music package name if one is chosen | `contact.html` `trackLead()` |
 
 **The Lead success signal.** `POST /api/inquiries` answers screened-out spam with a bare
 `{ok: true}` (so bots learn nothing), and a stored inquiry with `{ok: true, notified: …}`.
