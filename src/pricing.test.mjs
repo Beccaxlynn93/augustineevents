@@ -20,6 +20,7 @@ const db = new DatabaseSync(':memory:');
 db.exec(readFileSync(new URL('../migrations/0003_catalog.sql', import.meta.url), 'utf8'));
 db.exec(readFileSync(new URL('../migrations/0004_catalog_seed.sql', import.meta.url), 'utf8'));
 db.exec(readFileSync(new URL('../migrations/0005_item_photos.sql', import.meta.url), 'utf8'));
+db.exec(readFileSync(new URL('../migrations/0006_candlestick_price.sql', import.meta.url), 'utf8'));
 
 const catalog = buildCatalog(
   db.prepare('SELECT * FROM items WHERE active = 1').all(),
@@ -44,12 +45,12 @@ test('four florals take the bundle price, three do not', () => {
 
 test('a partial collection prices per unit', () => {
   const r = price({ slug: 'brass-candlestick', qty: 30 });
-  assert.equal(r.subtotal, 9000);
+  assert.equal(r.subtotal, 12000);
   assert.equal(r.bundles.length, 0);
 });
 
 test('the customer is never punished for buying more', () => {
-  // 49 candlesticks costs $147 per unit; 50 costs $140. Buying one more must never
+  // 49 candlesticks costs $196; 50 costs $140. Buying one more must never
   // cost more, so the resolver has to pick the bundle the moment it is satisfied.
   const fortyNine = price({ slug: 'brass-candlestick', qty: 49 }).subtotal;
   const fifty = price({ slug: 'brass-candlestick', qty: 50 }).subtotal;
