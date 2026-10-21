@@ -32,8 +32,8 @@
     root.querySelectorAll('.tb-toggle button').forEach(function (b) {
       b.setAttribute('aria-pressed', b.dataset.look === state.look ? 'true' : 'false');
     });
-    nameEl.textContent = LOOKS[state.look].label;
-    noteEl.textContent = LOOKS[state.look].note;
+    if (nameEl) nameEl.textContent = LOOKS[state.look].label;
+    if (noteEl) noteEl.textContent = LOOKS[state.look].note;
     dotsEl.innerHTML = '';
     group.forEach(function (_, i) {
       var b = document.createElement('button');

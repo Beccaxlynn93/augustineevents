@@ -43,7 +43,7 @@
 
 .tb-caption {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+  display: flex; align-items: flex-end; justify-content: flex-end; gap: 16px;
   padding: 56px clamp(16px, 3vw, 32px) clamp(14px, 2vw, 24px);
   background: linear-gradient(to top, color-mix(in srgb, var(--green-dark) 80%, transparent), transparent);
   color: var(--cream);
