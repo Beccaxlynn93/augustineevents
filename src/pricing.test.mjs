@@ -20,7 +20,7 @@ const db = new DatabaseSync(':memory:');
 db.exec(readFileSync(new URL('../migrations/0003_catalog.sql', import.meta.url), 'utf8'));
 db.exec(readFileSync(new URL('../migrations/0004_catalog_seed.sql', import.meta.url), 'utf8'));
 db.exec(readFileSync(new URL('../migrations/0005_item_photos.sql', import.meta.url), 'utf8'));
-db.exec(readFileSync(new URL('../migrations/0006_candlestick_price.sql', import.meta.url), 'utf8'));
+db.exec(readFileSync(new URL('../migrations/0006_brass_prices.sql', import.meta.url), 'utf8'));
 
 const catalog = buildCatalog(
   db.prepare('SELECT * FROM items WHERE active = 1').all(),
@@ -32,7 +32,7 @@ const price = (...lines) => resolveCart(lines, catalog);
 
 test('the whole brass collection prices as two bundles, not 58 line items', () => {
   const r = price({ slug: 'brass-candlestick', qty: 50 }, { slug: 'brass-candelabra-3arm', qty: 8 });
-  // Naive per-line would be 50*300 + 8*700 = 20600.
+  // Naive per-line would be 50*400 + 8*1000 = 28000.
   assert.equal(r.subtotal, 19000, '$140 collection + $50 candelabra set');
   assert.deepEqual(r.bundles.map((b) => b.slug).sort(), ['candelabra-set', 'candlestick-collection']);
   assert.equal(r.ok, true);
