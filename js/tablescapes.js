@@ -100,4 +100,67 @@
       if (e.key === 'ArrowRight') show(cur + 1);
     });
   }
+
+  // Intro slideshow. Each change is revealed through a growing circle that starts
+  // at the slide's flame point (--fx / --fy); see the .tb-reel rules.
+  var reel = document.getElementById('tbReel');
+  if (reel) {
+    var slides = Array.prototype.slice.call(reel.querySelectorAll('.tb-reel-slide'));
+    var dotsEl = document.getElementById('tbReelDots');
+    var rbtn = document.getElementById('tbReelPlay');
+    var glow = reel.querySelector('.tb-reel-glow');
+    var HOLD = 5200;
+    var idx = 0, playing = !reduce, inView = true, timer = null;
+    if (window.CSS && CSS.registerProperty && !reduce) reel.classList.add('tb-reveal');
+
+    slides.forEach(function (sl, i) {
+      var d = document.createElement('button');
+      d.type = 'button';
+      d.setAttribute('aria-label', 'Photo ' + (i + 1) + ' of ' + slides.length);
+      if (i === 0) d.setAttribute('aria-current', 'true');
+      d.addEventListener('click', function () { playing = false; go(i); syncBtn(); });
+      dotsEl.appendChild(d);
+    });
+    var dots = Array.prototype.slice.call(dotsEl.children);
+
+    function go(n) {
+      n = (n + slides.length) % slides.length;
+      if (n === idx) return;
+      var from = slides[idx], to = slides[n];
+      slides.forEach(function (sl) { sl.classList.remove('is-prev', 'is-entering'); });
+      from.classList.remove('is-active');
+      from.classList.add('is-prev');
+      to.classList.add('is-active', 'is-entering');
+      reel.style.setProperty('--fx', to.style.getPropertyValue('--fx'));
+      reel.style.setProperty('--fy', to.style.getPropertyValue('--fy'));
+      reel.classList.remove('is-changing');
+      void reel.offsetWidth; // restart the glow
+      reel.classList.add('is-changing');
+      var done = function () { from.classList.remove('is-prev'); to.classList.remove('is-entering'); };
+      var ended = false;
+      to.addEventListener('animationend', function h(e) {
+        if (e.target !== to || ended) return;
+        ended = true; to.removeEventListener('animationend', h); done();
+      });
+      setTimeout(function () { if (!ended) { ended = true; done(); } }, 3200);
+      dots.forEach(function (d, i) { if (i === n) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+      idx = n;
+      schedule();
+    }
+    function schedule() {
+      clearTimeout(timer);
+      if (playing && inView && !document.hidden) timer = setTimeout(function () { go(idx + 1); }, HOLD);
+    }
+    function syncBtn() {
+      rbtn.classList.toggle('is-paused', !playing);
+      rbtn.setAttribute('aria-label', playing ? 'Pause slideshow' : 'Play slideshow');
+      schedule();
+    }
+    rbtn.addEventListener('click', function () { playing = !playing; syncBtn(); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (e) { inView = e[0].isIntersecting; schedule(); }, { threshold: 0.3 }).observe(reel);
+    }
+    document.addEventListener('visibilitychange', schedule);
+    syncBtn();
+  }
 })();
