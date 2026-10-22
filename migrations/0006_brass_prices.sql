@@ -6,3 +6,5 @@ UPDATE items SET unit_price = 400  WHERE slug = 'brass-candlestick';
 UPDATE items SET unit_price = 1000 WHERE slug = 'brass-candelabra-3arm';
 UPDATE bundles SET price = 7000 WHERE slug = 'candelabra-set';
 UPDATE bundles SET price = 17500 WHERE slug = 'candlestick-collection';
+-- Entire Brass Collection Bundle $230 -> $250.
+UPDATE bundles SET price = 25000 WHERE slug = 'brass-collection';

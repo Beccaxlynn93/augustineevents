@@ -127,7 +127,7 @@ test('the full brass collection resolves to the bundle, beating its own parts', 
     { slug: 'brass-candelabra-9arm', qty: 1 }, { slug: 'italian-vase-small', qty: 2 },
     { slug: 'italian-vase-large', qty: 1 });
   // Parts, with the two collections at their set prices, are $175 + $70 + $25 + $10 + $15 = $295. The bundle must win.
-  assert.equal(r.subtotal, 23000);
+  assert.equal(r.subtotal, 25000);
   assert.deepEqual(r.bundles.map((b) => b.slug), ['brass-collection']);
   assert.ok(r.subtotal < 29500, 'bundle must beat the sum of its parts');
 });
@@ -189,14 +189,14 @@ test('choosing the brass package prices every member through the package', () =>
   const cart = [...pkg.items].map(([slug, qty]) => ({ slug, qty }));
   cart.push({ slug: 'dinner-plate', qty: 20 });
   const q = resolveCart(cart, catalog);
-  assert.equal(q.subtotal, 23000 + 20 * 125);
+  assert.equal(q.subtotal, 25000 + 20 * 125);
   assert.deepEqual(q.bundles.map((b) => b.slug), ['brass-collection']);
 
   const text = describeQuote(q, catalog);
   assert.ok(text.includes('Small Brass Italian Vases x2: included in Entire Brass Collection Bundle'), text.join('\n'));
   assert.ok(text.includes('White Round Dinner Plates x20 at $1.25 = $25.00'));
-  assert.ok(text.includes('Entire Brass Collection Bundle: $230.00'));
-  assert.ok(text.includes('Rental subtotal: $255.00'));
+  assert.ok(text.includes('Entire Brass Collection Bundle: $250.00'));
+  assert.ok(text.includes('Rental subtotal: $275.00'));
   assert.ok(text.includes('Includes delivery only items.'));
 });
 
