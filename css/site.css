@@ -27,8 +27,8 @@
   --on-dark-muted: color-mix(in srgb, var(--cream) 66%, transparent);
   --line-on-dark: color-mix(in srgb, var(--cream) 16%, transparent);
 
-  --serif: 'Cormorant Garamond', 'Cormorant', Georgia, 'Times New Roman', serif;
-  --sans: 'Jost', 'Lato', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
   --script: 'HeyLovely', 'Snell Roundhand', cursive;
 
   --wrap: 1200px;
@@ -82,15 +82,13 @@ button { font: inherit; color: inherit; }
 /* ── type ─────────────────────────────────────────────────────────────── */
 
 h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; color: var(--green-dark); letter-spacing: -0.005em; text-wrap: balance; }
-/* Cormorant defaults to old-style figures, which make $1,100 read like $I,IOO.
-   Anything set in the serif uses lining figures instead. */
+/* Keep lining figures on anything set in the serif, so prices stay even-height. */
 h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { font-variant-numeric: lining-nums; }
 
 .display {
   font-family: var(--serif); font-weight: 300;
   font-size: clamp(3rem, 6.4vw, 5.6rem); line-height: 1.0; letter-spacing: -0.015em;
 }
-.display em, .h2 em { font-style: italic; font-weight: 300; color: var(--green); }
 
 .h2 { font-size: clamp(2.3rem, 4.2vw, 3.5rem); line-height: 1.08; font-weight: 300; }
 .h3 { font-size: clamp(1.5rem, 2.2vw, 1.85rem); line-height: 1.2; font-weight: 500; }
@@ -98,10 +96,8 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 .eyebrow {
   display: inline-flex; align-items: center; gap: 14px;
   font-family: var(--sans); font-size: 0.72rem; font-weight: 500;
-  letter-spacing: 0.26em; text-transform: uppercase; color: var(--green);
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--green);
 }
-.eyebrow::before { content: ''; width: 34px; height: 1px; background: currentColor; opacity: 0.7; }
-.eyebrow.center::after { content: ''; width: 34px; height: 1px; background: currentColor; opacity: 0.7; }
 
 .lede { font-size: clamp(1.08rem, 1.4vw, 1.2rem); line-height: 1.75; color: var(--muted); font-weight: 300; max-width: 58ch; }
 .prose p { color: var(--muted); max-width: 62ch; }
@@ -271,7 +267,6 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
 /* The lighter green ground needs the stronger cream: 66% was 3.8:1 here. */
 .bg-green .eyebrow { color: var(--on-dark); }
 .bg-dark .lede, .bg-green .lede, .bg-dark .prose p, .bg-green .prose p { color: var(--on-dark); }
-.bg-dark .h2 em, .bg-green .h2 em { color: var(--cream); }
 
 /* ── interior page hero: text beside an arched photograph ──────────────── */
 

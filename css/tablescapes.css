@@ -18,7 +18,6 @@
   --tb-flame: color-mix(in srgb, var(--cream) 15%, #e8962e);
 }
 .tb :is(h1, h2, .eyebrow) { color: var(--tb-fg); transition: color 1.4s var(--ease); }
-.tb .display em, .tb .h2 em { color: var(--tb-accent); transition: color 1.4s var(--ease); }
 .tb .prose p { color: var(--tb-muted); transition: color 1.4s var(--ease); }
 .tb .closing { color: var(--on-dark); }
 .tb .closing :is(h2, .eyebrow) { color: var(--cream); }

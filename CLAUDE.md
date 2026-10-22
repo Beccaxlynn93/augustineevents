@@ -350,8 +350,10 @@ made with `color-mix`, never a new hue.
 | Role | Font | Notes |
 |---|---|---|
 | Logo / accents | `HeyLovely` | Self-hosted TTF. Now used for the logo and small flourishes only. |
-| Headings | `Cormorant Garamond` | Google Fonts, 300 to 600. Set with lining figures (`lining-nums`); its default old-style figures make $1,100 read like $I,IOO. |
-| Body | `Jost` | Google Fonts, 300/400/500. |
+| Headings | `Newsreader` | Google Fonts, optical size axis, 300 to 500. Replaced Cormorant Garamond on 2026-10-22 because that face reads as a stock template choice. Still set with lining figures (`lining-nums`) so prices stay even-height. |
+| Body | `Hanken Grotesk` | Google Fonts, 300 to 600. Replaced Jost on 2026-10-22. |
+
+**No italic emphasis in headings** (owners, 2026-10-22: it reads as AI-written). Do not wrap words in `<em>` inside `h1`/`h2` and do not restore the `.display em` rules. Eyebrow labels have no flanking rules for the same reason. Keep copy plain and specific: no "unforgettable", "bring your vision to life" or "most cherished moments".
 | Home headline | Becca's Canva font | An image, `hero-headline.png`, inside a real `<h1>`. The font lives only in Canva. |
 
 **Rules the system enforces**
