@@ -27,8 +27,8 @@
   --on-dark-muted: color-mix(in srgb, var(--cream) 66%, transparent);
   --line-on-dark: color-mix(in srgb, var(--cream) 16%, transparent);
 
-  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Italiana', Georgia, 'Times New Roman', serif;
+  --sans: 'Jost', 'Helvetica Neue', Arial, sans-serif;
   --script: 'HeyLovely', 'Snell Roundhand', cursive;
 
   --wrap: 1200px;
@@ -84,6 +84,11 @@ button { font: inherit; color: inherit; }
 h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; color: var(--green-dark); letter-spacing: -0.005em; text-wrap: balance; }
 /* Keep lining figures on anything set in the serif, so prices stay even-height. */
 h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { font-variant-numeric: lining-nums; }
+/* Italiana's figures are thin and ornate (a 1 reads as I, a 0 as O), so every
+   price, total and phone number is set in the sans instead. */
+[class*="price"], .rental-total-bar strong, .aside-list a, .aside-list p, .pkg-detail-price {
+  font-family: var(--sans) !important; font-weight: 300 !important; letter-spacing: -0.01em;
+}
 
 .display {
   font-family: var(--serif); font-weight: 300;
