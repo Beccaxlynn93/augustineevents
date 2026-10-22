@@ -10,12 +10,38 @@
   var saveData = navigator.connection && navigator.connection.saveData;
   var userPaused = !!(reduce || saveData);
   var visible = true;
+  var loaded = false;
+
+  // The video file is chosen here, not in markup, so it is only fetched once and
+  // only for visitors who will actually see it moving.
+  function pickSrc() {
+    var small = window.matchMedia && window.matchMedia('(max-width: 700px)').matches;
+    return video.getAttribute(small ? 'data-src-small' : 'data-src-large');
+  }
+  // Safari and every iPhone browser (all WebKit) will only stream a video from a
+  // server that answers byte-range requests with 206. Workers static assets answer
+  // 200 with the whole file, which WebKit refuses to play. So WebKit downloads the
+  // (small) file and plays it from memory; everyone else streams it normally.
+  var ua = navigator.userAgent;
+  var webkitOnly = /AppleWebKit/.test(ua) && !/Chrome|Chromium|Edg|Android/.test(ua);
+  function load() {
+    if (loaded) return;
+    loaded = true;
+    var src = pickSrc();
+    video.preload = 'auto';
+    if (!webkitOnly) { video.src = src; return update(); }
+    fetch(src).then(function (r) { return r.blob(); }).then(function (b) {
+      video.src = URL.createObjectURL(b);
+      update();
+    }).catch(function () {});
+  }
 
   function sync() {
     playBtn.classList.toggle('is-paused', video.paused);
     playBtn.setAttribute('aria-label', video.paused ? 'Play background video' : 'Pause background video');
   }
   function update() {
+    if (!loaded) { sync(); return; }
     if (userPaused || !visible || document.hidden) {
       video.pause();
     } else {
@@ -25,10 +51,12 @@
     sync();
   }
 
-  // Motion-sensitive visitors and data-saver users get the still poster; they can opt in with the button.
-  if (userPaused) { video.removeAttribute('autoplay'); video.preload = 'none'; }
+  // Motion-sensitive visitors and data-saver users get the still poster and
+  // download nothing until they press play.
+  if (!userPaused) load();
 
   playBtn.addEventListener('click', function () {
+    if (!loaded) { userPaused = false; load(); return; }
     userPaused = !video.paused;
     update();
   });
