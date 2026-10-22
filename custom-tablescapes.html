@@ -107,32 +107,44 @@
           <div class="prose fade-in">
             <p>Every custom tablescape starts with you: your date, your space and the feeling you want guests to walk into. We design the whole table and set it with pieces from the Augustine rental collection, so each detail feels chosen.</p>
             <p>We specialize in tables for 2 to 25 guests, for the gatherings that deserve more than a bare table: elopements, intimate dinner parties, bachelorette parties, bridal showers, micro weddings, engagement parties, book clubs and more.</p>
-            <p>The two tables below are samples of our work, styled for fall and winter. Yours will be designed for your season, your colors and your style.</p>
+            <p>Every table is designed from scratch for your season, your colors and your style. Here are some of our recent ones.</p>
           </div>
         </div>
       </div>
 
       <div class="wrap">
-        <p class="eyebrow fade-in">Samples of our work</p>
-      </div>
-
-      <div class="wrap tb-looks">
-        <div class="tb-look-card fade-in">
-          <img src="img/tablescape-fall-3.webp" width="1400" height="933" alt="" loading="lazy" />
-          <span class="tb-look-card-body">
-            <span class="tb-look-card-name">Fall Harvest</span>
-            <span class="tb-look-card-note">Sage toile, white pumpkins and burnt orange tapers glowing at dusk.</span>
-          </span>
+        <div class="tb-gallery-head">
+          <p class="eyebrow fade-in">Our work</p>
+          <h2 class="h2 fade-in">Recent custom tablescapes</h2>
         </div>
-        <div class="tb-look-card fade-in">
-          <img src="img/tablescape-winter-5.webp" width="1400" height="933" alt="" loading="lazy" />
-          <span class="tb-look-card-body">
-            <span class="tb-look-card-name">Winter</span>
-            <span class="tb-look-card-note">Cream linen, rosemary and a forest of brass candlesticks.</span>
-          </span>
+        <div class="tb-gallery">
+        <button type="button" class="tb-shot fade-in wide" data-full="img/tablescape-fall-1.webp"><img src="img/tablescape-fall-1.webp" width="1400" height="933" alt="A long outdoor table at dusk in sage green toile linen, set with white pumpkins, brass candlesticks and burnt orange taper candles" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-winter-1.webp"><img src="img/tablescape-winter-1.webp" width="1400" height="933" alt="A long table lit by dozens of taper candles in brass candlesticks" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-fall-3.webp"><img src="img/tablescape-fall-3.webp" width="1400" height="933" alt="A brass candelabra with taper candles beside a crystal goblet and a white pumpkin" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-winter-5.webp"><img src="img/tablescape-winter-5.webp" width="1400" height="933" alt="A place setting from above: a scalloped bowl with a sprig of rosemary on a dark napkin, with black and gold flatware" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-fall-6.webp"><img src="img/tablescape-fall-6.webp" width="1400" height="933" alt="The whole table from above, eight places set with candles, greenery and white pumpkins down the middle" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-winter-2.webp"><img src="img/tablescape-winter-2.webp" width="1400" height="933" alt="Rows of lit taper candles and crystal goblets down a cream linen table" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in wide" data-full="img/tablescape-fall-4.webp"><img src="img/tablescape-fall-4.webp" width="1400" height="933" alt="Three burnt orange and cream taper candles in a brass candelabra, with a white pumpkin on the table" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-winter-4.webp"><img src="img/tablescape-winter-4.webp" width="1400" height="933" alt="Brass candlesticks, crystal and a scalloped bowl on a dark napkin, set on cream crinkle linen" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-fall-2.webp"><img src="img/tablescape-fall-2.webp" width="1400" height="933" alt="Side view of the table with tall lit tapers, crystal goblets, greenery and cream napkins" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-winter-3.webp"><img src="img/tablescape-winter-3.webp" width="1400" height="933" alt="Close view of tall taper candles in brass holders beside crystal goblets" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in wide" data-full="img/tablescape-fall-5.webp"><img src="img/tablescape-fall-5.webp" width="1400" height="933" alt="A place setting from above: white plates, a cream napkin with a gold leaf ring and gold flatware on sage toile linen" loading="lazy" /></button>
+        <button type="button" class="tb-shot fade-in" data-full="img/tablescape-winter-6.webp"><img src="img/tablescape-winter-6.webp" width="1400" height="933" alt="Close view of a scalloped bowl on a dark napkin with gold flatware and brass candlesticks behind" loading="lazy" /></button>
         </div>
       </div>
     </section>
+
+    <dialog class="tb-dialog" id="tbDialog" aria-label="Tablescape photo">
+      <img id="tbDialogImg" alt="" />
+      <div class="tb-dialog-bar">
+        <p class="tb-dialog-caption" id="tbDialogCaption"></p>
+        <div class="tb-dialog-btns">
+          <button type="button" id="tbPrev" aria-label="Previous photo">&larr;</button>
+          <button type="button" id="tbNext" aria-label="Next photo">&rarr;</button>
+          <button type="button" id="tbClose">Close</button>
+        </div>
+      </div>
+    </dialog>
 
     <section class="section bg-green closing" data-vines>
       <div class="botanical-watermark" data-botanical style="right: -60px; bottom: -80px;"></div>
