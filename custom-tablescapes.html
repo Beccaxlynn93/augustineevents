@@ -25,7 +25,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/site.css" />
   <link rel="stylesheet" href="css/tablescapes.css" />
-  <link rel="preload" as="image" href="img/tablescape-fall-1.webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="img/tablescapes-hero-poster.jpg" fetchpriority="high" />
   <script>
     // Reveal animations hide content until it scrolls into view. Only do that
     // once js/site.js is running; if it never starts, show everything.
@@ -84,44 +84,21 @@
   </header>
 
   <main id="main" class="tb" data-theme="fall">
-    <section class="tb-show" aria-label="Tablescape showcase">
-      <div class="wrap">
-        <div class="tb-head">
-          <div class="tb-title">
-            <p class="eyebrow rise" style="--d:0">Designed for your table</p>
-            <h1 class="display rise" style="--d:1">Custom Tablescapes</h1>
-          </div>
+    <section class="tb-show" aria-label="Custom Tablescapes">
+      <video class="tb-video" id="tbVideo" muted loop playsinline autoplay preload="auto" poster="img/tablescapes-hero-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="video/tablescapes-hero-480.mp4" type="video/mp4" media="(max-width: 700px)" />
+        <source src="video/tablescapes-hero-720.mp4" type="video/mp4" />
+      </video>
+      <div class="tb-scrim" aria-hidden="true"></div>
+      <div class="wrap tb-hero-inner">
+        <div class="tb-title">
+          <p class="eyebrow rise" style="--d:0">Designed for your table</p>
+          <h1 class="display rise" style="--d:1">Custom Tablescapes</h1>
         </div>
-
-        <div class="tb-stage">
-        <div class="tb-side rise" aria-hidden="true"><svg class="line-art tb-candles-art" viewBox="0 0 100 360" focusable="false"><defs><radialGradient id="tbGlowL"><stop offset="0" stop-color="var(--tb-flame)" stop-opacity="0.85"/><stop offset="1" stop-color="var(--tb-flame)" stop-opacity="0"/></radialGradient></defs><g class="tb-lights"><circle class="tb-glow" style="--i:0" cx="30" cy="155" r="30" fill="url(#tbGlowL)"/><path class="tb-flame" style="--i:0" d="M30 146 C 24 154, 25.5 161, 30 163 C 34.5 161, 36 154, 30 146 Z"/><circle class="tb-glow" style="--i:1" cx="74" cy="213" r="30" fill="url(#tbGlowL)"/><path class="tb-flame" style="--i:1" d="M74 204 C 68 212, 69.5 219, 74 221 C 78.5 219, 80 212, 74 204 Z"/></g><path pathLength="1" d="M14 350 H46"/><path pathLength="1" d="M18 350 C 20 343, 40 343, 42 350"/><path pathLength="1" d="M30 344 V244"/><ellipse pathLength="1" cx="30" cy="297" rx="4.5" ry="2.8"/><path pathLength="1" d="M21 236 H39"/><path pathLength="1" d="M23 236 C 24 243, 36 243, 37 236"/><path pathLength="1" d="M26.5 236 V166 H33.5 V236"/><path pathLength="1" d="M30 166 V163"/><path pathLength="1" d="M58 350 H90"/><path pathLength="1" d="M62 350 C 64 343, 84 343, 86 350"/><path pathLength="1" d="M74 344 V290"/><ellipse pathLength="1" cx="74" cy="320" rx="4.5" ry="2.8"/><path pathLength="1" d="M65 282 H83"/><path pathLength="1" d="M67 282 C 68 289, 80 289, 81 282"/><path pathLength="1" d="M70.5 282 V224 H77.5 V282"/><path pathLength="1" d="M74 224 V221"/></svg></div>
-        <div class="tb-frame rise" style="--d:3">
-          <div class="tb-slides">
-            <figure class="tb-slide is-active" data-look="fall"><img src="img/tablescape-fall-1.webp" width="1400" height="933" alt="A long outdoor table at dusk in sage green toile linen, set with white pumpkins, brass candlesticks and burnt orange taper candles" fetchpriority="high" /></figure>
-            <figure class="tb-slide" data-look="fall"><img src="img/tablescape-fall-2.webp" width="1400" height="933" alt="Side view of the fall table with tall lit tapers, crystal goblets, greenery and cream napkins" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="fall"><img src="img/tablescape-fall-3.webp" width="1400" height="933" alt="A brass candelabra with taper candles beside a crystal goblet and a white pumpkin" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="fall"><img src="img/tablescape-fall-4.webp" width="1400" height="933" alt="Three burnt orange and cream taper candles in a brass candelabra, with a white pumpkin on the table" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="fall"><img src="img/tablescape-fall-5.webp" width="1400" height="933" alt="A place setting from above: white plates, a cream napkin with a gold leaf ring and gold flatware on sage toile linen" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="fall"><img src="img/tablescape-fall-6.webp" width="1400" height="934" alt="The whole fall table from above, eight places set with candles, greenery and white pumpkins down the middle" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="winter"><img src="img/tablescape-winter-1.webp" width="1400" height="934" alt="A long table lit by dozens of taper candles in brass candlesticks" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="winter"><img src="img/tablescape-winter-2.webp" width="1400" height="933" alt="Rows of lit taper candles and crystal goblets down a cream linen table" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="winter"><img src="img/tablescape-winter-3.webp" width="1400" height="933" alt="Close view of tall taper candles in brass holders beside crystal goblets" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="winter"><img src="img/tablescape-winter-4.webp" width="1400" height="933" alt="Brass candlesticks, crystal and a scalloped bowl on a dark napkin, set on cream crinkle linen" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="winter"><img src="img/tablescape-winter-5.webp" width="1400" height="933" alt="A winter place setting from above: a scalloped bowl with a sprig of rosemary on a dark napkin, with black and gold flatware" loading="lazy" /></figure>
-            <figure class="tb-slide" data-look="winter"><img src="img/tablescape-winter-6.webp" width="1400" height="933" alt="Close view of a scalloped bowl on a dark napkin with gold flatware and brass candlesticks behind" loading="lazy" /></figure>
-          </div>
-          <div class="tb-caption">
-            <div class="tb-controls">
-              <div class="tb-dots" id="tbDots" role="group" aria-label="Choose a photo"></div>
-              <button type="button" class="tb-play" id="tbPlay" aria-label="Pause slideshow">
-                <svg class="icon-pause" viewBox="0 0 12 14" aria-hidden="true" focusable="false"><path d="M2 1v12M10 1v12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                <svg class="icon-play" viewBox="0 0 12 14" aria-hidden="true" focusable="false"><path d="M2.5 1.5v11l8-5.5z" fill="currentColor"/></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="tb-side rise" aria-hidden="true"><svg class="line-art tb-candles-art" viewBox="0 0 100 360" focusable="false"><defs><radialGradient id="tbGlowR"><stop offset="0" stop-color="var(--tb-flame)" stop-opacity="0.85"/><stop offset="1" stop-color="var(--tb-flame)" stop-opacity="0"/></radialGradient></defs><g class="tb-lights"><circle class="tb-glow" style="--i:2" cx="26" cy="213" r="30" fill="url(#tbGlowR)"/><path class="tb-flame" style="--i:2" d="M26 204 C 20 212, 21.5 219, 26 221 C 30.5 219, 32 212, 26 204 Z"/><circle class="tb-glow" style="--i:3" cx="70" cy="141" r="30" fill="url(#tbGlowR)"/><path class="tb-flame" style="--i:3" d="M70 132 C 64 140, 65.5 147, 70 149 C 74.5 147, 76 140, 70 132 Z"/></g><path pathLength="1" d="M10 350 H42"/><path pathLength="1" d="M14 350 C 16 343, 36 343, 38 350"/><path pathLength="1" d="M26 344 V290"/><ellipse pathLength="1" cx="26" cy="320" rx="4.5" ry="2.8"/><path pathLength="1" d="M17 282 H35"/><path pathLength="1" d="M19 282 C 20 289, 32 289, 33 282"/><path pathLength="1" d="M22.5 282 V224 H29.5 V282"/><path pathLength="1" d="M26 224 V221"/><path pathLength="1" d="M54 350 H86"/><path pathLength="1" d="M58 350 C 60 343, 80 343, 82 350"/><path pathLength="1" d="M70 344 V234"/><ellipse pathLength="1" cx="70" cy="292" rx="4.5" ry="2.8"/><path pathLength="1" d="M61 226 H79"/><path pathLength="1" d="M63 226 C 64 233, 76 233, 77 226"/><path pathLength="1" d="M66.5 226 V152 H73.5 V226"/><path pathLength="1" d="M70 152 V149"/></svg></div>
-        </div>
+        <button type="button" class="tb-play" id="tbPlay" aria-label="Pause background video">
+          <svg class="icon-pause" viewBox="0 0 12 14" aria-hidden="true" focusable="false"><path d="M2 1v12M10 1v12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg class="icon-play" viewBox="0 0 12 14" aria-hidden="true" focusable="false"><path d="M2.5 1.5v11l8-5z" fill="currentColor"/></svg>
+        </button>
       </div>
     </section>
 
@@ -143,22 +120,20 @@
       </div>
 
       <div class="wrap tb-looks">
-        <button type="button" class="tb-look-card fade-in" data-look="fall">
+        <div class="tb-look-card fade-in">
           <img src="img/tablescape-fall-3.webp" width="1400" height="933" alt="" loading="lazy" />
           <span class="tb-look-card-body">
             <span class="tb-look-card-name">Fall Harvest</span>
             <span class="tb-look-card-note">Sage toile, white pumpkins and burnt orange tapers glowing at dusk.</span>
-            <span class="tb-look-card-cta">View this sample</span>
           </span>
-        </button>
-        <button type="button" class="tb-look-card fade-in" data-look="winter">
+        </div>
+        <div class="tb-look-card fade-in">
           <img src="img/tablescape-winter-5.webp" width="1400" height="933" alt="" loading="lazy" />
           <span class="tb-look-card-body">
             <span class="tb-look-card-name">Winter</span>
             <span class="tb-look-card-note">Cream linen, rosemary and a forest of brass candlesticks.</span>
-            <span class="tb-look-card-cta">View this sample</span>
           </span>
-        </button>
+        </div>
       </div>
     </section>
 

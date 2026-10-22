@@ -1,112 +1,45 @@
 (function () {
-  var root = document.querySelector('.tb');
-  if (!root) return;
-  var slides = Array.prototype.slice.call(root.querySelectorAll('.tb-slide'));
-  var frame = root.querySelector('.tb-frame');
-  var header = document.querySelector('.site-header');
-  var dotsEl = document.getElementById('tbDots');
+  var video = document.getElementById('tbVideo');
   var playBtn = document.getElementById('tbPlay');
-  var nameEl = document.getElementById('tbLookName');
-  var noteEl = document.getElementById('tbLookNote');
-  var HOLD = 4600;
-  var LOOKS = {
-    fall: { label: 'Fall Harvest', note: 'Sage toile, white pumpkins and burnt orange tapers.' },
-    winter: { label: 'Winter', note: 'Cream linen, rosemary and brass candlelight.' }
-  };
+  var header = document.querySelector('.site-header');
+  if (!video) return;
+  // The page is dark and the top panel is a dark video, so the header reads on dark.
+  if (header) header.classList.add('on-dark');
+
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var state = { look: 'fall', idx: 0, playing: !reduce, visible: true, timer: null };
+  var saveData = navigator.connection && navigator.connection.saveData;
+  var userPaused = !!(reduce || saveData);
+  var visible = true;
 
-  function inLook(look) {
-    return slides.filter(function (s) { return s.dataset.look === look; });
+  function sync() {
+    playBtn.classList.toggle('is-paused', video.paused);
+    playBtn.setAttribute('aria-label', video.paused ? 'Play background video' : 'Pause background video');
   }
-
-  function render() {
-    var group = inLook(state.look);
-    slides.forEach(function (s) {
-      var on = s === group[state.idx];
-      s.classList.toggle('is-active', on);
-      s.setAttribute('aria-hidden', on ? 'false' : 'true');
-    });
-    root.dataset.theme = state.look;
-    if (header) header.classList.toggle('on-dark', state.look === 'fall');
-    root.querySelectorAll('.tb-toggle button').forEach(function (b) {
-      b.setAttribute('aria-pressed', b.dataset.look === state.look ? 'true' : 'false');
-    });
-    if (nameEl) nameEl.textContent = LOOKS[state.look].label;
-    if (noteEl) noteEl.textContent = LOOKS[state.look].note;
-    dotsEl.innerHTML = '';
-    group.forEach(function (_, i) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('aria-label', LOOKS[state.look].label + ' photo ' + (i + 1) + ' of ' + group.length);
-      if (i === state.idx) b.setAttribute('aria-current', 'true');
-      b.addEventListener('click', function () { state.idx = i; stop(); render(); });
-      dotsEl.appendChild(b);
-    });
-    playBtn.classList.toggle('is-paused', !state.playing);
-    playBtn.setAttribute('aria-label', state.playing ? 'Pause slideshow' : 'Play slideshow');
-    schedule();
-  }
-
-  function next() {
-    var group = inLook(state.look);
-    if (state.idx < group.length - 1) {
-      state.idx++;
-    } else if (state.look === 'fall') {
-      state.look = 'winter';
-      state.idx = 0;
+  function update() {
+    if (userPaused || !visible || document.hidden) {
+      video.pause();
     } else {
-      state.playing = false;
+      var p = video.play();
+      if (p && p.catch) p.catch(function () {});
     }
-    render();
+    sync();
   }
 
-  function schedule() {
-    clearTimeout(state.timer);
-    if (state.playing && state.visible && !document.hidden) {
-      state.timer = setTimeout(next, HOLD);
-    }
-  }
+  // Motion-sensitive visitors and data-saver users get the still poster; they can opt in with the button.
+  if (userPaused) { video.removeAttribute('autoplay'); video.preload = 'none'; }
 
-  function stop() {
-    state.playing = false;
-    clearTimeout(state.timer);
-  }
-
-  function setLook(look) {
-    stop();
-    state.look = look;
-    state.idx = 0;
-    render();
-  }
-
-  root.querySelectorAll('.tb-toggle button').forEach(function (b) {
-    b.addEventListener('click', function () { setLook(b.dataset.look); });
-  });
-  root.querySelectorAll('.tb-look-card').forEach(function (c) {
-    c.addEventListener('click', function () {
-      setLook(c.dataset.look);
-      frame.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
-    });
-  });
   playBtn.addEventListener('click', function () {
-    if (state.playing) {
-      stop();
-    } else {
-      var atEnd = state.look === 'winter' && state.idx === inLook('winter').length - 1;
-      if (atEnd) { state.look = 'fall'; state.idx = 0; }
-      state.playing = true;
-    }
-    render();
+    userPaused = !video.paused;
+    update();
   });
-
+  video.addEventListener('play', sync);
+  video.addEventListener('pause', sync);
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
-      state.visible = entries[0].isIntersecting;
-      schedule();
-    }, { threshold: 0.25 }).observe(frame);
+      visible = entries[0].isIntersecting;
+      update();
+    }, { threshold: 0.1 }).observe(video);
   }
-  document.addEventListener('visibilitychange', schedule);
-
-  render();
+  document.addEventListener('visibilitychange', update);
+  sync();
 })();
