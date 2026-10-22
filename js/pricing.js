@@ -8,7 +8,7 @@
  *
  * The central rule: a cart total is NOT the sum of its lines. 50 candlesticks and
  * 8 candelabras is not 50*$4 + 8*$10 = $280. It is the candlestick collection at
- * $140 plus the candelabra set at $70, so $210. Bundles overlap and nest, so the
+ * $175 plus the candelabra set at $70, so $245. Bundles overlap and nest, so the
  * only honest way to price is to resolve the whole cart at once.
  *
  * All money is integer cents.
