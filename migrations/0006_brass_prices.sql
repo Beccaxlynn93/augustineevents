@@ -2,5 +2,6 @@
 -- site changes are merged; see the vault note.
 -- Candlestick holders $3 -> $4 each; the 50-piece collection stays $140.
 UPDATE items SET unit_price = 400  WHERE slug = 'brass-candlestick';
--- 3 arm candelabras $7 -> $10 each; the set of 8 stays $50.
+-- 3 arm candelabras $7 -> $10 each; the set of 8 goes $50 -> $70.
 UPDATE items SET unit_price = 1000 WHERE slug = 'brass-candelabra-3arm';
+UPDATE bundles SET price = 7000 WHERE slug = 'candelabra-set';

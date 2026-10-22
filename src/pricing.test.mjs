@@ -33,7 +33,7 @@ const price = (...lines) => resolveCart(lines, catalog);
 test('the whole brass collection prices as two bundles, not 58 line items', () => {
   const r = price({ slug: 'brass-candlestick', qty: 50 }, { slug: 'brass-candelabra-3arm', qty: 8 });
   // Naive per-line would be 50*400 + 8*1000 = 28000.
-  assert.equal(r.subtotal, 19000, '$140 collection + $50 candelabra set');
+  assert.equal(r.subtotal, 21000, '$140 collection + $70 candelabra set');
   assert.deepEqual(r.bundles.map((b) => b.slug).sort(), ['candelabra-set', 'candlestick-collection']);
   assert.equal(r.ok, true);
 });
@@ -118,7 +118,7 @@ test('the brass bundle needs the vases before it applies', () => {
   // vases". A cart without the vases has not earned it.
   const r = price({ slug: 'brass-candlestick', qty: 50 }, { slug: 'brass-candelabra-3arm', qty: 8 },
     { slug: 'brass-candelabra-9arm', qty: 1 });
-  assert.equal(r.subtotal, 21500, '$140 + $50 + $25, no bundle');
+  assert.equal(r.subtotal, 23500, '$140 + $70 + $25, no bundle');
   assert.ok(!r.bundles.some((b) => b.slug === 'brass-collection'));
 });
 
@@ -126,10 +126,10 @@ test('the full brass collection resolves to the bundle, beating its own parts', 
   const r = price({ slug: 'brass-candlestick', qty: 50 }, { slug: 'brass-candelabra-3arm', qty: 8 },
     { slug: 'brass-candelabra-9arm', qty: 1 }, { slug: 'italian-vase-small', qty: 2 },
     { slug: 'italian-vase-large', qty: 1 });
-  // Parts are $150 + $56 + $25 + $10 + $15 = $256. The bundle must win.
+  // Parts, with the two collections at their set prices, are $140 + $70 + $25 + $10 + $15 = $260. The bundle must win.
   assert.equal(r.subtotal, 23000);
   assert.deepEqual(r.bundles.map((b) => b.slug), ['brass-collection']);
-  assert.ok(r.subtotal < 25600, 'bundle must beat the sum of its parts');
+  assert.ok(r.subtotal < 26000, 'bundle must beat the sum of its parts');
 });
 
 test('the vases are reservable but not publicly listed', () => {
