@@ -65,6 +65,19 @@
     .pkg-field { display: none; flex-direction: column; gap: 6px; }
     .pkg-field.visible { display: flex; }
 
+    /* Custom Tablescapes: Indoor / Outdoor as selectable bubbles. The radios are
+       visually hidden but still focusable, so keyboard and screen readers work. */
+    #tablescapeField { gap: 18px; }
+    .ts-setting { border: 0; padding: 0; margin: 0; min-width: 0; }
+    .ts-setting legend { padding: 0; margin-bottom: 8px; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    .ts-bubbles { display: flex; flex-wrap: wrap; gap: 10px; }
+    .ts-bubble { position: relative; display: block; cursor: pointer; }
+    .ts-bubble input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; padding: 0; border: 0; }
+    .ts-bubble span { display: inline-block; padding: 10px 26px; border: 1px solid #d5cfc6; border-radius: 999px; background: var(--white); color: var(--text); font-size: 0.88rem; letter-spacing: 0.04em; text-transform: none; font-weight: 400; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+    .ts-bubble:hover span { border-color: var(--green); }
+    .ts-bubble input:checked + span { background: var(--green); border-color: var(--green); color: var(--white); }
+    .ts-bubble input:focus-visible + span { outline: 2px solid var(--green); outline-offset: 2px; }
+
     /* Rental checklist */
     .rental-list { border: 1px solid #d5cfc6; background: var(--white); }
     .rental-section-title { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--green); background: #f0ece4; padding: 8px 14px; }
@@ -309,6 +322,19 @@
           </select>
         </label>
 
+        <div class="pkg-field" id="tablescapeField">
+          <fieldset class="ts-setting">
+            <legend>Indoor or Outdoor</legend>
+            <div class="ts-bubbles">
+              <label class="ts-bubble"><input type="radio" name="ts_setting" value="Indoor" /><span>Indoor</span></label>
+              <label class="ts-bubble"><input type="radio" name="ts_setting" value="Outdoor" /><span>Outdoor</span></label>
+            </div>
+          </fieldset>
+          <label>Theme Inspiration
+            <input type="text" name="theme_inspiration" id="themeInspiration" inputmode="url" autocomplete="off" maxlength="500" placeholder="Paste a link to your mood board or Pinterest board" />
+          </label>
+        </div>
+
         <label class="pkg-field" id="musicField">Music Package
           <select name="music_package" id="musicPackageSelect">
             <option value="0">Select a package</option>
@@ -469,6 +495,7 @@
     packageType.addEventListener('change', function() {
       const val = this.value;
       musicField.classList.toggle('visible', val === 'music' || val === 'both');
+      document.getElementById('tablescapeField').classList.toggle('visible', val === 'tablescapes');
       rentalsField.classList.toggle('visible', val === 'rentals' || val === 'both');
       estimatedTotal.classList.toggle('visible', val !== '' && val !== 'tablescapes');
       deliveryRow.style.display = (val === 'rentals' || val === 'both') ? 'flex' : 'none';
@@ -517,6 +544,19 @@
       var musicEl = document.getElementById('musicPackageSelect');
       var musicLabel = musicEl.value !== '0' ? musicEl.options[musicEl.selectedIndex].text : 'None';
 
+      // Custom Tablescapes answers. The EmailJS template and the Worker only know
+      // the fixed fields above, so these also go into the message, where both the
+      // notification and the stored inquiry will show them.
+      var tsOn = packageTypeEl.value === 'tablescapes';
+      var tsChecked = form.querySelector('[name="ts_setting"]:checked');
+      var tsSetting = tsOn && tsChecked ? tsChecked.value : '';
+      var tsTheme = tsOn ? form.querySelector('[name="theme_inspiration"]').value.trim() : '';
+      var tsLines = [];
+      if (tsSetting) tsLines.push('Setting: ' + tsSetting);
+      if (tsTheme) tsLines.push('Theme inspiration: ' + tsTheme);
+      var fullMessage = form.querySelector('[name="message"]').value;
+      if (tsLines.length) fullMessage = (fullMessage ? fullMessage + '\n\n' : '') + 'Custom Tablescape details\n' + tsLines.join('\n');
+
       var templateParams = {
         website:          form.querySelector('[name="website"]').value,
         form_loaded_at:   window.__formLoadedAt || 0,
@@ -531,7 +571,7 @@
         estimated_total:  document.getElementById('rentalTotal').textContent,
         rental_delivery:  form.querySelector('[name="rental_delivery"]').value || 'N/A',
         delivery_address: form.querySelector('[name="delivery_address"]').value || 'N/A',
-        message:          form.querySelector('[name="message"]').value
+        message:          fullMessage
       };
 
       var btn = form.querySelector('.btn-green');
