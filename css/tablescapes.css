@@ -43,7 +43,8 @@
 
 /* Top panel: a muted looping video behind the title. */
 .tb-show { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: flex-end;
-  height: clamp(520px, 92svh, 940px); padding: calc(var(--header-h) + 24px) 0 clamp(32px, 5vw, 64px); background: #0d120c; }
+  /* The video is 16:9, so the panel is 16:9 too and nothing is cropped; it only gets shorter than that when the window is. */
+  height: min(56.25vw, 92svh); min-height: 420px; padding: calc(var(--header-h) + 24px) 0 clamp(24px, 4vw, 56px); background: #0d120c; }
 .tb-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
 .tb-scrim { position: absolute; inset: 0; z-index: -1;
   background: linear-gradient(to top, rgba(10, 14, 9, 0.78) 0%, rgba(10, 14, 9, 0.32) 42%, rgba(10, 14, 9, 0.18) 100%); }
@@ -55,7 +56,14 @@
 .tb-play svg { width: 12px; height: 14px; }
 .tb-play .icon-play, .tb-play.is-paused .icon-pause { display: none; }
 .tb-play.is-paused .icon-play { display: block; }
-@media (max-width: 700px) { .tb-show { height: clamp(460px, 80svh, 720px); } }
+/* Phones are portrait, so a full-bleed video would be cropped to a sliver. Show the whole
+   frame at the top and put the title underneath it. */
+@media (max-width: 700px) {
+  .tb-show { display: block; height: auto; min-height: 0; padding: var(--header-h) 0 28px; }
+  .tb-video { position: relative; inset: auto; z-index: auto; display: block; height: auto; aspect-ratio: 16 / 9; object-fit: contain; }
+  .tb-scrim { display: none; }
+  .tb-hero-inner { padding-top: 22px; }
+}
 
 /* Slideshow beside the intro. The photo changes like light spreading from a candle
    flame: the next photo is revealed through a soft circle that grows out of the
