@@ -350,7 +350,7 @@
   // text carries everything. One vine crosses the whole banner, swagging in from
   // the left edge, lying along the frame's top and swagging out to the right
   // edge; shoots fall down both sides; a garland hangs underneath.
-  function layBanner(W, HH, B, narrow) {
+  function layBanner(W, HH, B, narrow, notes) {
     var vines = [], blooms = [];
     var arc = Math.PI * B.r / 2, L = rimLen(B);
     var clampY = function (y) { return Math.max(8, Math.min(HH - 10, y)); };
@@ -371,6 +371,14 @@
     var turn = narrow ? -1 : 1, R = narrow ? 5 : 8;
     vines.push(new Vine({ vine: 0, i: landL }).add(rim(B, arc * 0.5, 0)).add(drop(B, -1, B.h * (narrow ? 0.22 : 0.5))).curl(turn, R));
     vines.push(new Vine({ vine: 0, i: landR }).add(rim(B, L - arc * 0.5, L)).add(drop(B, 1, B.h * (narrow ? 0.16 : 0.38))).curl(-turn, R));
+
+    // Music notes drifting up off the main vine (banners with data-vine-notes).
+    if (notes) {
+      var spots = narrow ? [0.2, 0.5, 0.8] : [0.1, 0.26, 0.42, 0.58, 0.74, 0.9];
+      spots.forEach(function (f, k) {
+        blooms.push({ vine: 0, i: Math.round(f * (main.p.length - 1)), note: k % 3 === 1 ? 'pair' : 'eighth', s: (narrow ? 0.9 : 1.1) * (k % 2 ? 0.9 : 1.1) });
+      });
+    }
 
     var room = HH - (B.y + B.h) - 34;
     if (room > 16) {
@@ -405,7 +413,7 @@
     var B = narrow
       ? { x: 12, y: T.t - padY, w: W - 24, h: T.b - T.t + 2 * padY, r: 16 }
       : { x: T.l - 48, y: T.t - padY, w: T.r - T.l + 96, h: T.b - T.t + 2 * padY, r: 18 };
-    paint(sec, B, layBanner(W, HH, B, narrow), animate ? 300 : -1);
+    paint(sec, B, layBanner(W, HH, B, narrow, sec.hasAttribute('data-vine-notes')), animate ? 300 : -1);
   }
 
   function drawVines(hero, animate) {
