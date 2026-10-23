@@ -68,6 +68,7 @@
     /* Custom Tablescapes: Indoor / Outdoor as selectable bubbles. The radios are
        visually hidden but still focusable, so keyboard and screen readers work. */
     #tablescapeField { gap: 18px; }
+    .svc-hint { font-weight: 400; letter-spacing: 0.04em; text-transform: none; margin-left: 6px; }
     .ts-setting { border: 0; padding: 0; margin: 0; min-width: 0; }
     .ts-setting legend { padding: 0; margin-bottom: 8px; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
     .ts-bubbles { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -312,15 +313,14 @@
         <label><span class="lbl">Email <span class="req" aria-hidden="true">*</span></span><input type="email" name="email" placeholder="jane@example.com" required /></label>
         <label><span class="lbl">Date of Event <span class="req" aria-hidden="true">*</span></span><input type="date" name="event_date" required /></label>
         <label>Venue Address <input type="text" name="venue_address" placeholder="Venue name, street, city, state" /></label>
-        <label><span class="lbl">Package Type <span class="req" aria-hidden="true">*</span></span>
-          <select name="package_type" id="packageType" required>
-            <option value="">Select a package type</option>
-            <option value="music">Event Music</option>
-            <option value="rentals">Event Rentals</option>
-            <option value="both">Both</option>
-            <option value="tablescapes">Custom Tablescapes</option>
-          </select>
-        </label>
+        <fieldset class="ts-setting svc-pick" id="servicePick">
+          <legend>What are you booking? <span class="req" aria-hidden="true">*</span> <span class="svc-hint">Choose one or more</span></legend>
+          <div class="ts-bubbles">
+            <label class="ts-bubble"><input type="checkbox" name="services" value="music" data-label="Event Music" /><span>Event Music</span></label>
+            <label class="ts-bubble"><input type="checkbox" name="services" value="rentals" data-label="Event Rentals" /><span>Event Rentals</span></label>
+            <label class="ts-bubble"><input type="checkbox" name="services" value="tablescapes" data-label="Custom Tablescapes" /><span>Custom Tablescapes</span></label>
+          </div>
+        </fieldset>
 
         <div class="pkg-field" id="tablescapeField">
           <fieldset class="ts-setting">
@@ -437,8 +437,12 @@
   </footer>
 
   <script>
-    // Show/hide package fields
-    const packageType = document.getElementById('packageType');
+    // Services: the visitor can tick any combination of music, rentals and a
+    // custom tablescape. Every section below keys off these boxes.
+    const serviceBoxes = Array.from(document.querySelectorAll('input[name="services"]'));
+    function hasService(v) { return serviceBoxes.some(function (b) { return b.value === v && b.checked; }); }
+    function musicChosen() { return hasService('music'); }
+    function tablescapesChosen() { return hasService('tablescapes'); }
     const musicField = document.getElementById('musicField');
     const rentalsField = document.getElementById('rentalsField');
 
@@ -492,29 +496,33 @@
 
     rentalDelivery.addEventListener('change', showAddressRow);
 
-    packageType.addEventListener('change', function() {
-      const val = this.value;
-      musicField.classList.toggle('visible', val === 'music' || val === 'both');
-      document.getElementById('tablescapeField').classList.toggle('visible', val === 'tablescapes');
-      rentalsField.classList.toggle('visible', val === 'rentals' || val === 'both');
-      estimatedTotal.classList.toggle('visible', val !== '' && val !== 'tablescapes');
-      deliveryRow.style.display = (val === 'rentals' || val === 'both') ? 'flex' : 'none';
+    function syncServices() {
+      const music = musicChosen(), rentals = rentalsChosen(), tables = tablescapesChosen();
+      musicField.classList.toggle('visible', music);
+      document.getElementById('tablescapeField').classList.toggle('visible', tables);
+      rentalsField.classList.toggle('visible', rentals);
+      // The estimate covers music and rentals; tablescapes are quoted by Becca.
+      estimatedTotal.classList.toggle('visible', music || rentals);
+      deliveryRow.style.display = rentals ? 'flex' : 'none';
+      // A checkbox group has no built-in "pick at least one", so the first box carries the message.
+      serviceBoxes[0].setCustomValidity((music || rentals || tables) ? '' : 'Choose at least one service.');
       syncDeliveryOnly();
       calcTotal();
-    });
+    }
+    serviceBoxes.forEach(function (b) { b.addEventListener('change', syncServices); });
 
     musicPackageSelect.addEventListener('change', calcTotal);
 
     // True when the visitor has asked about rentals, so a selection made and
     // then abandoned by switching to "Event Music" is not counted or sent.
     function rentalsChosen() {
-      return packageType.value === 'rentals' || packageType.value === 'both';
+      return hasService('rentals');
     }
 
     // The rental figure comes from js/rental-picker.js, which prices the cart
     // with the same resolveCart the Worker uses, bundles included.
     function calcTotal() {
-      let total = parseFloat(musicPackageSelect.value) || 0;
+      let total = musicChosen() ? (parseFloat(musicPackageSelect.value) || 0) : 0;
       if (rentalsChosen() && window.RentalPicker) total += window.RentalPicker.subtotalCents() / 100;
       document.getElementById('rentalTotal').textContent = '$' + total.toFixed(2);
     }
@@ -539,15 +547,15 @@
         rentals = ['Rental list was unavailable; see the message for the items requested.'];
       }
 
-      var packageTypeEl = document.getElementById('packageType');
-      var packageLabel = packageTypeEl.options[packageTypeEl.selectedIndex].text;
+      var chosen = serviceBoxes.filter(function (b) { return b.checked; });
+      var packageLabel = chosen.map(function (b) { return b.dataset.label; }).join(' + ');
       var musicEl = document.getElementById('musicPackageSelect');
-      var musicLabel = musicEl.value !== '0' ? musicEl.options[musicEl.selectedIndex].text : 'None';
+      var musicLabel = (musicChosen() && musicEl.value !== '0') ? musicEl.options[musicEl.selectedIndex].text : 'None';
 
       // Custom Tablescapes answers. The EmailJS template and the Worker only know
       // the fixed fields above, so these also go into the message, where both the
       // notification and the stored inquiry will show them.
-      var tsOn = packageTypeEl.value === 'tablescapes';
+      var tsOn = tablescapesChosen();
       var tsChecked = form.querySelector('[name="ts_setting"]:checked');
       var tsSetting = tsOn && tsChecked ? tsChecked.value : '';
       var tsTheme = tsOn ? form.querySelector('[name="theme_inspiration"]').value.trim() : '';
@@ -582,9 +590,10 @@
       // never anything the visitor typed.
       function trackLead() {
         if (!window.metaTrack) return;
-        var type = packageTypeEl.value;
-        var params = { content_category: type === 'music' ? 'Music' : type === 'rentals' ? 'Rentals' : type === 'both' ? 'Both' : type === 'tablescapes' ? 'Tablescapes' : 'Unspecified' };
-        if (musicEl.value !== '0') params.content_name = musicLabel.split(',')[0];
+        var vals = chosen.map(function (b) { return b.value; }).sort().join('+');
+        var cats = { 'music': 'Music', 'rentals': 'Rentals', 'tablescapes': 'Tablescapes', 'music+rentals': 'Both' };
+        var params = { content_category: cats[vals] || (vals ? 'Multiple' : 'Unspecified') };
+        if (musicLabel !== 'None') params.content_name = musicLabel.split(',')[0];
         window.metaTrack('Lead', params);
       }
 
@@ -599,7 +608,7 @@
           var body = JSON.stringify(Object.assign({}, templateParams, {
             email_sent: emailSent ? 1 : 0,
             cart: cart,
-            music_price: parseFloat(musicPackageSelect.value) || 0
+            music_price: musicChosen() ? (parseFloat(musicPackageSelect.value) || 0) : 0
           }));
           fetch('/api/inquiries', {
             method: 'POST',
@@ -635,8 +644,8 @@
     // Arriving from the Custom Tablescapes page (contact.html?type=tablescapes).
     (function () {
       if (new URLSearchParams(location.search).get('type') !== 'tablescapes') return;
-      packageType.value = 'tablescapes';
-      packageType.dispatchEvent(new Event('change'));
+      serviceBoxes.find(function (b) { return b.value === 'tablescapes'; }).checked = true;
+      syncServices();
     })();
 
     // Arriving from a package's "Book this package" (contact.html?package=Silver):
@@ -647,11 +656,12 @@
       const option = Array.from(musicPackageSelect.options)
         .find(o => o.text.toLowerCase().startsWith(wanted.toLowerCase() + ','));
       if (!option) return;
-      if (!packageType.value) packageType.value = 'music';
-      packageType.dispatchEvent(new Event('change'));
+      serviceBoxes.find(function (b) { return b.value === 'music'; }).checked = true;
+      syncServices();
       musicPackageSelect.value = option.value;
       musicPackageSelect.dispatchEvent(new Event('change'));
     })();
+    syncServices();
     </script>
 </body>
 </html>

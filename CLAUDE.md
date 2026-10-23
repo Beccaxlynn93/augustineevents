@@ -462,6 +462,17 @@ made with `color-mix`, never a new hue.
 
 ---
 
+## Booking form services (2026-10-22)
+
+The form's old Package Type dropdown (Music / Rentals / Both / Tablescapes) is now three
+checkboxes styled as bubbles (`input[name="services"]`: `music`, `rentals`, `tablescapes`),
+so a visitor can book any combination. Each section (music package, rental picker and
+delivery, tablescape setting and inspiration link, estimate) shows when its box is ticked.
+At least one is required (custom validity on the first box). The `package_type` sent to
+EmailJS and the Worker is the ticked labels joined with " + ", e.g. "Event Music + Custom
+Tablescapes"; the Worker stores it as free text and needed no change. Music price and package
+only count when music is ticked. `?type=tablescapes` and `?package=Name` still preselect.
+
 ## Meta Pixel
 
 Added 2026-10-04 on `redesign` (approved by Justin) to measure Meta ads. Browser
@@ -485,7 +496,7 @@ The `saved_resource*.html` and `Augustine Music Packages.html` files are not ser
 | `ViewContent` | `event-rentals.html` / `event-music.html` load | `content_category`: `Rentals` / `Music`, from `<html data-meta-category>` | head block |
 | `ViewContent` | a music package's details panel opens (click, or the tabs carrying an open package across) | `content_name`: package (e.g. `Silver`), `content_category`: `Music` | `js/packages.js` `open()` |
 | `Contact` | any `mailto:` or `tel:` link is clicked, any page | `content_category`: `Email` / `Phone` only | `js/site.js` |
-| `Lead` | the contact form's inquiry is **stored by the Worker** | `content_category`: `Music` / `Rentals` / `Both` / `Tablescapes` (Package Type); `content_name`: music package name if one is chosen | `contact.html` `trackLead()` |
+| `Lead` | the contact form's inquiry is **stored by the Worker** | `content_category`: `Music` / `Rentals` / `Tablescapes` for a single service, `Both` for music + rentals, `Multiple` for any other combination; `content_name`: music package name if music is ticked and a package chosen | `contact.html` `trackLead()` |
 
 **The Lead success signal.** `POST /api/inquiries` answers screened-out spam with a bare
 `{ok: true}` (so bots learn nothing), and a stored inquiry with `{ok: true, notified: …}`.
