@@ -86,7 +86,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; color: var(--green
 h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { font-variant-numeric: lining-nums; }
 /* Italiana's figures are thin and ornate (a 1 reads as I, a 0 as O), so every
    price, total and phone number is set in the sans instead. */
-[class*="price"], .rental-total-bar strong, .aside-list a, .aside-list p, .pkg-detail-price {
+[class*="price"], [class*="price"] strong, .rental-total-bar strong, .aside-list a, .aside-list p, .pkg-detail-price {
   font-family: var(--sans) !important; font-weight: 300 !important; letter-spacing: -0.01em;
 }
 
