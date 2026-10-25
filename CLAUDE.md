@@ -245,7 +245,10 @@ conversion path.
 order minimum is still stored, with a note, because Becca approves every booking.
 **The booking form does block it, though** (2026-10-25): with Event Rentals ticked and the
 picker loaded, a rental subtotal under `ORDER_MINIMUM` ($150, raised from $100) stops the
-send and says how much more to add. If the catalog failed to load, the form still sends.
+send and says how much more to add. Owner rule: no rental request sends below the minimum, so
+if the catalog failed to load (total cannot be checked) the form holds the request and asks for a
+refresh, and `contact.html` repeats the $150 (`RENTAL_MINIMUM_CENTS`) so a stale cached
+`rental-picker.js` cannot skip the check. Keep the two numbers in step with `ORDER_MINIMUM`.
 Music packages are not in the catalog yet, so `music_price` is the one figure still
 taken from the browser. It is a fixed list of six.
 

@@ -530,19 +530,34 @@
       document.getElementById('rentalTotal').textContent = '$' + total.toFixed(2);
     }
 
-    // Rental minimum. Only enforced when the picker loaded: if the catalog failed,
-    // visitors list items in the message and the request must still go through.
+    // Rental minimum ($150). A rental request never sends below it. The number is
+    // repeated here so a browser holding an older copy of the picker script still
+    // enforces it, and if the rental list could not load (so the total cannot be
+    // checked) the request is held too.
+    const RENTAL_MINIMUM_CENTS = 15000;
     const rentalMinMsg = document.getElementById('rentalMinMsg');
+    function rentalMinimumCents() {
+      const p = window.RentalPicker;
+      return Math.max(RENTAL_MINIMUM_CENTS, (p && Number(p.minimumCents)) || 0);
+    }
     function rentalShortfall() {
+      if (!rentalsChosen()) return 0;
       const picker = window.RentalPicker;
-      if (!rentalsChosen() || !picker || !picker.available) return 0;
-      return Math.max(0, picker.minimumCents - picker.subtotalCents());
+      if (!picker || !picker.available) return rentalMinimumCents();
+      const have = Number(picker.subtotalCents()) || 0;
+      return Math.max(0, rentalMinimumCents() - have);
     }
     function showRentalMinimum() {
       const short = rentalShortfall();
       if (!short) { rentalMinMsg.hidden = true; return false; }
-      const min = window.RentalPicker.minimumCents / 100;
-      const have = window.RentalPicker.subtotalCents() / 100;
+      const min = rentalMinimumCents() / 100;
+      const picker = window.RentalPicker;
+      if (!picker || !picker.available) {
+        rentalMinMsg.textContent = 'The rental list did not load, so we cannot check the $' + min + ' rental minimum. Please refresh the page and try again, or untick Event Rentals.';
+        rentalMinMsg.hidden = false;
+        return true;
+      }
+      const have = (Number(picker.subtotalCents()) || 0) / 100;
       rentalMinMsg.textContent = have > 0
         ? 'Rental orders have a $' + min + ' minimum. Your rentals come to $' + have.toFixed(2) + ', so add $' + (short / 100).toFixed(2) + ' more to send your request.'
         : 'Rental orders have a $' + min + ' minimum. Choose at least $' + min + ' of rentals, or untick Event Rentals.';
