@@ -241,8 +241,11 @@ the catalog request or D1 fails, the picker shows a fallback asking for items in
 message box and the form still submits. Keep it that way: this is the site's only
 conversion path.
 
-**Pricing never rejects a lead.** A cart over stock, under a minimum or below the $100
+**Pricing never rejects a lead.** A cart over stock, under a minimum or below the $150
 order minimum is still stored, with a note, because Becca approves every booking.
+**The booking form does block it, though** (2026-10-25): with Event Rentals ticked and the
+picker loaded, a rental subtotal under `ORDER_MINIMUM` ($150, raised from $100) stops the
+send and says how much more to add. If the catalog failed to load, the form still sends.
 Music packages are not in the catalog yet, so `music_price` is the one figure still
 taken from the browser. It is a fixed list of six.
 

@@ -14,8 +14,9 @@
  * All money is integer cents.
  */
 
-// event-rentals.html: "All rental orders have a $100 minimum."
-export const ORDER_MINIMUM = 10000;
+// event-rentals.html: "All rental orders have a $150 minimum." The booking form will not
+// send a rental request below it; the Worker still stores one with a note if it arrives.
+export const ORDER_MINIMUM = 15000;
 
 // Guard on the subset enumeration below. Four bundles today; this trips long
 // before 2^n becomes a problem, and fails loudly rather than hanging.

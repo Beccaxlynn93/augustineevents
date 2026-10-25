@@ -115,6 +115,7 @@
     .rental-row-bundle .rental-item-name { font-weight: 700; color: var(--green-dark); }
     .rental-loading, .rental-fallback { margin: 0; padding: 18px 14px; font-size: 0.85rem; color: var(--muted); line-height: 1.6; text-transform: none; letter-spacing: 0; font-weight: 400; }
     .rental-notes { margin: 6px 0 0; font-size: 0.78rem; color: var(--green-dark); line-height: 1.6; }
+    .rental-min-msg { margin: 8px 0 0; padding: 10px 14px; border: 1px solid #a4442f; background: #fdf7f5; color: #8a3a28; font-size: 0.88rem; line-height: 1.55; border-radius: 8px; }
 
     /* margin:auto restores the browser's centring of a modal dialog, which the
        global * { margin: 0 } reset above removes. */
@@ -381,6 +382,7 @@
           <strong id="rentalTotal">$0.00</strong>
         </div>
         <p class="rental-notes" id="rentalNotes" aria-live="polite" hidden></p>
+        <p class="rental-min-msg" id="rentalMinMsg" role="alert" hidden></p>
 
         <input type="hidden" name="selected_rentals" id="hiddenRentals" />
         <input type="hidden" name="estimated_total" id="hiddenTotal" />
@@ -504,6 +506,7 @@
       // The estimate covers music and rentals; tablescapes are quoted by Becca.
       estimatedTotal.classList.toggle('visible', music || rentals);
       deliveryRow.style.display = rentals ? 'flex' : 'none';
+      if (!rentals && rentalMinMsg) rentalMinMsg.hidden = true;
       // A checkbox group has no built-in "pick at least one", so the first box carries the message.
       serviceBoxes[0].setCustomValidity((music || rentals || tables) ? '' : 'Choose at least one service.');
       syncDeliveryOnly();
@@ -527,16 +530,43 @@
       document.getElementById('rentalTotal').textContent = '$' + total.toFixed(2);
     }
 
+    // Rental minimum. Only enforced when the picker loaded: if the catalog failed,
+    // visitors list items in the message and the request must still go through.
+    const rentalMinMsg = document.getElementById('rentalMinMsg');
+    function rentalShortfall() {
+      const picker = window.RentalPicker;
+      if (!rentalsChosen() || !picker || !picker.available) return 0;
+      return Math.max(0, picker.minimumCents - picker.subtotalCents());
+    }
+    function showRentalMinimum() {
+      const short = rentalShortfall();
+      if (!short) { rentalMinMsg.hidden = true; return false; }
+      const min = window.RentalPicker.minimumCents / 100;
+      const have = window.RentalPicker.subtotalCents() / 100;
+      rentalMinMsg.textContent = have > 0
+        ? 'Rental orders have a $' + min + ' minimum. Your rentals come to $' + have.toFixed(2) + ', so add $' + (short / 100).toFixed(2) + ' more to send your request.'
+        : 'Rental orders have a $' + min + ' minimum. Choose at least $' + min + ' of rentals, or untick Event Rentals.';
+      rentalMinMsg.hidden = false;
+      return true;
+    }
+
     // The picker announces every selection change.
     document.addEventListener('rentals:change', function() {
       syncDeliveryOnly();
       calcTotal();
+      // Once the message is showing, keep it current, and clear it when the minimum is met.
+      if (!rentalMinMsg.hidden) showRentalMinimum();
     });
 
     // Populate hidden fields and send via EmailJS
     document.querySelector('form').addEventListener('submit', function(e) {
       e.preventDefault();
       var form = this;
+
+      if (showRentalMinimum()) {
+        rentalMinMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
 
       // Rentals summary and structured cart, from the picker. The Worker re-prices
       // the cart itself; the summary is what the EmailJS notification shows.

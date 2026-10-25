@@ -14,7 +14,7 @@
  * through window.RentalPicker and a 'rentals:change' event on document.
  */
 import { buildCatalog } from './catalog.js';
-import { resolveCart, describeQuote, dollars } from './pricing.js';
+import { resolveCart, describeQuote, dollars, ORDER_MINIMUM } from './pricing.js';
 
 const SECTIONS = [
   ['linens', 'Linens'],
@@ -343,6 +343,7 @@ window.RentalPicker = {
   get available() { return !!catalog; },
   cart: currentCart,
   subtotalCents: () => (lastQuote ? lastQuote.subtotal : 0),
+  minimumCents: ORDER_MINIMUM,
   summary: () => (lastQuote ? describeQuote(lastQuote, catalog) : []),
   hasDeliveryOnly: () => !!(lastQuote && lastQuote.delivery_required),
 };

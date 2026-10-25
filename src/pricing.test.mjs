@@ -94,12 +94,12 @@ test('all three rectangular tablecloths are rentable', () => {
   assert.equal(price({ slug: 'toile-rect-tablecloth', qty: 4 }).ok, false, 'only 3 exist');
 });
 
-test('the $100 order minimum is enforced', () => {
+test('the $150 order minimum is enforced', () => {
   const r = price({ slug: 'wisteria-chandelier', qty: 1 });
   assert.equal(r.subtotal, 2500);
   assert.equal(r.ok, false);
-  assert.match(r.errors[0], /\$100 minimum/);
-  assert.equal(ORDER_MINIMUM, 10000);
+  assert.match(r.errors[0], /\$150 minimum/);
+  assert.equal(ORDER_MINIMUM, 15000);
 });
 
 test('an unknown item is rejected rather than silently priced at zero', () => {
