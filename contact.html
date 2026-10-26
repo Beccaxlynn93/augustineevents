@@ -68,6 +68,11 @@
     /* Custom Tablescapes: Indoor / Outdoor as selectable bubbles. The radios are
        visually hidden but still focusable, so keyboard and screen readers work. */
     #tablescapeField { gap: 18px; }
+    .ts-guests { display: flex; flex-direction: column; gap: 8px; }
+    .ts-guests-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ts-guests .qty-btn { width: 34px; height: 34px; font-size: 1.1rem; }
+    .ts-guests .qty-num { width: 64px; font-size: 1rem; padding: 7px 4px; }
+    .ts-guests-note { font-size: 0.8rem; color: var(--muted); letter-spacing: 0; text-transform: none; font-weight: 400; margin-left: 4px; }
     .svc-hint { font-weight: 400; letter-spacing: 0.04em; text-transform: none; margin-left: 6px; }
     .ts-setting { border: 0; padding: 0; margin: 0; min-width: 0; }
     .ts-setting legend { padding: 0; margin-bottom: 8px; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -324,6 +329,15 @@
         </fieldset>
 
         <div class="pkg-field" id="tablescapeField">
+          <div class="ts-guests">
+            <label for="tsGuests"><span class="lbl">How many people is your table for? <span class="req" aria-hidden="true">*</span></span></label>
+            <div class="ts-guests-row">
+              <button type="button" class="qty-btn ts-guests-btn" data-step="-1" aria-label="Fewer guests">&minus;</button>
+              <input type="number" class="qty-num ts-guests-num" id="tsGuests" name="ts_guests" min="2" max="25" step="1" inputmode="numeric" placeholder="&ndash;" />
+              <button type="button" class="qty-btn ts-guests-btn" data-step="1" aria-label="More guests">+</button>
+              <span class="ts-guests-note">2 to 25 guests. Planning for more? Tell us in the message.</span>
+            </div>
+          </div>
           <fieldset class="ts-setting">
             <legend>Indoor or Outdoor</legend>
             <div class="ts-bubbles">
@@ -498,10 +512,28 @@
 
     rentalDelivery.addEventListener('change', showAddressRow);
 
+    // Tablescape guest counter: 2 to 25, stepped with the buttons or typed.
+    const tsGuests = document.getElementById('tsGuests');
+    document.querySelectorAll('.ts-guests-btn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        const cur = parseInt(tsGuests.value, 10);
+        const step = Number(b.dataset.step);
+        const next = isNaN(cur) ? 2 : cur + step;
+        tsGuests.value = Math.min(25, Math.max(2, next));
+        tsGuests.dispatchEvent(new Event('input'));
+      });
+    });
+    tsGuests.addEventListener('change', function () {
+      const v = parseInt(tsGuests.value, 10);
+      if (!isNaN(v)) tsGuests.value = Math.min(25, Math.max(2, v));
+    });
+
     function syncServices() {
       const music = musicChosen(), rentals = rentalsChosen(), tables = tablescapesChosen();
       musicField.classList.toggle('visible', music);
       document.getElementById('tablescapeField').classList.toggle('visible', tables);
+      // The guest count is only asked for (and required) when a tablescape is being booked.
+      tsGuests.required = tables;
       rentalsField.classList.toggle('visible', rentals);
       // The estimate covers music and rentals; tablescapes are quoted by Becca.
       estimatedTotal.classList.toggle('visible', music || rentals);
@@ -604,7 +636,9 @@
       var tsChecked = form.querySelector('[name="ts_setting"]:checked');
       var tsSetting = tsOn && tsChecked ? tsChecked.value : '';
       var tsTheme = tsOn ? form.querySelector('[name="theme_inspiration"]').value.trim() : '';
+      var tsGuestCount = tsOn ? form.querySelector('[name="ts_guests"]').value.trim() : '';
       var tsLines = [];
+      if (tsGuestCount) tsLines.push('Guests: ' + tsGuestCount);
       if (tsSetting) tsLines.push('Setting: ' + tsSetting);
       if (tsTheme) tsLines.push('Theme inspiration: ' + tsTheme);
       var fullMessage = form.querySelector('[name="message"]').value;
