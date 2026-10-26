@@ -21,7 +21,7 @@ db.exec(readFileSync(new URL('../migrations/0003_catalog.sql', import.meta.url),
 db.exec(readFileSync(new URL('../migrations/0004_catalog_seed.sql', import.meta.url), 'utf8'));
 db.exec(readFileSync(new URL('../migrations/0005_item_photos.sql', import.meta.url), 'utf8'));
 db.exec(readFileSync(new URL('../migrations/0006_brass_prices.sql', import.meta.url), 'utf8'));
-db.exec(readFileSync(new URL('../migrations/0007_ramekin_photo.sql', import.meta.url), 'utf8'));
+db.exec(readFileSync(new URL('../migrations/0007_shoot_photos.sql', import.meta.url), 'utf8'));
 
 const catalog = buildCatalog(
   db.prepare('SELECT * FROM items WHERE active = 1').all(),
