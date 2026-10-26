@@ -19,6 +19,7 @@ import { screen } from './guards.js';
 // computed by one implementation and cannot drift apart.
 import { buildCatalog } from '../js/catalog.js';
 import { resolveCart, describeQuote, dollars } from '../js/pricing.js';
+import { driveFrom } from './distance.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 
@@ -219,6 +220,12 @@ async function recordInquiry(request, env) {
   // failure is recorded, never raised, and never costs us the record.
   const extras = {};
   for (const key of EMAIL_FIELDS) extras[key] = clean(payload[key]);
+  const musicPrice = Number(payload.music_price);
+  if (Number.isFinite(musicPrice) && musicPrice > 0 && musicPrice < 10000) extras.music_price = musicPrice;
+  // For a rental delivery, how far the drive is from base (email only; best effort).
+  if (row.rental_delivery === 'Delivery' && row.delivery_address) {
+    try { extras.drive = await driveFrom(env, row.delivery_address); } catch { /* the email still sends */ }
+  }
   const result = await sendNotification(env, row, extras);
 
   if (result.sent && id) {

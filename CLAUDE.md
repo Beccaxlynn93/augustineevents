@@ -311,6 +311,15 @@ service: Event, Live music, Custom tablescape (guests, indoor/outdoor, inspirati
 message (`client_message`). Those four keys are read for the email only; the combined `message` is
 still what is stored.
 
+**Notification email layout (2026-10-26, second pass).** Every service section ends in a subtotal
+(music: the package price; tablescape: "To quote (from $500)"; rentals: the server's rental subtotal),
+items absorbed into a bundle are left out (the bundle line names it), and money is shown with commas.
+For a rental **delivery**, `src/distance.js` adds the drive from home: US Census geocoder for the
+address, public OSRM router for the car route (free, no keys, 3.5 s timeouts, free-flow time so no
+traffic), flagged when over 30 minutes, plus a Google Maps directions link. **The home address is in
+Worker secrets `DELIVERY_ORIGIN_LL` ("lon,lat") and `DELIVERY_ORIGIN_ADDR`, never in this repo, which
+is public.** Without the secrets the drive line is simply omitted.
+
 ### Junk to delete
 
 Roughly 40 files from an accidental browser "Save Page As" commit. Not referenced by any real page:

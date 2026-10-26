@@ -9,6 +9,8 @@
  * House copy rule: no em dashes or en dashes anywhere in customer facing text.
  */
 
+import { DELIVERY_LIMIT_MIN } from './distance.js';
+
 export const NOTIFY = ['raugustinemusic@gmail.com', 'justinben2335@gmail.com'];
 export const FROM = { email: 'bookings@augustineevents.com', name: 'Augustine Website' };
 
@@ -30,6 +32,41 @@ function prettyDate(iso) {
   if (!months[m - 1]) return iso;
   const dow = days[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
   return `${dow}, ${d} ${months[m - 1]} ${y}`;
+}
+
+/** "$1350.00" or 1350 -> "$1,350.00". Anything unreadable is passed through. */
+function money(v) {
+  const n = typeof v === 'number' ? v : Number(String(v).replace(/[$,\s]/g, ''));
+  if (!Number.isFinite(n)) return String(v);
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/**
+ * Turns the stored rental breakdown into [label, amount] rows for the email.
+ * Items absorbed into a bundle are left out (the bundle line names it, and Becca
+ * knows what is in it), as are the subtotal and "priced by" lines, which the
+ * section's own subtotal replaces. Returns { rows, subtotal, notes }.
+ */
+function rentalRows(text) {
+  const rows = [], notes = [];
+  let subtotal = null;
+  for (const raw of String(text || '').split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    let m;
+    if ((m = line.match(/^Rental subtotal:\s*(.+)$/i))) { subtotal = m[1]; continue; }
+    if (/^Priced by the website/i.test(line)) continue;
+    if (/: included in /i.test(line)) continue;
+    if ((m = line.match(/^(.+?) x(\d+): (\d+) in (.+?), (\d+) at (\$[\d.,]+) = (\$[\d.,]+)$/))) {
+      rows.push([`${m[1]} × ${m[5]} extra (${m[3]} in ${m[4]})`, money(m[7])]); continue;
+    }
+    if ((m = line.match(/^(.+?) x(\d+) at (\$[\d.,]+) = (\$[\d.,]+)$/))) {
+      rows.push([`${m[1]} × ${m[2]} at ${m[3]} each`, money(m[4])]); continue;
+    }
+    if ((m = line.match(/^(.+?):\s*(\$[\d.,]+)$/))) { rows.push([m[1], money(m[2])]); continue; }
+    notes.push(line);
+  }
+  return { rows, subtotal: subtotal && money(subtotal), notes };
 }
 
 /** A value worth showing: drops blanks and the placeholders the form sends. */
@@ -66,32 +103,51 @@ export function buildEmail(row, extras = {}) {
   // Prefer the visitor's own words; fall back to the stored message.
   const message = extras.client_message !== undefined ? real(extras.client_message) : real(row.message);
 
-  // Sections: [title, [[label, value, href?], ...], preformatted block?]
+  // Each section: { title, rows: [[label, value, href?]], items: [[label, amount]], subtotal }
   const sections = [];
-  sections.push(['Event', [
+  sections.push({ title: 'Event', rows: [
     ['Date', when],
     ['Venue', real(row.venue_address) || 'Not given'],
-  ]]);
+  ] });
   if (wants('music') || music) {
-    sections.push(['Live music', [['Package', music || 'Not chosen yet']]]);
+    // "Silver, Duo · $1,100" -> package "Silver, Duo", price $1,100.
+    const pm = music && music.match(/^(.*?)\s*[·|-]\s*(\$[\d,]+(?:\.\d+)?)\s*$/);
+    const pkg = pm ? pm[1] : music;
+    const price = extras.music_price || (pm ? pm[2] : null);
+    sections.push({ title: 'Live music', rows: [['Package', pkg || 'Not chosen yet']],
+      subtotal: price ? money(price) : 'Package not chosen' });
   }
   if (wants('tablescape') || guests || setting || theme) {
-    sections.push(['Custom tablescape', [
+    sections.push({ title: 'Custom tablescape', rows: [
       ['Guests', guests || 'Not given'],
       ['Indoor or outdoor', setting || 'Not given'],
       ['Theme inspiration', theme || 'None shared', theme && /^https?:\/\//i.test(theme) ? theme : null],
-    ]]);
+    ], subtotal: 'To quote (from $500)' });
   }
   if (wants('rental') || rentals) {
+    const r = rentalRows(rentals);
     const rows = [['Delivery or pickup', delivery || 'Not chosen']];
     if (deliveryAddr) rows.push(['Delivery address', deliveryAddr]);
-    sections.push(['Event rentals', rows, rentals || 'No items selected']);
+    const drive = extras.drive;
+    if (deliveryAddr && drive) {
+      if (drive.miles != null) {
+        const over = drive.minutes > DELIVERY_LIMIT_MIN;
+        rows.push(['Drive from home', `${drive.miles} miles, about ${drive.minutes} min without traffic` +
+          (over ? ` (outside the ${DELIVERY_LIMIT_MIN}-minute delivery area)` : '')]);
+      } else {
+        rows.push(['Drive from home', 'Could not look up the address']);
+      }
+      if (drive.mapsUrl) rows.push(['Directions', 'Open in Google Maps', drive.mapsUrl]);
+    }
+    r.notes.forEach((n) => rows.push(['Note', n]));
+    if (!r.rows.length) rows.push(['Items', 'None selected']);
+    sections.push({ title: 'Event rentals', rows, items: r.rows,
+      subtotal: r.subtotal || (r.rows.length ? null : '$0.00'),
+      subNote: delivery === 'Delivery' ? 'Plus delivery, based on mileage' : null });
   }
 
-  const covered = [music && 'music', rentals && 'rentals'].filter(Boolean).join(' and ') || 'the selection';
-  const totalNote = total
-    ? `Covers ${covered}, as priced by the website.` + (wants('tablescape') ? ' Tablescapes are quoted separately.' : '')
-    : null;
+  const totalMoney = total ? money(total) : null;
+  const totalNote = total && wants('tablescape') ? 'Tablescape quoted separately.' : null;
 
   // ---- plain text ----
   const text = [
@@ -100,13 +156,14 @@ export function buildEmail(row, extras = {}) {
     `${name}`,
     `${row.email || 'No email given'}`,
     ...(services ? [`Booking: ${services}`] : []),
-    ...sections.flatMap(([title, rows, block]) => [
+    ...sections.flatMap((sec) => [
       ``,
-      title.toUpperCase(),
-      ...rows.map(([l, v]) => `${l}: ${v}`),
-      ...(block ? [``, block] : []),
+      sec.title.toUpperCase(),
+      ...sec.rows.map(([l, v]) => `${l}: ${v}`),
+      ...(sec.items || []).map(([l, a]) => `  ${l}  ${a}`),
+      ...(sec.subtotal ? [`Subtotal: ${sec.subtotal}${sec.subNote ? ' (' + sec.subNote + ')' : ''}`] : []),
     ]),
-    ...(total ? [``, `ESTIMATED TOTAL: ${total}`, totalNote] : []),
+    ...(totalMoney ? [``, `ESTIMATED TOTAL: ${totalMoney}${totalNote ? ' (' + totalNote + ')' : ''}`] : []),
     ``,
     `THEIR MESSAGE`,
     message || 'No message left.',
@@ -123,12 +180,26 @@ export function buildEmail(row, extras = {}) {
           <td style="padding:6px 0;color:#2c2c2c;font-size:14px;vertical-align:top;">${href ? `<a href="${esc(href)}" style="color:#4a5e40;">${esc(value)}</a>` : esc(value)}</td>
         </tr>`;
   const heading = (t) => `<div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#4a5e40;font-weight:700;">${esc(t)}</div>`;
-  const section = ([title, rows, block]) => `
+  const item = (label, amount) => `
+        <tr>
+          <td style="padding:5px 16px 5px 0;color:#2c2c2c;font-size:14px;vertical-align:top;">${esc(label)}</td>
+          <td style="padding:5px 0;color:#2c2c2c;font-size:14px;vertical-align:top;text-align:right;white-space:nowrap;">${esc(amount)}</td>
+        </tr>`;
+  const section = (sec) => `
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid #e8e4dc;">
-        ${heading(title)}
-        <table style="width:100%;border-collapse:collapse;margin-top:6px;">${rows.map((r) => line(...r)).join('')}
-        </table>${block ? `
-        <pre style="margin:10px 0 0;padding:12px 14px;background:#faf8f4;font-family:inherit;font-size:13px;color:#2c2c2c;white-space:pre-wrap;line-height:1.6;">${esc(block)}</pre>` : ''}
+        ${heading(sec.title)}
+        <table style="width:100%;border-collapse:collapse;margin-top:6px;">${sec.rows.map((r) => line(...r)).join('')}
+        </table>${sec.items && sec.items.length ? `
+        <div style="margin-top:10px;background:#faf8f4;padding:8px 14px;">
+          <table style="width:100%;border-collapse:collapse;">${sec.items.map((r) => item(...r)).join('')}
+          </table>
+        </div>` : ''}${sec.subtotal ? `
+        <table style="width:100%;border-collapse:collapse;margin-top:10px;border-top:1px dashed #e0dbd1;">
+          <tr>
+            <td style="padding:8px 0 0;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#5a5a5a;font-weight:700;">Subtotal${sec.subNote ? `<div style="font-size:11px;letter-spacing:0;text-transform:none;font-weight:400;margin-top:2px;">${esc(sec.subNote)}</div>` : ''}</td>
+            <td style="padding:8px 0 0;font-size:15px;font-weight:700;color:#2e3b28;text-align:right;white-space:nowrap;vertical-align:top;">${esc(sec.subtotal)}</td>
+          </tr>
+        </table>` : ''}
       </div>`;
 
   const html = `<!doctype html>
@@ -148,11 +219,11 @@ export function buildEmail(row, extras = {}) {
       </div>
       ${services ? `<div style="margin-top:12px;font-size:13px;color:#2c2c2c;"><span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#eef2ea;color:#2e3b28;">${esc(services)}</span></div>` : ''}
       ${sections.map(section).join('')}
-      ${total ? `
+      ${totalMoney ? `
       <div style="margin-top:22px;padding:14px 16px;background:#f8faf7;border-left:3px solid #4a5e40;">
         <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5a5a5a;font-weight:700;">Estimated total</span>
-        <span style="float:right;font-size:17px;font-weight:700;color:#4a5e40;">${esc(total)}</span>
-        <div style="clear:both;margin-top:4px;font-size:12px;color:#5a5a5a;">${esc(totalNote)}</div>
+        <span style="float:right;font-size:17px;font-weight:700;color:#4a5e40;">${esc(totalMoney)}</span>
+        ${totalNote ? `<div style="clear:both;margin-top:4px;font-size:12px;color:#5a5a5a;">${esc(totalNote)}</div>` : '<div style="clear:both;"></div>'}
       </div>` : ''}
 
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid #e8e4dc;">
