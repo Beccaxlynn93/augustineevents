@@ -185,21 +185,24 @@ export function buildEmail(row, extras = {}) {
           <td style="padding:5px 16px 5px 0;color:#2c2c2c;font-size:14px;vertical-align:top;">${esc(label)}</td>
           <td style="padding:5px 0;color:#2c2c2c;font-size:14px;vertical-align:top;text-align:right;white-space:nowrap;">${esc(amount)}</td>
         </tr>`;
+  const subRow = (sec) => `
+        <tr>
+          <td style="padding:6px 16px 6px 0;color:#5a5a5a;font-size:13px;white-space:nowrap;vertical-align:top;width:140px;">Subtotal</td>
+          <td style="padding:6px 0;color:#2e3b28;font-size:14px;font-weight:700;vertical-align:top;">${esc(sec.subtotal)}</td>
+        </tr>`;
   const section = (sec) => `
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid #e8e4dc;">
         ${heading(sec.title)}
-        <table style="width:100%;border-collapse:collapse;margin-top:6px;">${sec.rows.map((r) => line(...r)).join('')}
+        <table style="width:100%;border-collapse:collapse;margin-top:6px;">${sec.rows.map((r) => line(...r)).join('')}${!(sec.items && sec.items.length) && sec.subtotal ? subRow(sec) : ''}
         </table>${sec.items && sec.items.length ? `
         <div style="margin-top:10px;background:#faf8f4;padding:8px 14px;">
-          <table style="width:100%;border-collapse:collapse;">${sec.items.map((r) => item(...r)).join('')}
+          <table style="width:100%;border-collapse:collapse;">${sec.items.map((r) => item(...r)).join('')}${sec.subtotal ? `
+            <tr>
+              <td style="padding:7px 16px 3px 0;border-top:1px solid #e8e4dc;color:#2e3b28;font-size:14px;font-weight:700;">Subtotal${sec.subNote ? `<span style="font-weight:400;color:#5a5a5a;font-size:12px;"> &middot; ${esc(sec.subNote)}</span>` : ''}</td>
+              <td style="padding:7px 0 3px;border-top:1px solid #e8e4dc;color:#2e3b28;font-size:14px;font-weight:700;text-align:right;white-space:nowrap;">${esc(sec.subtotal)}</td>
+            </tr>` : ''}
           </table>
-        </div>` : ''}${sec.subtotal ? `
-        <table style="width:100%;border-collapse:collapse;margin-top:10px;border-top:1px dashed #e0dbd1;">
-          <tr>
-            <td style="padding:8px 0 0;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#5a5a5a;font-weight:700;">Subtotal${sec.subNote ? `<div style="font-size:11px;letter-spacing:0;text-transform:none;font-weight:400;margin-top:2px;">${esc(sec.subNote)}</div>` : ''}</td>
-            <td style="padding:8px 0 0;font-size:15px;font-weight:700;color:#2e3b28;text-align:right;white-space:nowrap;vertical-align:top;">${esc(sec.subtotal)}</td>
-          </tr>
-        </table>` : ''}
+        </div>` : ''}
       </div>`;
 
   const html = `<!doctype html>
