@@ -90,7 +90,8 @@ test('delivery is required when the cart holds a delivery only item', () => {
 test('all three rectangular tablecloths are rentable', () => {
   // The workbook shows one out of service; the owners confirmed it is back.
   const r = price({ slug: 'toile-rect-tablecloth', qty: 3 }, { slug: 'toile-round-tablecloth', qty: 8 });
-  assert.equal(r.ok, true);
+  // $110 is under the $150 order minimum, so the only error may be that one; none about stock.
+  assert.ok(r.errors.every((e) => /minimum\. This order/.test(e)), r.errors.join(' | '));
   assert.equal(r.subtotal, 11000);
   assert.equal(price({ slug: 'toile-rect-tablecloth', qty: 4 }).ok, false, 'only 3 exist');
 });
