@@ -100,11 +100,11 @@
       margin-bottom: clamp(28px, 3vw, 40px); display: grid; grid-template-columns: 1fr;
       border-radius: var(--radius-lg); overflow: hidden; background: var(--green-dark); color: var(--on-dark); box-shadow: var(--shadow-md);
     }
-    /* Four photos above the bundle details: the full harvest table with its 3 arm
-       candelabras across the top left, the brass candlesticks and the Italian vases beneath
-       it, and the 9 arm candelabra in a tall column on the right. On a phone they stack. */
+    /* Four photos above the bundle details, in a staggered two-row layout: the harvest
+       table (wide) and the 9 arm candelabra (narrow) on top, the Italian vases (narrow) and
+       the candlestick table (wide) beneath. On a phone they stack in that order. */
     .bundle-photos {
-      display: grid; grid-template-columns: 1.2fr 1fr 0.9fr; grid-template-rows: 1.6fr 1fr; gap: 4px;
+      display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); grid-template-rows: 1.4fr 1fr; gap: 4px;
       height: clamp(520px, 56vw, 820px); background: var(--green-dark);
     }
     .bundle-photos figure { position: relative; overflow: hidden; margin: 0; }
@@ -113,12 +113,12 @@
     .bundle-photos figure:hover img { transform: scale(1.04); }
     .bp-singles img { object-position: 50% 55%; }
     .bp-trio img { object-position: 50% 59%; }
-    .bp-table { grid-column: 1 / 3; grid-row: 1; }
+    .bp-table { grid-column: 1 / 10; grid-row: 1; }
     .bp-table img { object-position: 50% 40%; }
-    .bp-nine { grid-column: 3; grid-row: 1 / 3; }
+    .bp-nine { grid-column: 10 / 14; grid-row: 1; }
     .bp-nine img { object-position: 50% 55%; }
-    .bp-singles { grid-column: 1; grid-row: 2; }
-    .bp-trio { grid-column: 2; grid-row: 2; }
+    .bp-trio { grid-column: 1 / 6; grid-row: 2; }
+    .bp-singles { grid-column: 6 / 14; grid-row: 2; }
     .bundle-copy { display: grid; align-content: center; justify-items: start; gap: 14px; padding: clamp(28px, 3.6vw, 52px); }
     @media (min-width: 1000px) {
       .bundle-copy { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: clamp(32px, 5vw, 72px); }
@@ -135,7 +135,7 @@
     .bundle-copy .line-art { color: var(--cream); }
     /* Phone: the candlesticks across the top, the vases beneath. */
     @media (max-width: 640px) {
-      .bundle-photos { grid-template-columns: 1fr; grid-template-rows: 240px 420px 200px 170px; height: auto; }
+      .bundle-photos { grid-template-columns: 1fr; grid-template-rows: 240px 420px 170px 200px; height: auto; }
       .bp-table, .bp-nine, .bp-singles, .bp-trio { grid-column: 1; grid-row: auto; }
       .bp-trio img { object-position: 50% 50%; }
     }
@@ -339,8 +339,8 @@
         <div class="bundle-photos">
           <figure class="bp-table"><img src="img/brass-harvest-table.webp" alt="A full harvest table at dusk lined with 3 arm brass candelabras holding burnt orange and cream tapers, with crystal goblets, white pumpkins and toile linen" loading="lazy" width="1600" height="1067" /></figure>
           <figure class="bp-nine"><img src="img/brass-9-arm-candelabra.webp" alt="The 9 arm brass candelabra with all nine white tapers lit, on a dark table runner" loading="lazy" width="900" height="1350" /></figure>
-          <figure class="bp-singles"><img src="img/brass-candlesticks-table.webp" alt="A candlelit table lined with single brass candlesticks of different heights holding white tapers" loading="lazy" width="1400" height="933" /></figure>
           <figure class="bp-trio"><picture><source media="(min-width: 641px)" srcset="img/italian-vases-trio.webp" width="900" height="1350" /><img src="img/italian-vases-trio-wide.webp" alt="Three ornate Italian brass vases, one large between two small" loading="lazy" width="1200" height="600" /></picture></figure>
+          <figure class="bp-singles"><img src="img/brass-candlesticks-table.webp" alt="A candlelit table lined with single brass candlesticks of different heights holding white tapers" loading="lazy" width="1400" height="933" /></figure>
         </div>
         <div class="bundle-copy has-art">
           <span class="card-art" aria-hidden="true"><svg class="line-art" data-art="candelabra"></svg></span>
