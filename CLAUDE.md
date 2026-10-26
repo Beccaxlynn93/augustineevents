@@ -2,22 +2,91 @@
 
 Context and working instructions for Claude Code on this repository.
 
-Project overview and dated history live in Justin's Obsidian vault (the "brain"):
-Mac: `~/Documents/Obsidian/ClaudeVault/Projects/Augustine Music/Augustine Website.md`.
-This file holds the technical detail; update the vault note at the end of a session.
+Overview, history and decisions live in the vault (the "brain"):
+`Projects/Augustine Music and Events/Augustine Website.md`
+(homelab: `/mnt/vault/...`; Mac: `~/Documents/Obsidian/ClaudeVault/...`).
+Becca's plain-language guide is `Projects/Augustine Music and Events/Becca - Start Here.md`.
+This file holds the technical detail. Add a dated entry to the vault note at the end of a session.
 
-> **Verified 2026-09-11** against the repo, the live site, the Cloudflare API, the
-> Workers Builds configuration, and the production D1 database.
->
-> **This copy is on the `redesign` branch and describes it.** `main` is nine commits
-> behind and still serves the previous design with the old booking form. See
-> "Branches and previews" for what each branch holds and the order to merge them.
-> This is a Cloudflare Worker, not GitHub Pages and not Cloudflare Pages. It
-> deploys from git, and on 2026-09-09 a push to `main` produced the first
-> build-sourced deployment, which is what finally proved the pipeline. Until that
-> day production was still serving the hand-uploaded version from 2026-05-15.
-> Do not trust an unverified claim in this file over what production actually returns.
-> This document has been confidently wrong before.
+## RUNBOOK: read this first (verified 2026-10-26)
+
+**If anything else in this file disagrees with this runbook, the runbook wins.** Sections
+further down carry older dates and are kept as history and reference.
+
+**Where the work happens.** The homelab (claude-agent, `/root/work/augustineevents`).
+The remote is `git@github.com:Beccaxlynn93/augustineevents.git`, and pushes go over **SSH** as
+Justinben2335, who is a collaborator. Never push over HTTPS: the PAT in
+`/root/.config/gh-token` is fine-grained and returns 403 on Becca's repo. Don't detour
+through the Mac or Becca's Air just to push.
+
+**Branches.** `main` = the live site. `becca` = the working branch for all of Becca's
+edits. On 2026-10-26 both are at the same commit. Every other branch (`tablescapes`,
+`redesign`, `booking-catalog`, `design-pass`, `site-updates`, `booking-phase-1`,
+`recover-live-site`) is history, already contained in `main`. Don't build on them.
+
+**Making a change (the normal path):**
+1. `git checkout becca && git pull --ff-only` (if `main` is ahead, `git merge --ff-only main` first).
+2. Edit, commit with a plain-English message, `git push origin becca`.
+3. The preview updates by itself in about a minute: https://becca-rough-salad-4d39.raugustinemusic.workers.dev
+   Check it with `curl -s <url> | grep '<text you changed>'`, then send Becca the link.
+4. **Only when Becca (or Justin) says to put it live:**
+   `git checkout main && git merge --ff-only becca && git push origin main && git checkout becca`.
+   Production updates in about a minute. Verify with curl against https://augustineevents.com/.
+   A successful `git push` proves nothing on its own.
+
+**If the push doesn't show up after about 3 minutes,** Cloudflare Workers Builds is stuck
+(it was on 2026-10-26 from about 03:20 CDT until midday). The fallback is a manual deploy from
+**Justin's MacBook Pro**, which has the only wrangler login (Node 22, `zsh -lic` for PATH):
+`git archive HEAD | ssh justinbrown@192.168.1.196 'mkdir -p /tmp/aug && tar -x -C /tmp/aug'`, then on the
+Mac run `cd /tmp/aug && CLOUDFLARE_ACCOUNT_ID=20da6feefc828587a10b5b232912d1a5 npx -y wrangler@4 deploy`
+for production, or `... versions upload --preview-alias becca` for the preview. Delete `/tmp/aug` afterwards.
+If the Mac is asleep, tell Becca the change is saved and waiting, and ask Justin to wake the Mac.
+Claude-agent has no Cloudflare credentials of its own.
+
+**Database (D1 `augustine-inquiries`).** There is only one database, and every preview uses the
+live one. Pushes never run migrations. Price and catalog changes are a new `migrations/000N_*.sql`
+file, applied from the Mac with `npx wrangler d1 migrations apply augustine-inquiries --remote`
+(with `CLOUDFLARE_ACCOUNT_ID` set). Apply it right after the matching code goes live, not before.
+First, export the affected tables to TrueNAS
+`backups/AugustineMusicAndEvents/Business/Website/D1 backups/`.
+
+**Where assets live:**
+| What | Where |
+|---|---|
+| Web-ready images | repo `img/` (WebP, at most 1400 px wide, never multi-megabyte) |
+| Rental item photos | repo `Photographer photos/` (catalog photos) |
+| Site video | repo `video/` (`tablescapes-hero-720.mp4`, `-480.mp4`, poster). Workers assets must be under 25 MiB each |
+| Fonts | repo `fonts/` (Hey Lovely webfont); Italiana and Jost come from Google Fonts |
+| Shoot photos (source) | TrueNAS `backups/AugustineMusicAndEvents/Photos/2026-10-09 Tablescape Shoot/` (`Edited (Lightroom exports)/` numbered 001 to 114, `Original JPGs (SD card)/`) |
+| Shoot video (source) | TrueNAS `backups/AugustineMusicAndEvents/Videos/` |
+| Font licence, receipts | TrueNAS `backups/AugustineMusicAndEvents/Business/Licenses/` |
+| D1 backups | TrueNAS `backups/AugustineMusicAndEvents/Business/Website/D1 backups/` |
+
+To read TrueNAS: `ssh root@192.168.1.145`, share root `/mnt/tank/backups`. Make web images with
+Pillow on the homelab. Make video with `vedit` (ffmpeg on the gaming PC, which must be awake).
+After copying anything onto TrueNAS as root, run `chown 3000:3000` and `chmod g+rwX` on it.
+
+**Tests.** `node --test src/pricing.test.mjs` needs Node 22. The homelab has Node 20, so run the
+tests on the Mac (same `git archive` pattern). Run them for any change to `src/`.
+
+**Design and copy rules:**
+- Italiana for headings, Jost for body text. Prices, totals and phone numbers always in Jost.
+- No italic `<em>` in headings.
+- No em or en dashes in client-facing copy.
+- Plain, warm wording, never stock wedding phrases. Never name a wedding couple.
+- Alt text on every image.
+
+**Always ask first:**
+- Before anything goes live.
+- Before changing prices, packages or inventory counts (confirm the exact numbers).
+- Before deleting anything.
+- Before a booking-form test. Previews email Becca for real, so put "TEST - ignore" in the message
+  and delete the row afterwards.
+
+Never hand-upload through the Cloudflare dashboard.
+
+**Talking to Becca.** Use plain language. Say "preview link" and "live site", not branch or deploy
+jargon. Never offer her a workaround that needs her to use git, a terminal or the Cloudflare dashboard.
 
 ---
 
@@ -89,7 +158,10 @@ repo. To check production, mirror it over HTTP.
 
 ---
 
-## Branches and previews
+## Branches and previews (history, as of 2026-09-11)
+
+> **Superseded.** Everything below was merged to `main` on 2026-10-26. Current branches are in the
+> RUNBOOK at the top. Kept for the preview-alias and shared-database notes.
 
 Four branches, each built on the one before, so the newest contains all of it.
 Nothing below is on `main` yet. The owners reviewed the redesign on 2026-09-11 and
