@@ -50,8 +50,8 @@
     .hero .eyebrow { color: var(--on-dark); }
     /* Becca's headline font lives only in Canva, so the heading is her image,
        inside a real <h1> whose alt text is the heading. */
-    .hero-text { line-height: 0; }
-    .hero-text img { width: min(760px, 86vw); height: auto; filter: drop-shadow(0 2px 18px rgba(0, 0, 0, 0.35)); }
+    /* Live text in the site's heading font (was an image of Becca's Canva lettering). */
+    .hero-text { color: var(--cream); max-width: 16ch; margin-inline: auto; font-size: clamp(2.6rem, 6vw, 5.2rem); line-height: 1.04; text-wrap: balance; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35); }
     .hero-lede { max-width: 50ch; text-wrap: balance; color: var(--on-dark); font-size: clamp(1.05rem, 1.5vw, 1.2rem); font-weight: 300; line-height: 1.7; }
     .hero .btn-row { justify-content: center; }
 
@@ -186,9 +186,7 @@
       <div class="hero-media" aria-hidden="true"></div>
       <div class="hero-content">
         <p class="eyebrow center rise" style="--d:0">Weddings &amp; celebrations &middot; Greater Nashville</p>
-        <h1 class="hero-text rise" style="--d:1">
-          <img src="hero-headline.png" alt="Romantic Music &amp; Intimate Wedding Rentals" width="1176" height="206" fetchpriority="high" />
-        </h1>
+        <h1 class="hero-text display rise" style="--d:1">Romantic Music &amp; Intimate Wedding Rentals</h1>
         <p class="hero-lede rise" style="--d:2">An elegant, garden&#8209;inspired setting for your most intimate gatherings, with live music and a table designed just for you.</p>
         <div class="btn-row rise" style="--d:3">
           <a href="custom-tablescapes.html" class="btn btn-solid-light">Custom Tablescapes <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
