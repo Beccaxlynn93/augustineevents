@@ -94,3 +94,12 @@
 .tb-reel-btn.is-paused .icon-play { display: block; }
 @media (max-width: 760px) { .tb-reel { justify-self: center; max-width: 440px; } }
 @media (prefers-reduced-motion: reduce) { .tb-reel-slide.is-entering, .tb-reel.is-changing .tb-reel-glow { animation-duration: 0.01s !important; } }
+
+/* Beside the description (wide screens) the slideshow is exactly as tall as the text,
+   so the words are never pushed below the fold by a taller picture. */
+@media (min-width: 761px) {
+  .tb-intro-grid { align-items: stretch; }
+  .tb-intro-text { align-self: center; }
+  .tb-reel { display: flex; flex-direction: column; height: 100%; max-width: 420px; }
+  .tb-reel-stage { aspect-ratio: auto; flex: 1 1 0; min-height: 360px; }
+}
