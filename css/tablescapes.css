@@ -98,8 +98,10 @@
 /* Beside the description (wide screens) the slideshow is exactly as tall as the text,
    so the words are never pushed below the fold by a taller picture. */
 @media (min-width: 761px) {
-  .tb-intro-grid { align-items: stretch; }
+  .tb-intro-grid { align-items: stretch; grid-template-columns: minmax(0, 1fr) auto; }
   .tb-intro-text { align-self: center; }
-  .tb-reel { display: flex; flex-direction: column; height: 100%; max-width: 420px; }
-  .tb-reel-stage { aspect-ratio: auto; flex: 1 1 0; min-height: 360px; }
+  /* The stage takes its height from the text, and js/tablescapes.js sets its width
+     (--reel-w) to keep the photos' own 3:4 shape, so nothing is cropped. */
+  .tb-reel { display: flex; flex-direction: column; height: 100%; max-width: none; width: var(--reel-w, 340px); }
+  .tb-reel-stage { flex: 1 1 0; min-height: 360px; aspect-ratio: auto; }
 }

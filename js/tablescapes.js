@@ -78,6 +78,22 @@
     var rbtn = document.getElementById('tbReelPlay');
     var glow = reel.querySelector('.tb-reel-glow');
     var HOLD = 5200;
+
+    // Beside the text, size the slideshow to the text's height at the photos' 3:4 shape.
+    var introText = document.querySelector('.tb-intro-text');
+    var stageEl = reel.querySelector('.tb-reel-stage');
+    var wideMq = window.matchMedia('(min-width: 761px)');
+    function fitReel() {
+      if (!wideMq.matches || !introText) { reel.style.removeProperty('--reel-w'); return; }
+      var bar = reel.querySelector('.tb-reel-bar');
+      var barH = bar ? bar.getBoundingClientRect().height + 14 : 0;
+      var h = Math.max(360, introText.getBoundingClientRect().height - barH);
+      reel.style.setProperty('--reel-w', Math.round(h * 3 / 4) + 'px');
+    }
+    fitReel();
+    if ('ResizeObserver' in window && introText) new ResizeObserver(fitReel).observe(introText);
+    window.addEventListener('resize', fitReel);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitReel);
     var idx = 0, playing = !reduce, inView = true, timer = null;
     if (window.CSS && CSS.registerProperty && !reduce) reel.classList.add('tb-reveal');
 
