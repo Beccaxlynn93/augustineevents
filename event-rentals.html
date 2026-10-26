@@ -100,19 +100,21 @@
       margin-bottom: clamp(28px, 3vw, 40px); display: grid; grid-template-columns: 1fr;
       border-radius: var(--radius-lg); overflow: hidden; background: var(--green-dark); color: var(--on-dark); box-shadow: var(--shadow-md);
     }
-    /* Two photos side by side above the bundle details: the brass candlesticks and the
-       Italian vases. On a phone they stack. */
+    /* Three photos above the bundle details: the full harvest table with its 3 arm
+       candelabras across the top, the brass candlesticks and the Italian vases beneath.
+       On a phone they stack. */
     .bundle-photos {
-      display: grid; grid-template-columns: 1.2fr 1fr; gap: 4px;
-      height: clamp(380px, 36vw, 520px); background: var(--green-dark);
+      display: grid; grid-template-columns: 1.2fr 1fr; grid-template-rows: 1.6fr 1fr; gap: 4px;
+      height: clamp(520px, 56vw, 820px); background: var(--green-dark);
     }
     .bundle-photos figure { position: relative; overflow: hidden; margin: 0; }
     /* Out of flow, so a photo's own proportions never stretch its tile. */
     .bundle-photos img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
     .bundle-photos figure:hover img { transform: scale(1.04); }
     .bp-singles img { object-position: 50% 55%; }
-    .bp-trio img { object-position: 50% 62%; }
-    @media (max-width: 640px) { .bp-trio img { object-position: 50% 50%; } }
+    .bp-trio img { object-position: 50% 50%; }
+    .bp-table { grid-column: 1 / -1; }
+    .bp-table img { object-position: 50% 40%; }
     .bundle-copy { display: grid; align-content: center; justify-items: start; gap: 14px; padding: clamp(28px, 3.6vw, 52px); }
     @media (min-width: 1000px) {
       .bundle-copy { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: clamp(32px, 5vw, 72px); }
@@ -129,7 +131,7 @@
     .bundle-copy .line-art { color: var(--cream); }
     /* Phone: the candlesticks across the top, the vases beneath. */
     @media (max-width: 640px) {
-      .bundle-photos { grid-template-columns: 1fr; grid-template-rows: 230px 180px; height: auto; }
+      .bundle-photos { grid-template-columns: 1fr; grid-template-rows: 240px 200px 170px; height: auto; }
     }
 
     /* Two equal halves, whatever their headings say: 1fr alone would let the
@@ -329,8 +331,9 @@
            are only rented as part of it, so this is the one place they appear. -->
       <div class="bundle-feature fade-in">
         <div class="bundle-photos">
+          <figure class="bp-table"><img src="img/brass-harvest-table.webp" alt="A full harvest table at dusk lined with 3 arm brass candelabras holding burnt orange and cream tapers, with crystal goblets, white pumpkins and toile linen" loading="lazy" width="1600" height="1067" /></figure>
           <figure class="bp-singles"><img src="img/brass-candlesticks-table.webp" alt="A candlelit table lined with single brass candlesticks of different heights holding white tapers" loading="lazy" width="1400" height="933" /></figure>
-          <figure class="bp-trio"><picture><source media="(min-width: 641px)" srcset="img/italian-vases-trio.webp" width="900" height="1350" /><img src="img/italian-vases-trio-wide.webp" alt="Three ornate Italian brass vases, one large between two small" loading="lazy" width="1200" height="600" /></picture></figure>
+          <figure class="bp-trio"><img src="img/italian-vases-trio-wide.webp" alt="Three ornate Italian brass vases, one large between two small" loading="lazy" width="1200" height="600" /></figure>
         </div>
         <div class="bundle-copy has-art">
           <span class="card-art" aria-hidden="true"><svg class="line-art" data-art="candelabra"></svg></span>
