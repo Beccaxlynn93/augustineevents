@@ -34,6 +34,9 @@
   <style>
     .about-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(40px, 7vw, 110px); align-items: center; }
     .about-grid--flip { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
+    /* A landscape photo needs more of the row than a portrait. */
+    .about-grid--wide { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+    .about-grid--wide .arch { width: min(620px, 100%); }
     .about-copy { display: grid; gap: 22px; justify-items: start; }
     .signature { font-size: 2.6rem; color: var(--green); line-height: 1; }
     .about-center { display: grid; gap: 18px; justify-items: center; text-align: center; }
@@ -52,8 +55,9 @@
     .expect-art { height: 56px; color: var(--green); }
     .expect-art .line-art { height: 100%; width: auto; }
     @media (max-width: 900px) {
-      .about-grid, .about-grid--flip { grid-template-columns: 1fr; }
+      .about-grid, .about-grid--flip, .about-grid--wide { grid-template-columns: 1fr; }
       .about-grid .arch { width: min(360px, 80vw); }
+      .about-grid--wide .arch { width: min(560px, 92vw); }
       .about-grid--flip .arch { order: -1; }
       .review-grid, .expect-grid { grid-template-columns: 1fr; }
     }
@@ -162,12 +166,17 @@
     </section>
 
     <section class="section bg-white">
-      <div class="wrap-narrow about-center">
-        <span class="about-art" aria-hidden="true"><svg class="line-art" data-art="piano"></svg><svg class="line-art" data-art="guitar"></svg></span>
-        <p class="eyebrow center fade-in">On piano and guitar</p>
-        <h2 class="h2 fade-in">Making music together</h2>
-        <div class="prose fade-in">
-          <p>My husband, Justin, plays piano and guitar in our duo and trio packages. He's a seasoned professional in his own right, having toured as band leader and pianist for Jo Dee Messina. He also plays and records the custom piano and guitar backing tracks I use for solo violin bookings, so even a solo performance has a full, rich sound.</p>
+      <div class="wrap about-grid about-grid--wide">
+        <figure class="arch is-framed reveal-clip">
+          <img src="img/becca-justin-wedding.webp" alt="Becca and Justin walking back down the aisle hand in hand on their wedding day, Becca laughing with her bouquet raised, in black and white" loading="lazy" width="1400" height="1000" style="--ratio: 1400 / 1000;" />
+        </figure>
+        <div class="about-copy">
+          <span class="about-art" aria-hidden="true"><svg class="line-art" data-art="piano"></svg><svg class="line-art" data-art="guitar"></svg></span>
+          <p class="eyebrow fade-in">On piano and guitar</p>
+          <h2 class="h2 fade-in">Making music together</h2>
+          <div class="prose fade-in">
+            <p>My husband, Justin, plays piano and guitar in our duo and trio packages. He's a seasoned professional in his own right, having toured as band leader and pianist for Jo Dee Messina. He also plays and records the custom piano and guitar backing tracks I use for solo violin bookings, so even a solo performance has a full, rich sound.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -200,10 +209,7 @@
     </section>
 
     <section class="section bg-white">
-      <div class="wrap about-grid">
-        <figure class="arch is-framed reveal-clip">
-          <img src="img/poppy.webp" alt="Poppy, Becca's red toy poodle, sitting in a field of yellow wildflowers with her tongue out" loading="lazy" width="769" height="1024" style="--ratio: 769 / 1024;" />
-        </figure>
+      <div class="wrap about-grid about-grid--flip">
         <div class="about-copy">
           <p class="eyebrow fade-in">Off the clock</p>
           <h2 class="h2 fade-in">A little more about me</h2>
@@ -211,6 +217,9 @@
             <p>I grew up in Michigan's Upper Peninsula, a mile from the shores of Lake Superior, and I still head home as often as I can. When I'm not playing or designing, you'll find me with a good book, hunting down the best coffee shop in town, or out on an adventure with Poppy, my six-pound red toy poodle.</p>
           </div>
         </div>
+        <figure class="arch is-framed reveal-clip">
+          <img src="img/poppy.webp" alt="Poppy, Becca's red toy poodle, sitting in a field of yellow wildflowers with her tongue out" loading="lazy" width="769" height="1024" style="--ratio: 769 / 1024;" />
+        </figure>
       </div>
     </section>
 
