@@ -3,8 +3,6 @@
   var playBtn = document.getElementById('tbPlay');
   var header = document.querySelector('.site-header');
   if (!video) return;
-  // The page is dark and the top panel is a dark video, so the header reads on dark.
-  if (header) header.classList.add('on-dark');
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var saveData = navigator.connection && navigator.connection.saveData;

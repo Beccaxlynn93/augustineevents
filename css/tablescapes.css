@@ -41,49 +41,21 @@
 
 
 
-/* Top panel: a muted looping video shown as a picture with a soft vignette. The edges
-   fade into the page's dark background, so it reads as part of the page, not a full-screen takeover. */
-.tb-show { position: relative; isolation: isolate; overflow: hidden; display: block;
-  padding: calc(var(--header-h) + clamp(22px, 3.4vw, 46px)) 0 clamp(36px, 5vw, 72px); background: var(--tb-bg); }
-.tb-video { position: relative; display: block; width: min(1180px, 94vw); height: auto; aspect-ratio: 16 / 9; margin: 0 auto; object-fit: cover;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 15%, #000 78%, transparent);
-  -webkit-mask-composite: source-in; mask-composite: intersect;
-  mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 15%, #000 78%, transparent); }
-.tb-scrim { display: none; }
-/* Title above the video, centred, with the site's sprig divider beneath it. */
-.tb-hero-head { position: relative; z-index: 1; text-align: center; margin-bottom: clamp(10px, 1.8vw, 22px); }
-.tb-hero-head h1 { line-height: 1.05; }
-.tb-flourish { margin: clamp(12px, 1.6vw, 18px) auto 0; max-width: 420px; }
-/* Fine line-drawn branches in the dark margins either side of the video. They sit
-   behind it and stay faint, so they frame the trailer without competing with it. */
-.tb-branch { z-index: 0; color: var(--cream); opacity: 0.12; width: clamp(200px, 22vw, 340px); }
-.tb-branch-l { left: -60px; top: 14%; transform: scaleX(-1) rotate(8deg); }
-.tb-branch-r { right: -60px; top: 22%; transform: rotate(-6deg); }
-.tb-video-wrap { position: relative; z-index: 1; width: min(1180px, 94vw); margin: 0 auto; }
-.tb-video-wrap .tb-video { width: 100%; }
-.tb-video-wrap .tb-play { position: absolute; right: clamp(14px, 3vw, 40px); bottom: clamp(18px, 4vw, 52px); }
-.tb-show :is(h1, .eyebrow) { color: var(--cream); }
-.tb-play { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(245, 242, 236, 0.7); background: rgba(10, 14, 9, 0.28);
+/* Top panel: the same page hero as the other tabs (cream, text left, framed picture
+   right, vines drawn over both by js/site.js), with the trailer as the picture. */
+.tb .tb-page-hero :is(h1, .eyebrow) { color: var(--green-dark); }
+.tb .tb-page-hero .eyebrow { color: var(--green); }
+@media (min-width: 901px) { .tb-page-hero .wrap { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); } }
+.tb-page-hero .arch { width: min(640px, 100%); }
+.tb-hero-fig video { position: relative; display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover;
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-md); background: var(--green-dark); }
+.tb-play { position: absolute; right: 14px; bottom: 14px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(245, 242, 236, 0.7); background: rgba(10, 14, 9, 0.35);
   color: var(--cream); cursor: pointer; display: grid; place-items: center; backdrop-filter: blur(4px); }
-.tb-play:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+.tb-play:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 .tb-play svg { width: 12px; height: 14px; }
 .tb-play .icon-play, .tb-play.is-paused .icon-pause { display: none; }
 .tb-play.is-paused .icon-play { display: block; }
-@media (max-width: 700px) {
-  .tb-video { width: 100%; }
-  .tb-video-wrap { width: 100%; }
-  .tb-branch { display: none; }
-}
-
-/* The nav bar on this page is always the page's dark colour (it used to turn cream once you scrolled),
-   so it reads as one piece with the top of the video's vignette. */
-.site-header.tb-header, .site-header.tb-header.is-scrolled {
-  color: var(--cream); background: color-mix(in srgb, var(--green-dark) 38%, black);
-  -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 1px 0 rgba(245, 242, 236, 0.08);
-}
-.nav-open .site-header.tb-header { color: var(--green-dark); background: transparent; box-shadow: none; }
-/* The hero fades into the next banner, so no hairline between them. */
-.tb-show + .tb-intro { border-top: 0; }
+@media (max-width: 900px) { .tb-page-hero .arch { width: min(560px, 92vw); } }
 
 /* Slideshow beside the intro. The photo changes like light spreading from a candle
    flame: the next photo is revealed through a soft circle that grows out of the
