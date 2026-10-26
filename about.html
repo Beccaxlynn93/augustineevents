@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About | Augustine Music &amp; Events</title>
-  <meta name="description" content="Meet Becca Augustine, a professional musician with over 15 years of experience in weddings, parties and corporate events near Nashville, TN." />
+  <meta name="description" content="Meet Becca Augustine, a Nashville violinist, vocalist and tablescape designer bringing live music and elegant, garden-inspired tables to weddings and intimate gatherings." />
   <link rel="canonical" href="https://augustineevents.com/about" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Augustine Music &amp; Events" />
   <meta property="og:title" content="About | Augustine Music & Events" />
-  <meta property="og:description" content="Meet Becca Augustine, a professional musician with over 15 years of experience in weddings, parties and corporate events near Nashville, TN." />
+  <meta property="og:description" content="Meet Becca Augustine, a Nashville violinist, vocalist and tablescape designer bringing live music and elegant, garden-inspired tables to weddings and intimate gatherings." />
   <meta property="og:url" content="https://augustineevents.com/about" />
   <meta property="og:image" content="https://augustineevents.com/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
@@ -18,7 +18,7 @@
   <meta property="og:image:alt" content="A candlelit wedding reception table set with glassware, greenery and white florals." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="About | Augustine Music & Events" />
-  <meta name="twitter:description" content="Meet Becca Augustine, a professional musician with over 15 years of experience in weddings, parties and corporate events near Nashville, TN." />
+  <meta name="twitter:description" content="Meet Becca Augustine, a Nashville violinist, vocalist and tablescape designer bringing live music and elegant, garden-inspired tables to weddings and intimate gatherings." />
   <meta name="twitter:image" content="https://augustineevents.com/og-image.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -33,11 +33,29 @@
   <script src="js/site.js" defer></script>
   <style>
     .about-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(40px, 7vw, 110px); align-items: center; }
+    .about-grid--flip { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
     .about-copy { display: grid; gap: 22px; justify-items: start; }
     .signature { font-size: 2.6rem; color: var(--green); line-height: 1; }
+    .about-center { display: grid; gap: 18px; justify-items: center; text-align: center; }
+    .about-center .prose p { margin-inline: auto; }
+    .about-art { display: flex; gap: 10px; height: 64px; color: var(--green); margin-bottom: 4px; }
+    .about-art .line-art { height: 100%; width: auto; }
+    .review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(18px, 3vw, 36px); max-width: 1000px; margin-inline: auto; }
+    .review { margin: 0; padding: clamp(26px, 3.4vw, 42px); background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); display: grid; gap: 20px; align-content: space-between; }
+    .review blockquote { margin: 0; font-family: var(--sans); font-weight: 300; font-size: clamp(1.02rem, 1.25vw, 1.12rem); line-height: 1.75; color: var(--text); }
+    .review blockquote::before { content: "\201C"; display: block; font-family: var(--serif); font-size: 3.4rem; line-height: 0.7; color: var(--green); opacity: 0.55; margin-bottom: 6px; }
+    .review figcaption { font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; color: var(--green); }
+    .review figcaption span { display: block; margin-top: 4px; letter-spacing: 0.06em; text-transform: none; font-weight: 400; color: var(--muted); }
+    .expect-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 3vw, 36px); }
+    .expect { display: grid; gap: 12px; justify-items: center; text-align: center; padding: clamp(22px, 3vw, 34px); }
+    .expect p { color: var(--muted); max-width: 30ch; }
+    .expect-art { height: 56px; color: var(--green); }
+    .expect-art .line-art { height: 100%; width: auto; }
     @media (max-width: 900px) {
-      .about-grid { grid-template-columns: 1fr; }
+      .about-grid, .about-grid--flip { grid-template-columns: 1fr; }
       .about-grid .arch { width: min(360px, 80vw); }
+      .about-grid--flip .arch { order: -1; }
+      .review-grid, .expect-grid { grid-template-columns: 1fr; }
     }
   </style>
   <!-- Meta Pixel: identical on every page, just before </head>. The ID is on two
@@ -93,9 +111,9 @@
     <section class="page-hero">
       <div class="wrap">
         <div class="page-hero-text">
-          <p class="eyebrow rise" style="--d:0">About</p>
+          <p class="eyebrow rise" style="--d:0">Violinist, Vocalist &amp; Designer</p>
           <h1 class="display rise" style="--d:1">About Becca</h1>
-          <div class="rise" style="--d:2"><p class="lede">Based in the greater Nashville area, I work closely with each couple and client to understand what they want and make it happen.</p></div>
+          <div class="rise" style="--d:2"><p class="lede">I'm a Nashville violinist and vocalist with a lifelong love of beautiful things. I bring live music and thoughtfully designed tables to weddings and intimate gatherings.</p></div>
           <div class="btn-row rise" style="--d:3"><a href="contact.html" class="btn">Get in Touch <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a></div>
         </div>
         <figure class="arch reveal-clip">
@@ -110,16 +128,100 @@
           <img src="img/becca-portrait.webp" alt="Becca Augustine smiling and holding her violin outdoors" loading="lazy" width="699" height="754" style="--ratio: 699 / 754;" />
         </figure>
         <div class="about-copy">
-          <p class="eyebrow fade-in">Violinist, vocalist, and decorator</p>
+          <p class="eyebrow fade-in">The music</p>
           <h2 class="h2 fade-in">Hi, I'm Becca</h2>
           <div class="prose fade-in">
-            <p>Hi! I've been a professional musician for over 15 years. I specialize in weddings, parties, and corporate events, pairing live music with beautifully designed tables to create moments that bring your loved ones together.</p>
-            <p>Whether you're dreaming of a sweeping ceremony score or a fully styled micro wedding, I'm here to make it happen with care, intention, and a touch of perfection.</p>
+            <p>I picked up the violin at three years old and never really put it down. From age six to eighteen I played in my family's folk band, traveling around the region and learning what it means to play for a room full of people. I went on to earn a Bachelor of Arts in Violin Performance, with a minor in Vocal Performance, and moved to Nashville after college to make music my full-time career.</p>
+            <p>In the years since, I've toured across the US and parts of Europe, played Lower Broadway with more bands than I can count, and performed at weddings, private parties and corporate events. Whether it's a quiet ceremony or a full evening, I bring the same care to every note.</p>
           </div>
-          <div class="signature-row fade-in" aria-hidden="true"><p class="signature script">Becca</p><span class="signature-art"><svg class="line-art" data-art="violin"></svg><svg class="line-art" data-art="vase"></svg></span></div>
+          <div class="signature-row fade-in" aria-hidden="true"><p class="signature script">Becca</p><span class="signature-art"><svg class="line-art" data-art="violin"></svg></span></div>
           <div class="btn-row fade-in">
             <a href="event-music.html" class="btn">Event Music <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
-            <a href="event-rentals.html" class="text-link">Browse rentals <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-cream">
+      <div class="wrap about-grid about-grid--flip">
+        <div class="about-copy">
+          <p class="eyebrow fade-in">The design side</p>
+          <h2 class="h2 fade-in">From bridal magazines to the table</h2>
+          <div class="prose fade-in">
+            <p>Long before I designed a single table, I was the girl buying bridal magazines and studying every dress, bouquet and tablescape. Planning my own wedding brought that love rushing back, and I knew I wanted to create those moments for other people too.</p>
+            <p>My style draws from European gardens and old-world architecture, with a soft spot for moody, dark academia touches: candlelight, rich textures and pieces that feel like they have a story. Many of them do. My husband and I plan a day of antiquing on almost every trip, and some of my favourite finds end up on the tables I design.</p>
+          </div>
+          <div class="btn-row fade-in">
+            <a href="custom-tablescapes.html" class="btn">Custom Tablescapes <svg class="arrow" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+        <figure class="arch is-framed reveal-clip">
+          <img src="img/tablescape-slide-13.webp" alt="Looking down a candlelit harvest table Becca designed, with brass candlesticks, crystal goblets and white pumpkins" loading="lazy" width="900" height="1200" style="--ratio: 3 / 4;" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="section bg-white">
+      <div class="wrap-narrow about-center">
+        <span class="about-art" aria-hidden="true"><svg class="line-art" data-art="piano"></svg><svg class="line-art" data-art="guitar"></svg></span>
+        <p class="eyebrow center fade-in">On piano and guitar</p>
+        <h2 class="h2 fade-in">Making music together</h2>
+        <div class="prose fade-in">
+          <p>My husband, Justin, plays piano and guitar in our duo and trio packages. He's a seasoned professional in his own right, having toured as band leader and pianist for Jo Dee Messina. He also plays and records the custom piano and guitar backing tracks I use for solo violin bookings, so even a solo performance has a full, rich sound.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-cream">
+      <div class="wrap">
+        <div class="section-head center">
+          <p class="eyebrow center fade-in">Kind words</p>
+          <h2 class="h2 fade-in">From our couples</h2>
+        </div>
+        <div class="review-grid" data-stagger>
+          <figure class="review fade-in">
+            <blockquote>Rebecca was an absolutely amazing performer! We had her play violin at our ceremony and then sing at our cocktail hour, both absolutely flawless and everyone was asking me where I found her all night! She was very professional leading up to the wedding and the day of. 10000/10 recommend booking her for your events!</blockquote>
+            <figcaption>Grace H. <span>Wedding, 2026</span></figcaption>
+          </figure>
+          <figure class="review fade-in">
+            <blockquote>Becca did a phenomenal job at our wedding! She was able to accommodate our music requests, which made the day feel even more special and personal. Our guests raved about her performance, and we're so happy she was part of our day!</blockquote>
+            <figcaption>Kaitlynn M. <span>Wedding, 2026</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-white">
+      <div class="wrap-narrow about-center">
+        <p class="eyebrow center fade-in">Off the clock</p>
+        <h2 class="h2 fade-in">A little more about me</h2>
+        <div class="prose fade-in">
+          <p>I grew up in Michigan's Upper Peninsula, a mile from the shores of Lake Superior, and I still head home as often as I can. When I'm not playing or designing, you'll find me with a good book, hunting down the best coffee shop in town, or out on an adventure with Poppy, my six-pound red toy poodle.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-cream">
+      <div class="wrap">
+        <div class="section-head center">
+          <p class="eyebrow center fade-in">Working with me</p>
+          <h2 class="h2 fade-in">What you can expect</h2>
+        </div>
+        <div class="expect-grid" data-stagger>
+          <div class="expect fade-in">
+            <span class="expect-art" aria-hidden="true"><svg class="line-art" data-art="calendar"></svg></span>
+            <h3 class="h3">Easy from start to finish</h3>
+            <p>I handle the details so you can enjoy the planning, and the day itself.</p>
+          </div>
+          <div class="expect fade-in">
+            <span class="expect-art" aria-hidden="true"><svg class="line-art" data-art="envelope"></svg></span>
+            <h3 class="h3">Clear, quick communication</h3>
+            <p>You'll always know where things stand.</p>
+          </div>
+          <div class="expect fade-in">
+            <span class="expect-art" aria-hidden="true"><svg class="line-art" data-art="candelabra"></svg></span>
+            <h3 class="h3">An eye for the smallest details</h3>
+            <p>The napkin fold, the candle height, the song that plays as you walk in. It all matters to me.</p>
           </div>
         </div>
       </div>
