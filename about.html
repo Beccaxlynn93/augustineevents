@@ -37,6 +37,9 @@
     /* A landscape photo needs more of the row than a portrait. */
     .about-grid--wide { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
     .about-grid--wide .arch { width: min(620px, 100%); }
+    /* Poppy: a short paragraph, so a smaller photo keeps the section in proportion. */
+    .about-grid--small { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr); }
+    .about-grid--small .arch { width: min(300px, 100%); }
     .about-copy { display: grid; gap: 22px; justify-items: start; }
     .signature { font-size: 2.6rem; color: var(--green); line-height: 1; }
     .about-center { display: grid; gap: 18px; justify-items: center; text-align: center; }
@@ -209,7 +212,7 @@
     </section>
 
     <section class="section bg-white">
-      <div class="wrap about-grid about-grid--flip">
+      <div class="wrap about-grid about-grid--flip about-grid--small">
         <div class="about-copy">
           <p class="eyebrow fade-in">Off the clock</p>
           <h2 class="h2 fade-in">A little more about me</h2>
