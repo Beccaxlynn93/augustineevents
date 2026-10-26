@@ -683,44 +683,58 @@
       // fire and forget: if it fails, times out, or the endpoint is down, the
       // visitor never sees it and the email is unaffected. The email remains
       // the notification; this is the durable copy.
-      function recordInquiry(emailSent) {
-        try {
-          // The structured cart goes to the Worker only, which re-prices it
-          // against the live catalog. EmailJS gets flat strings.
-          var body = JSON.stringify(Object.assign({}, templateParams, {
-            email_sent: emailSent ? 1 : 0,
-            cart: cart,
-            music_price: musicChosen() ? (parseFloat(musicPackageSelect.value) || 0) : 0
-          }));
-          fetch('/api/inquiries', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: body,
-            keepalive: true
-          }).then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (res) {
-              // Meta Pixel Lead, only for an inquiry the Worker actually stored. It
-              // answers screened-out spam with a bare {ok: true}, so "notified"
-              // (present only once a row is written) is the real success signal.
-              if (res && res.ok && 'notified' in res) trackLead();
-            })
-            .catch(function () {});
-        } catch (e) {
-          /* never let capture affect the visitor */
-        }
+      // The website's own server stores the inquiry and sends Becca and Justin the
+      // full notification (every section the visitor filled in). EmailJS, whose
+      // template predates music and tablescapes, is now only a fallback: it sends
+      // when the server could not be reached or could not deliver its email, so a
+      // lead is never lost and Becca no longer gets two emails per booking.
+      function postInquiry() {
+        var body = JSON.stringify(Object.assign({}, templateParams, {
+          email_sent: 0,
+          cart: cart,
+          music_price: musicChosen() ? (parseFloat(musicPackageSelect.value) || 0) : 0,
+          // Structured copies for the notification email; the combined message in
+          // templateParams is what gets stored.
+          client_message: form.querySelector('[name="message"]').value,
+          ts_guests: tsGuestCount,
+          ts_setting: tsSetting,
+          theme_inspiration: tsTheme
+        }));
+        var ctl = window.AbortController ? new AbortController() : null;
+        var timer = ctl ? setTimeout(function () { ctl.abort(); }, 12000) : null;
+        return fetch('/api/inquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body,
+          signal: ctl ? ctl.signal : undefined
+        }).then(function (r) { return r.ok ? r.json() : null; })
+          .catch(function () { return null; })
+          .then(function (res) { if (timer) clearTimeout(timer); return res; });
       }
 
-      emailjs.send('service_i7u4b0s', 'template_qqheek4', templateParams)
-        .then(function() {
-          recordInquiry(true);
-          form.innerHTML = '<p style="font-family:\'Playfair Display\',serif;font-size:1.4rem;color:var(--green-dark);text-align:center;padding:40px 0;">Thank you! We\'ll be in touch soon.</p>';
-        }, function() {
-          // The email failed, which is exactly when the stored copy matters most.
-          recordInquiry(false);
-          btn.textContent = 'Send Booking Request';
-          btn.disabled = false;
-          alert('Something went wrong. Please email raugustinemusic@gmail.com directly.');
-        });
+      function done() {
+        form.innerHTML = '<p style="font-family:\'Playfair Display\',serif;font-size:1.4rem;color:var(--green-dark);text-align:center;padding:40px 0;">Thank you! We\'ll be in touch soon.</p>';
+      }
+      function failed() {
+        btn.textContent = 'Send Booking Request';
+        btn.disabled = false;
+        alert('Something went wrong. Please email raugustinemusic@gmail.com directly.');
+      }
+
+      postInquiry().then(function (res) {
+        var stored = !!(res && res.ok && 'notified' in res);
+        // Meta Pixel Lead, only for an inquiry the server actually stored. It
+        // answers screened-out spam with a bare {ok: true}, so "notified" (present
+        // only once a row is written) is the real success signal.
+        if (stored) trackLead();
+        if (stored && res.notified) return done();
+        // Screened out as spam: answer as success and send nothing.
+        if (res && res.ok && !('notified' in res)) return done();
+        // Server unreachable, or it stored the inquiry but its email failed.
+        if (!window.emailjs) return stored ? done() : failed();
+        emailjs.send('service_i7u4b0s', 'template_qqheek4', templateParams)
+          .then(done, function () { return stored ? done() : failed(); });
+      });
     });
 
     // Arriving from the Custom Tablescapes page (contact.html?type=tablescapes).

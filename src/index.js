@@ -38,6 +38,10 @@ const FIELDS = [
   'message',
 ];
 
+// Read for the notification email only (not stored as columns: the combined
+// `message` already carries them for the record).
+const EMAIL_FIELDS = ['client_message', 'ts_guests', 'ts_setting', 'theme_inspiration'];
+
 const MAX_FIELD_LEN = 4000;
 
 function clean(value) {
@@ -213,7 +217,9 @@ async function recordInquiry(request, env) {
 
   // The inquiry is safe at this point. Sending is best effort from here: a mail
   // failure is recorded, never raised, and never costs us the record.
-  const result = await sendNotification(env, row);
+  const extras = {};
+  for (const key of EMAIL_FIELDS) extras[key] = clean(payload[key]);
+  const result = await sendNotification(env, row, extras);
 
   if (result.sent && id) {
     try {

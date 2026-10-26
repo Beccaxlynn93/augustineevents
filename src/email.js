@@ -12,15 +12,6 @@
 export const NOTIFY = ['raugustinemusic@gmail.com', 'justinben2335@gmail.com'];
 export const FROM = { email: 'bookings@augustineevents.com', name: 'Augustine Website' };
 
-const LABELS = [
-  ['event_date', 'Event date'],
-  ['venue_address', 'Venue'],
-  ['package_type', 'Package type'],
-  ['music_package', 'Music package'],
-  ['rental_delivery', 'Delivery or pickup'],
-  ['delivery_address', 'Delivery address'],
-];
-
 function esc(value) {
   return String(value == null ? '' : value)
     .replace(/&/g, '&amp;')
@@ -29,58 +20,120 @@ function esc(value) {
     .replace(/"/g, '&quot;');
 }
 
-/** 2027-06-12 becomes "12 June 2027". Anything unexpected is passed through. */
+/** 2027-06-12 becomes "Saturday, 12 June 2027". Anything unexpected is passed through. */
 function prettyDate(iso) {
   if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || 'Not given';
   const months = ['January','February','March','April','May','June',
                   'July','August','September','October','November','December'];
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const [y, m, d] = iso.split('-').map(Number);
   if (!months[m - 1]) return iso;
-  return `${d} ${months[m - 1]} ${y}`;
+  const dow = days[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+  return `${dow}, ${d} ${months[m - 1]} ${y}`;
 }
 
-export function buildEmail(row) {
+/** A value worth showing: drops blanks and the placeholders the form sends. */
+function real(v) {
+  if (v == null) return null;
+  const t = String(v).trim();
+  return !t || /^(none|n\/a|not given|0)$/i.test(t) ? null : t;
+}
+
+/**
+ * Lays the inquiry out by what the visitor is booking: contact and event first,
+ * then one section per service they ticked (music, tablescape, rentals), then the
+ * total and their own message. Only filled-in fields are shown.
+ *
+ * `extras` carries the structured tablescape answers and the visitor's own message
+ * without the tablescape lines the browser appends to it for storage.
+ */
+export function buildEmail(row, extras = {}) {
   const name = [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Someone';
   const when = prettyDate(row.event_date);
+  const services = real(row.package_type);
+  const wants = (word) => !!services && services.toLowerCase().includes(word);
 
-  const subject = `New inquiry: ${name}, ${when}`;
+  const subject = `New inquiry: ${name}, ${when}${services ? ' · ' + services : ''}`;
 
-  const details = LABELS
-    .filter(([key]) => row[key])
-    .map(([key, label]) => [label, key === 'event_date' ? when : row[key]]);
+  const rentals = real(row.rental_items);
+  const music = real(row.music_package);
+  const guests = real(extras.ts_guests);
+  const setting = real(extras.ts_setting);
+  const theme = real(extras.theme_inspiration);
+  const delivery = real(row.rental_delivery);
+  const deliveryAddr = delivery === 'Delivery' ? real(row.delivery_address) : null;
+  const total = real(row.estimated_total);
+  // Prefer the visitor's own words; fall back to the stored message.
+  const message = extras.client_message !== undefined ? real(extras.client_message) : real(row.message);
 
-  const rentals = (row.rental_items || '').trim();
-  const hasRentals = rentals && rentals !== 'None';
+  // Sections: [title, [[label, value, href?], ...], preformatted block?]
+  const sections = [];
+  sections.push(['Event', [
+    ['Date', when],
+    ['Venue', real(row.venue_address) || 'Not given'],
+  ]]);
+  if (wants('music') || music) {
+    sections.push(['Live music', [['Package', music || 'Not chosen yet']]]);
+  }
+  if (wants('tablescape') || guests || setting || theme) {
+    sections.push(['Custom tablescape', [
+      ['Guests', guests || 'Not given'],
+      ['Indoor or outdoor', setting || 'Not given'],
+      ['Theme inspiration', theme || 'None shared', theme && /^https?:\/\//i.test(theme) ? theme : null],
+    ]]);
+  }
+  if (wants('rental') || rentals) {
+    const rows = [['Delivery or pickup', delivery || 'Not chosen']];
+    if (deliveryAddr) rows.push(['Delivery address', deliveryAddr]);
+    sections.push(['Event rentals', rows, rentals || 'No items selected']);
+  }
+
+  const covered = [music && 'music', rentals && 'rentals'].filter(Boolean).join(' and ') || 'the selection';
+  const totalNote = total
+    ? `Covers ${covered}, as priced by the website.` + (wants('tablescape') ? ' Tablescapes are quoted separately.' : '')
+    : null;
 
   // ---- plain text ----
-  // null means "omit this line". Empty strings are kept, because they are the
-  // blank lines that give the message its paragraph breaks.
   const text = [
     `New inquiry from the website`,
     ``,
-    `Name:  ${name}`,
-    `Email: ${row.email || 'Not given'}`,
-    ...details.map(([l, v]) => `${l}: ${v}`),
+    `${name}`,
+    `${row.email || 'No email given'}`,
+    ...(services ? [`Booking: ${services}`] : []),
+    ...sections.flatMap(([title, rows, block]) => [
+      ``,
+      title.toUpperCase(),
+      ...rows.map(([l, v]) => `${l}: ${v}`),
+      ...(block ? [``, block] : []),
+    ]),
+    ...(total ? [``, `ESTIMATED TOTAL: ${total}`, totalNote] : []),
     ``,
-    hasRentals ? `Rental items:\n${rentals}` : `Rental items: none selected`,
-    row.estimated_total ? `Estimated total: ${row.estimated_total}` : null,
-    ``,
-    row.message ? `Message:\n${row.message}` : `No message left.`,
+    `THEIR MESSAGE`,
+    message || 'No message left.',
     ``,
     `Reply directly to this email to reach them.`,
-  ].filter((line) => line !== null).join('\n');
+  ].join('\n');
 
   // ---- html ----
   // Inline styles only. Email clients strip <style> blocks, and the palette is
   // the site's own so the notification looks like it came from the brand.
-  const row2 = (label, value) => `
-      <tr>
-        <td style="padding:7px 16px 7px 0;color:#5a5a5a;font-size:13px;white-space:nowrap;vertical-align:top;">${esc(label)}</td>
-        <td style="padding:7px 0;color:#2c2c2c;font-size:14px;vertical-align:top;">${esc(value)}</td>
-      </tr>`;
+  const line = (label, value, href) => `
+        <tr>
+          <td style="padding:6px 16px 6px 0;color:#5a5a5a;font-size:13px;white-space:nowrap;vertical-align:top;width:140px;">${esc(label)}</td>
+          <td style="padding:6px 0;color:#2c2c2c;font-size:14px;vertical-align:top;">${href ? `<a href="${esc(href)}" style="color:#4a5e40;">${esc(value)}</a>` : esc(value)}</td>
+        </tr>`;
+  const heading = (t) => `<div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#4a5e40;font-weight:700;">${esc(t)}</div>`;
+  const section = ([title, rows, block]) => `
+      <div style="margin-top:22px;padding-top:16px;border-top:1px solid #e8e4dc;">
+        ${heading(title)}
+        <table style="width:100%;border-collapse:collapse;margin-top:6px;">${rows.map((r) => line(...r)).join('')}
+        </table>${block ? `
+        <pre style="margin:10px 0 0;padding:12px 14px;background:#faf8f4;font-family:inherit;font-size:13px;color:#2c2c2c;white-space:pre-wrap;line-height:1.6;">${esc(block)}</pre>` : ''}
+      </div>`;
 
   const html = `<!doctype html>
 <html>
+<head><meta charset="utf-8"></head>
 <body style="margin:0;padding:24px;background:#f5f2ec;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
   <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e8e4dc;">
     <div style="background:#2e3b28;padding:20px 28px;">
@@ -89,32 +142,23 @@ export function buildEmail(row) {
     </div>
 
     <div style="padding:24px 28px;">
-      <div style="font-size:19px;color:#2e3b28;font-family:Georgia,'Times New Roman',serif;">${esc(name)}</div>
+      <div style="font-size:21px;color:#2e3b28;font-family:Georgia,'Times New Roman',serif;">${esc(name)}</div>
       <div style="margin-top:4px;font-size:14px;">
         <a href="mailto:${esc(row.email || '')}" style="color:#4a5e40;">${esc(row.email || 'No email given')}</a>
       </div>
-
-      <table style="width:100%;border-collapse:collapse;margin-top:18px;">
-        ${details.map(([l, v]) => row2(l, v)).join('')}
-      </table>
-
-      ${hasRentals ? `
-      <div style="margin-top:22px;padding-top:16px;border-top:1px solid #e8e4dc;">
-        <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5a5a5a;font-weight:700;">Rental items</div>
-        <pre style="margin:8px 0 0;font-family:inherit;font-size:14px;color:#2c2c2c;white-space:pre-wrap;line-height:1.6;">${esc(rentals)}</pre>
-      </div>` : ''}
-
-      ${row.estimated_total ? `
-      <div style="margin-top:16px;padding:12px 16px;background:#f8faf7;border-left:3px solid #4a5e40;">
+      ${services ? `<div style="margin-top:12px;font-size:13px;color:#2c2c2c;"><span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#eef2ea;color:#2e3b28;">${esc(services)}</span></div>` : ''}
+      ${sections.map(section).join('')}
+      ${total ? `
+      <div style="margin-top:22px;padding:14px 16px;background:#f8faf7;border-left:3px solid #4a5e40;">
         <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5a5a5a;font-weight:700;">Estimated total</span>
-        <span style="float:right;font-size:16px;font-weight:700;color:#4a5e40;">${esc(row.estimated_total)}</span>
+        <span style="float:right;font-size:17px;font-weight:700;color:#4a5e40;">${esc(total)}</span>
+        <div style="clear:both;margin-top:4px;font-size:12px;color:#5a5a5a;">${esc(totalNote)}</div>
       </div>` : ''}
 
-      ${row.message ? `
       <div style="margin-top:22px;padding-top:16px;border-top:1px solid #e8e4dc;">
-        <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5a5a5a;font-weight:700;">Message</div>
-        <p style="margin:8px 0 0;font-size:14px;color:#2c2c2c;line-height:1.7;white-space:pre-wrap;">${esc(row.message)}</p>
-      </div>` : ''}
+        ${heading('Their message')}
+        <p style="margin:8px 0 0;font-size:14px;color:#2c2c2c;line-height:1.7;white-space:pre-wrap;">${esc(message || 'No message left.')}</p>
+      </div>
 
       <p style="margin:24px 0 0;font-size:12px;color:#5a5a5a;line-height:1.6;">
         Reply to this email to answer them directly. A copy of this inquiry is
@@ -132,7 +176,7 @@ export function buildEmail(row) {
  * Best effort. Returns true only on a confirmed send. Never throws, because a
  * mail failure must not cost us the stored inquiry.
  */
-export async function sendNotification(env, row) {
+export async function sendNotification(env, row, extras = {}) {
   if (!env.EMAIL) return { sent: false, error: 'EMAIL binding not configured' };
 
   // Recipients come from config when present, so they can be changed without a
@@ -143,7 +187,7 @@ export async function sendNotification(env, row) {
     .filter(Boolean);
   const to = recipients.length ? recipients : NOTIFY;
 
-  const { subject, text, html } = buildEmail(row);
+  const { subject, text, html } = buildEmail(row, extras);
 
   // Sent one recipient at a time on purpose. On the free path a send is only
   // permitted to verified destination addresses, and a single unverified

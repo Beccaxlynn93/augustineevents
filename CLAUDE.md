@@ -300,12 +300,16 @@ Those three identifiers are **publishable by design** for EmailJS and are not se
 Do not "fix" them by moving them to env vars; removing them breaks the visitor-facing
 success path. There are no real secrets in this repo and it should stay that way.
 
-The form posts to `/api/inquiries` **fire and forget**, wrapped in `.catch()`, after
-EmailJS resolves or rejects. That ordering is deliberate: if the Worker, the database
-or the endpoint is down, the visitor never sees it and the email is unaffected. Retiring
-EmailJS is possible now that the Worker sends its own mail, but it is a separate
-decision and would make the Worker a single point of failure for the only conversion
-path on the site.
+**Changed 2026-10-26: the Worker is now the primary path and EmailJS the fallback.** The form posts to
+`/api/inquiries` first (12 s timeout). If the Worker stores the inquiry and its email is delivered
+(`notified: true`), the visitor sees "Thank you" and **no EmailJS email is sent**, so Becca gets one
+complete notification per booking (the EmailJS template predates music and tablescapes and showed
+only rental fields). EmailJS sends only if the Worker is unreachable or stored the row but could not
+email; spam (a bare `{ok: true}`) sends nothing. The notification (`src/email.js`) is laid out by
+service: Event, Live music, Custom tablescape (guests, indoor/outdoor, inspiration link, sent as
+`ts_guests`, `ts_setting`, `theme_inspiration`), Event rentals, estimated total, then the visitor's own
+message (`client_message`). Those four keys are read for the email only; the combined `message` is
+still what is stored.
 
 ### Junk to delete
 
