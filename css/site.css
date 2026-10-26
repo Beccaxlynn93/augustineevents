@@ -9,8 +9,8 @@
  * below is a tint of those six made with color-mix, never a new hue.
  */
 
-/* Hey Lovely by 50Fox Studio. Commercial desktop + webfont licence bought on Creative Market, 2026-10-26.
-   The web files come from that purchase; HeyLovely.ttf (identical design) stays as a fallback. */
+/* Hey Lovely by 50Fox Studio. Creative Market order 148670832 (2026-10-26) is a DESKTOP licence (2 seats) only;
+   the webfont licence that covers loading it here is still to buy. See CLAUDE.md. HeyLovely.ttf is a fallback. */
 @font-face { font-family: 'HeyLovely'; src: url('../fonts/hey-lovely.woff2') format('woff2'), url('../fonts/hey-lovely.woff') format('woff'), url('../HeyLovely.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
 
 :root {
