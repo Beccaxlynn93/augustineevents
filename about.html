@@ -65,7 +65,12 @@
     .review figcaption { font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; color: var(--green); }
     .review figcaption span { display: block; margin-top: 4px; letter-spacing: 0.06em; text-transform: none; font-weight: 400; color: var(--muted); }
     .expect-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 3vw, 36px); }
-    .expect { display: grid; gap: 12px; justify-items: center; text-align: center; padding: clamp(22px, 3vw, 34px); }
+    /* Icon, heading and text each share a row across the three cards (subgrid), so a
+       heading that wraps to two lines never pushes its neighbours out of line. */
+    .expect-grid { grid-template-rows: auto auto 1fr; row-gap: 12px; }
+    .expect { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 12px; align-content: start; justify-items: center; text-align: center; padding: clamp(22px, 3vw, 34px); }
+    .expect-art { align-self: end; }
+    .expect h3 { align-self: start; }
     .expect p { color: var(--muted); max-width: 30ch; }
     .expect-art { height: 56px; color: var(--green); }
     .expect-art .line-art { height: 100%; width: auto; }
@@ -75,6 +80,8 @@
       .about-grid--wide .arch { width: min(560px, 92vw); }
       .about-grid--flip .arch { order: -1; }
       .review-grid, .expect-grid { grid-template-columns: 1fr; }
+      .expect-grid { grid-template-rows: none; }
+      .expect { grid-row: auto; grid-template-rows: none; }
     }
   </style>
   <!-- Meta Pixel: identical on every page, just before </head>. The ID is on two
