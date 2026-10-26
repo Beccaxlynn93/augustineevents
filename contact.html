@@ -153,6 +153,7 @@
     .rental-delivery-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--muted); white-space: nowrap; }
     .rental-delivery-select { border: 1px solid #d8d3ca; background: #fff; padding: 7px 12px; font-family: var(--sans); font-size: 0.9rem; color: var(--text); border-radius: 4px; cursor: pointer; flex: 1; }
     .rental-delivery-select:focus { outline: none; border-color: var(--green); }
+    .rental-delivery-area { font-size: 0.78rem; color: var(--muted); margin: 2px 0 0; line-height: 1.55; }
     .rental-delivery-note { font-size: 0.75rem; color: var(--green); margin: 2px 0 0; font-weight: 700; letter-spacing: 0.02em; }
     .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
     .rental-total-bar { display: none; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 2px solid var(--green); border-bottom: 1px solid #d8d3ca; }
@@ -384,6 +385,7 @@
             <option value="Delivery">Delivery</option>
           </select>
         </div>
+        <p class="rental-delivery-area" id="deliveryAreaNote" hidden>Delivery is available within a 30-minute drive of Donelson, TN. The fee is based on mileage and confirmed when you book.</p>
         <p class="rental-delivery-note" id="deliveryOnlyNote" hidden>Your selection includes delivery only items, so pickup is not available.</p>
 
         <div id="deliveryAddressRow" style="display:none;">
@@ -484,6 +486,7 @@
       const rentalsActive = deliveryRow.style.display !== 'none';
       deliveryAddressRow.style.display =
         (rentalsActive && rentalDelivery.value === 'Delivery') ? 'block' : 'none';
+      document.getElementById('deliveryAreaNote').hidden = !(rentalsActive && rentalDelivery.value === 'Delivery');
     }
 
     // Some items are delivery only. If any are selected, pickup is not an option.
