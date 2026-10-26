@@ -355,7 +355,7 @@ made with `color-mix`, never a new hue.
 
 | Role | Font | Notes |
 |---|---|---|
-| Logo / accents | `HeyLovely` | Self-hosted TTF. Now used for the logo and small flourishes only. |
+| Logo / accents | `HeyLovely` | Hey Lovely by 50Fox Studio. **Commercially licensed 2026-10-26** (Creative Market, desktop + webfont licences, bought on Becca's account). Served as `fonts/hey-lovely.woff2` / `.woff` from the purchase, with `HeyLovely.ttf` (byte-identical to the licensed TTF) as fallback. Purchase zip and 50Fox info PDF archived on TrueNAS `backups/AugustineMusicAndEvents/Business/Licenses/`. Used for the logo, the A monogram and small flourishes only. |
 | Headings | `Italiana` | Google Fonts, single weight. Thin, geometric and a little art deco, chosen 2026-10-22 to match the line-art vines and Becca's Canva headline. Replaced Cormorant Garamond (read as a stock template face). Set with lining figures (`lining-nums`) so prices stay even-height. |
 | Body | `Jost` | Google Fonts, 300/400/500. |
 | Home headline | Becca's Canva font | An image, `hero-headline.png`, inside a real `<h1>`. The font lives only in Canva. |
