@@ -7,5 +7,5 @@ UPDATE items SET photo = '/img/rental-dessert-ramekins.webp' WHERE slug = 'desse
 UPDATE items SET photo = '/img/rental-3-arm-candelabra.webp' WHERE slug = 'brass-candelabra-3arm';
 -- White round dinner plates: frame 002.
 UPDATE items SET photo = '/img/rental-dinner-plates.webp' WHERE slug = 'dinner-plate';
--- White round salad plates: frame 011.
+-- White round salad plates: frame 020.
 UPDATE items SET photo = '/img/rental-salad-plates.webp' WHERE slug = 'salad-plate';
