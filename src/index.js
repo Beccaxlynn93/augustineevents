@@ -37,6 +37,7 @@ const FIELDS = [
   'rental_delivery',
   'delivery_address',
   'message',
+  'heard_from',
 ];
 
 // Read for the notification email only (not stored as columns: the combined
@@ -190,8 +191,8 @@ async function recordInquiry(request, env) {
          received_at, first_name, last_name, email, event_date, venue_address,
          package_type, music_package, rental_items, estimated_total,
          rental_delivery, delivery_address, message, email_sent,
-         user_agent, country, ip_hash
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         user_agent, country, ip_hash, heard_from
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       new Date().toISOString(),
@@ -210,7 +211,8 @@ async function recordInquiry(request, env) {
       0,
       clean(request.headers.get('user-agent')),
       request.headers.get('cf-ipcountry') || null,
-      verdict.ipHash || null
+      verdict.ipHash || null,
+      row.heard_from
     )
     .run();
 

@@ -73,6 +73,7 @@
     .ts-guests .qty-btn { width: 34px; height: 34px; font-size: 1.1rem; }
     .ts-guests .qty-num { width: 64px; font-size: 1rem; padding: 7px 4px; }
     .ts-guests-note { font-size: 0.8rem; color: var(--muted); letter-spacing: 0; text-transform: none; font-weight: 400; margin-left: 4px; }
+    #heardOtherRow[hidden] { display: none; }
     .svc-hint { font-weight: 400; letter-spacing: 0.04em; text-transform: none; margin-left: 6px; }
     .ts-setting { border: 0; padding: 0; margin: 0; min-width: 0; }
     .ts-setting legend { padding: 0; margin-bottom: 8px; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -402,6 +403,22 @@
 
         <input type="hidden" name="selected_rentals" id="hiddenRentals" />
         <input type="hidden" name="estimated_total" id="hiddenTotal" />
+        <label>How did you hear about us?
+          <select name="heard_from" id="heardFrom">
+            <option value="">Select one</option>
+            <option>Instagram</option>
+            <option>Facebook</option>
+            <option>Google search</option>
+            <option>The Knot or WeddingWire</option>
+            <option>A friend or past client</option>
+            <option>A venue or planner</option>
+            <option>Saw us at an event</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+        <label id="heardOtherRow" hidden>Where did you hear about us?
+          <input type="text" name="heard_other" id="heardOther" maxlength="120" autocomplete="off" />
+        </label>
         <label>Message <textarea name="message" placeholder="Tell me about your event..."></textarea></label>
         <button type="submit" class="btn-green">Send Booking Request</button>
         <p class="form-note">Fields marked <span class="req" aria-hidden="true">*</span> are required. Your request goes directly to Becca, who will follow up by email to confirm availability and next steps. Any estimate shown above is a starting point, not a final quote. <strong>Serving the greater Nashville, TN area.</strong></p>
@@ -530,6 +547,16 @@
       const v = parseInt(tsGuests.value, 10);
       if (!isNaN(v)) tsGuests.value = Math.min(25, Math.max(2, v));
     });
+
+    // "Other" opens a short text box.
+    const heardFrom = document.getElementById('heardFrom');
+    const heardOtherRow = document.getElementById('heardOtherRow');
+    heardFrom.addEventListener('change', function () { heardOtherRow.hidden = heardFrom.value !== 'Other'; });
+    function heardValue() {
+      if (heardFrom.value !== 'Other') return heardFrom.value;
+      const t = document.getElementById('heardOther').value.trim();
+      return t ? 'Other: ' + t : 'Other';
+    }
 
     function syncServices() {
       const music = musicChosen(), rentals = rentalsChosen(), tables = tablescapesChosen();
@@ -661,8 +688,14 @@
         estimated_total:  document.getElementById('rentalTotal').textContent,
         rental_delivery:  form.querySelector('[name="rental_delivery"]').value || 'N/A',
         delivery_address: form.querySelector('[name="delivery_address"]').value || 'N/A',
-        message:          fullMessage
+        message:          fullMessage,
+        heard_from:       heardValue()
       };
+      // The EmailJS template only knows its fixed fields, so on the fallback path the
+      // answer rides along in the message.
+      var emailjsParams = Object.assign({}, templateParams, {
+        message: fullMessage + (templateParams.heard_from ? '\n\nHow they heard about us: ' + templateParams.heard_from : '')
+      });
 
       var btn = form.querySelector('.btn-green');
       btn.textContent = 'Sending...';
@@ -732,7 +765,7 @@
         if (res && res.ok && !('notified' in res)) return done();
         // Server unreachable, or it stored the inquiry but its email failed.
         if (!window.emailjs) return stored ? done() : failed();
-        emailjs.send('service_i7u4b0s', 'template_qqheek4', templateParams)
+        emailjs.send('service_i7u4b0s', 'template_qqheek4', emailjsParams)
           .then(done, function () { return stored ? done() : failed(); });
       });
     });

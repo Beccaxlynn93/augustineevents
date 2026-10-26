@@ -108,6 +108,7 @@ export function buildEmail(row, extras = {}) {
   sections.push({ title: 'Event', rows: [
     ['Date', when],
     ['Venue', real(row.venue_address) || 'Not given'],
+    ['Heard about us', real(row.heard_from) || 'Not answered'],
   ] });
   if (wants('music') || music) {
     // "Silver, Duo · $1,100" -> package "Silver, Duo", price $1,100.
