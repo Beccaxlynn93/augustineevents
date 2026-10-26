@@ -42,15 +42,16 @@
     .about-grid--small .arch { width: min(300px, 100%); }
     /* A sprig of the hero vine draped over the top-right corner of Poppy's photo. */
     .poppy-vine { position: absolute; top: -34px; right: -46px; width: 150px; height: auto; z-index: 2; pointer-events: none; color: var(--green); overflow: visible; }
-    .poppy-vine .stem { fill: none; stroke: currentColor; stroke-width: 1.15; stroke-linecap: round; opacity: 0.55; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.8s var(--ease-out) 0.4s; }
-    .poppy-vine .leaf { fill: currentColor; fill-opacity: 0.08; stroke: currentColor; stroke-width: 1; opacity: 0; transition: opacity 0.8s var(--ease) 1.2s; }
-    .poppy-vine .bloom circle { fill: currentColor; opacity: 0; transition: opacity 0.6s var(--ease) 1.6s; }
+    .poppy-vine .stem { fill: none; stroke: currentColor; stroke-width: 1.15; stroke-linecap: round; stroke-linejoin: round; opacity: 0.5; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.8s var(--ease-out) 0.4s; }
+    .poppy-vine .leaf { fill: currentColor; fill-opacity: 0.06; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; opacity: 0; transition: opacity 0.8s var(--ease) 1.2s; }
+    .poppy-vine .bloom { fill: currentColor; stroke: none; opacity: 0; transition: opacity 0.6s var(--ease) 1.6s; }
+    /* As in the page-top vines, the petals are outlined, not filled. */
+    .poppy-vine .bloom path { fill: none; stroke: currentColor; stroke-width: 1.15; stroke-linejoin: round; opacity: 0.5; }
     .poppy-vine .bloom .bloom-core { fill: var(--white); }
     .reveal-clip.visible .poppy-vine .stem, .no-js .poppy-vine .stem { stroke-dashoffset: 0; }
-    .reveal-clip.visible .poppy-vine .leaf { opacity: 0.6; }
-    .reveal-clip.visible .poppy-vine .bloom circle { opacity: 0.62; }
-    .reveal-clip.visible .poppy-vine .bloom .bloom-core { opacity: 1; }
-    @media (prefers-reduced-motion: reduce) { .poppy-vine .stem { stroke-dashoffset: 0; } .poppy-vine .leaf { opacity: 0.6; } .poppy-vine .bloom circle { opacity: 0.62; } .poppy-vine .bloom .bloom-core { opacity: 1; } }
+    .reveal-clip.visible .poppy-vine .leaf { opacity: 0.48; }
+    .reveal-clip.visible .poppy-vine .bloom { opacity: 0.62; }
+    @media (prefers-reduced-motion: reduce) { .poppy-vine .stem { stroke-dashoffset: 0; } .poppy-vine .leaf { opacity: 0.48; } .poppy-vine .bloom { opacity: 0.62; } }
     @media (max-width: 900px) { .poppy-vine { width: 120px; top: -26px; right: -30px; } }
     .about-copy { display: grid; gap: 22px; justify-items: start; }
     .signature { font-size: 2.6rem; color: var(--green); line-height: 1; }
@@ -245,18 +246,17 @@
           <svg class="poppy-vine" viewBox="0 0 170 150" aria-hidden="true" focusable="false">
             <path class="stem" pathLength="1" d="M2 40 C 40 26, 88 18, 124 26 C 150 32, 160 52, 156 80 C 153 102, 146 120, 150 146"/>
             <path class="stem" pathLength="1" d="M124 26 C 132 12, 146 6, 160 8"/>
-            <path class="leaf" d="M30 31 C 26 20, 32 12, 40 11 C 42 20, 38 28, 30 31 Z"/>
-            <path class="leaf" d="M58 24 C 60 34, 68 40, 76 38 C 74 29, 66 23, 58 24 Z"/>
-            <path class="leaf" d="M86 20 C 82 9, 88 2, 97 1 C 99 10, 94 18, 86 20 Z"/>
-            <path class="leaf" d="M106 22 C 110 32, 118 37, 126 34 C 123 26, 114 21, 106 22 Z"/>
-            <path class="leaf" d="M155 50 C 166 48, 170 56, 168 64 C 160 64, 154 58, 155 50 Z"/>
-            <path class="leaf" d="M156 78 C 145 76, 139 84, 141 92 C 149 92, 155 86, 156 78 Z"/>
-            <path class="leaf" d="M152 106 C 162 104, 168 112, 166 120 C 158 120, 151 114, 152 106 Z"/>
-            <path class="leaf" d="M148 10 C 150 2, 158 0, 164 2 C 162 9, 155 12, 148 10 Z"/>
-            <g class="bloom" transform="translate(124 26)">
-              <circle r="4.2" cx="0" cy="-5"/><circle r="4.2" cx="4.8" cy="-1.5"/><circle r="4.2" cx="3" cy="4"/><circle r="4.2" cx="-3" cy="4"/><circle r="4.2" cx="-4.8" cy="-1.5"/>
-              <circle class="bloom-core" r="2.2"/>
-            </g>
+            <path class="leaf" d="M21.2 33.7 Q31.2 28.1 29.1 16.9 Q19.1 22.5 21.2 33.7"/>
+            <path class="leaf" d="M51.3 26.7 Q54.7 38.7 67.2 39.4 Q63.8 27.3 51.3 26.7"/>
+            <path class="leaf" d="M82.1 23.1 Q92.3 20.2 92.8 9.6 Q82.6 12.5 82.1 23.1"/>
+            <path class="leaf" d="M113.1 24.1 Q112.8 35.7 123.6 39.7 Q124.0 28.1 113.1 24.1"/>
+            <path class="leaf" d="M141.9 34.0 Q150.8 38.0 157.4 30.9 Q148.5 26.8 141.9 34.0"/>
+            <path class="leaf" d="M156.3 60.6 Q146.0 63.0 145.0 73.6 Q155.3 71.2 156.3 60.6"/>
+            <path class="leaf" d="M154.1 91.4 Q154.5 100.3 163.0 102.8 Q162.7 93.9 154.1 91.4"/>
+            <path class="leaf" d="M149.1 121.9 Q139.5 122.1 136.6 131.4 Q146.2 131.2 149.1 121.9"/>
+            <path class="leaf" d="M131.4 16.6 Q136.2 9.7 131.2 2.9 Q126.4 9.9 131.4 16.6"/>
+            <path class="leaf" d="M147.5 8.4 Q149.9 16.3 158.2 16.4 Q155.7 8.5 147.5 8.4"/>
+            <g transform="translate(124 26) scale(1.136)"><g class="bloom"><path transform="rotate(0)" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/><path transform="rotate(72)" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/><path transform="rotate(144)" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/><path transform="rotate(216)" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/><path transform="rotate(288)" d="M0 0 C -3.2 -3 -3.2 -8.5 0 -10.5 C 3.2 -8.5 3.2 -3 0 0 Z"/><circle class="bloom-core" r="2.2"/></g></g>
           </svg>
         </figure>
       </div>
