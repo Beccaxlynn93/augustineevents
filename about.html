@@ -40,7 +40,8 @@
     .about-center .prose p { margin-inline: auto; }
     .about-art { display: flex; gap: 10px; height: 64px; color: var(--green); margin-bottom: 4px; }
     .about-art .line-art { height: 100%; width: auto; }
-    .review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(18px, 3vw, 36px); max-width: 1000px; margin-inline: auto; }
+    .review-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 30px); max-width: 1200px; margin-inline: auto; }
+    @media (max-width: 1100px) and (min-width: 901px) { .review-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .review { margin: 0; padding: clamp(26px, 3.4vw, 42px); background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); display: grid; gap: 20px; align-content: space-between; }
     .review blockquote { margin: 0; font-family: var(--sans); font-weight: 300; font-size: clamp(1.02rem, 1.25vw, 1.12rem); line-height: 1.75; color: var(--text); }
     .review blockquote::before { content: "\201C"; display: block; font-family: var(--serif); font-size: 3.4rem; line-height: 0.7; color: var(--green); opacity: 0.55; margin-bottom: 6px; }
@@ -186,6 +187,10 @@
           <figure class="review fade-in">
             <blockquote>Becca did a phenomenal job at our wedding! She was able to accommodate our music requests, which made the day feel even more special and personal. Our guests raved about her performance, and we're so happy she was part of our day!</blockquote>
             <figcaption>Kaitlynn M. <span>Wedding, 2026</span></figcaption>
+          </figure>
+          <figure class="review fade-in">
+            <blockquote>Rebecca did an amazing job. She really elevated our wedding ceremony. She did a great job at picking songs that matched our vibe and she played the songs that we picked perfectly. I highly recommend her!</blockquote>
+            <figcaption>Grace B. <span>Wedding, 2025 &middot; via The Knot</span></figcaption>
           </figure>
         </div>
       </div>
