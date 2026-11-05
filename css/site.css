@@ -412,6 +412,8 @@ h1, h2, h3, h4, .display, .h2, .h3, [class*="price"], .aside-list, .band-line { 
   display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px;
   padding-block: 22px 28px; border-top: 1px solid var(--line-on-dark); font-size: 0.8rem;
 }
+.footer-privacy { margin-left: 14px; color: var(--cream); text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size 0.45s var(--ease-out); }
+.footer-privacy:hover { background-size: 100% 1px; }
 .footer-credits { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
 .footer-credits .credit { display: inline-flex; align-items: center; gap: 8px; }
 .photo-credit-link {
