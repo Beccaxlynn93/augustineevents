@@ -105,3 +105,15 @@
   .tb-reel { display: flex; flex-direction: column; height: 100%; max-width: none; width: var(--reel-w, 340px); }
   .tb-reel-stage { flex: 1 1 0; min-height: 360px; aspect-ratio: auto; }
 }
+
+/* Questions people search for, answered from the page's own wording (also marked up as FAQPage). */
+.tb-faq { border-top: 1px solid var(--tb-line); padding: clamp(56px, 8vw, 100px) 0; }
+.tb-faq .h2 { margin-bottom: 28px; }
+.tb-faq-list { display: grid; gap: 0; border-top: 1px solid var(--tb-line); }
+.tb-faq-item { border-bottom: 1px solid var(--tb-line); }
+.tb-faq-item summary { cursor: pointer; list-style: none; padding: 18px 32px 18px 0; position: relative; font-size: 1.05rem; color: var(--tb-fg); }
+.tb-faq-item summary::-webkit-details-marker { display: none; }
+.tb-faq-item summary::after { content: "+"; position: absolute; right: 4px; top: 14px; font-size: 1.4rem; line-height: 1; color: var(--tb-muted); transition: transform 0.3s var(--ease); }
+.tb-faq-item[open] summary::after { transform: rotate(45deg); }
+.tb-faq-item p { padding: 0 0 20px; color: var(--tb-muted); max-width: 62ch; line-height: 1.75; }
+.tb-faq-item a { color: var(--tb-fg); text-decoration: underline; text-underline-offset: 3px; }
