@@ -20,6 +20,7 @@ import { screen } from './guards.js';
 import { buildCatalog } from '../js/catalog.js';
 import { resolveCart, describeQuote, dollars } from '../js/pricing.js';
 import { driveFrom } from './distance.js';
+import { handleRsvp } from './rsvp.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 
@@ -282,6 +283,11 @@ export default {
         console.error('inquiry insert failed:', err && err.message);
         return json({ ok: false, error: 'Could not record that right now.' }, 500);
       }
+    }
+
+    // Family event RSVPs (src/rsvp.js). Separate table, never touches inquiries.
+    if (pathname === '/api/rsvp' || pathname === '/api/rsvp/list') {
+      return handleRsvp(request, env);
     }
 
     // Matches today's behavior for any path that is not a static asset:

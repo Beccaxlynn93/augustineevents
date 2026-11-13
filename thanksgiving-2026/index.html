@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thanksgiving 2026</title>
+<!-- Private family invitation. Not linked from the business site and kept out of search. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Thanksgiving weekend at the lodge, Nov 25 to 29. Open your invitation and RSVP.">
+<meta property="og:title" content="You're invited: Thanksgiving 2026">
+<meta property="og:description" content="Open your invitation and RSVP.">
+<meta property="og:image" content="https://augustineevents.com/thanksgiving-2026/og.jpg">
+<meta name="theme-color" content="#1c1206">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="preload" href="card.webp" as="image">
+<style>
+  :root {
+    --ink: #3e2600;
+    --ink-soft: #6b5233;
+    --cream: #e7e0d3;
+    --paper: #f1ebe0;
+    --night: #1c1206;
+    --wine: #6b1d1d;
+    --gold: #b08d57;
+    --line: rgba(62, 38, 0, .16);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--ink); background: var(--night);
+    font: 400 18px/1.55 "EB Garamond", Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(28, 18, 6, .35), rgba(12, 7, 2, .9) 75%),
+      url("damask.webp") center / 280px auto repeat;
+  }
+  body.intro { overflow: hidden; }
+
+  /* ---------- intro (three.js envelope) ---------- */
+  #stage { position: fixed; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+  body.intro #stage { z-index: 20; pointer-events: auto; cursor: pointer; }
+  .intro-ui { position: fixed; inset: 0; z-index: 21; pointer-events: none; display: none; }
+  body.intro .intro-ui { display: block; }
+  .hint {
+    position: absolute; left: 0; right: 0; bottom: max(7vh, 40px); text-align: center;
+    color: var(--cream); font: italic 400 1.15rem/1.3 "EB Garamond", serif; letter-spacing: .04em;
+    animation: breathe 2.4s ease-in-out infinite; transition: opacity .4s;
+  }
+  .hint small { display: block; font-style: normal; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; opacity: .65; margin-top: .35rem; }
+  .skip {
+    position: absolute; top: max(16px, env(safe-area-inset-top)); right: 16px; pointer-events: auto;
+    background: none; border: 1px solid rgba(231, 224, 211, .35); color: var(--cream); border-radius: 999px;
+    font: 500 .75rem/1 "EB Garamond", serif; letter-spacing: .14em; text-transform: uppercase; padding: .55rem .9rem; cursor: pointer;
+  }
+  @keyframes breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+  /* ---------- page ---------- */
+  main { position: relative; z-index: 1; opacity: 0; transition: opacity 1s ease; }
+  body.opened main { opacity: 1; }
+  .hero { min-height: 100svh; display: grid; place-items: center; padding: 24px 16px 64px; position: relative; }
+  #card { display: block; width: min(88vw, 470px, calc(86svh * 900 / 1458)); height: auto; aspect-ratio: 900 / 1458; filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .55)); }
+  .scroll-cue {
+    position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; color: var(--cream);
+    font-size: .74rem; letter-spacing: .24em; text-transform: uppercase; opacity: .75; text-decoration: none;
+  }
+  .scroll-cue span { display: block; font-size: 1.1rem; animation: bob 2s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(5px); } }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 72px; }
+  .sheet {
+    background: var(--paper); border-radius: 6px; padding: 32px 28px; margin-bottom: 22px; position: relative;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(176, 141, 87, .35), inset 0 0 0 7px var(--paper), inset 0 0 0 8px rgba(176, 141, 87, .45);
+  }
+  .eyebrow { font-size: .72rem; letter-spacing: .26em; text-transform: uppercase; color: var(--wine); font-weight: 500; margin: 0 0 .3rem; }
+  h2 { font: 600 2.1rem/1.1 "Cormorant Garamond", serif; margin: 0 0 1rem; letter-spacing: -.005em; }
+  h3 { font: 600 1.3rem/1.2 "Cormorant Garamond", serif; margin: 0; }
+  p { margin: 0 0 .8rem; }
+  .muted { color: var(--ink-soft); }
+  .rule { height: 1px; background: var(--line); margin: 1.2rem 0; border: 0; }
+  .orn { text-align: center; color: var(--gold); letter-spacing: .5em; margin: -6px 0 18px; font-size: .9rem; }
+
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 26px; }
+  .fact h3 { margin-bottom: .25rem; }
+  .fact p { font-size: 1rem; margin: 0; }
+  .callout { border-left: 2px solid var(--wine); padding: .2rem 0 .2rem 1rem; margin-top: 1.1rem; }
+  .callout h3 { margin-bottom: .2rem; }
+  .callout p { margin: 0; font-size: 1rem; }
+
+  .days { display: grid; gap: 0; }
+  .day { display: grid; grid-template-columns: 7.2rem 1fr; gap: 18px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .day:first-child { border-top: 0; padding-top: 4px; }
+  .day .when b { display: block; font: 600 1.35rem/1.1 "Cormorant Garamond", serif; }
+  .day .when span { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+  .day h3 { margin-bottom: .2rem; }
+  .day ul { margin: 0; padding: 0; list-style: none; font-size: 1rem; }
+  .day li { padding-left: 1rem; position: relative; }
+  .day li::before { content: ""; position: absolute; left: 0; top: .7em; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  .day li b { font-weight: 500; }
+
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: .7rem; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 999px; padding: .65rem 1.2rem;
+    font: 500 .9rem/1 "EB Garamond", serif; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--ink); color: var(--ink); background: transparent;
+  }
+  .btn.solid { background: var(--wine); border-color: var(--wine); color: #f6efe3; }
+  .btn:disabled { opacity: .55; cursor: default; }
+
+  .bring { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 26px; }
+  .bring h3 { margin-bottom: .2rem; }
+  .bring p { font-size: 1rem; margin: 0; }
+
+  /* ---------- RSVP ---------- */
+  label.f { display: block; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 .35rem; }
+  input[type=text], textarea {
+    width: 100%; font: 400 1.05rem/1.4 "EB Garamond", serif; color: var(--ink); background: #fbf8f2;
+    border: 1px solid rgba(62, 38, 0, .28); border-radius: 4px; padding: .65rem .8rem;
+  }
+  input[type=text]:focus, textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  textarea { min-height: 76px; resize: vertical; }
+  .names { display: grid; gap: 10px; margin-bottom: .6rem; }
+  .name-row { display: flex; gap: 8px; }
+  .x { flex: none; width: 44px; border: 1px solid rgba(62, 38, 0, .28); background: none; border-radius: 4px; color: var(--ink-soft); font-size: 1.2rem; cursor: pointer; }
+  .linkish { background: none; border: 0; padding: 0; color: var(--wine); font: italic 400 1rem "EB Garamond", serif; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .acts { display: grid; gap: 12px; margin: 1.4rem 0; }
+  .act { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; background: rgba(255, 255, 255, .35); }
+  .act .t { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .act .sub { font-size: .92rem; color: var(--ink-soft); margin: .15rem 0 .6rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: .45rem; min-height: 40px; padding: .45rem .95rem; border-radius: 999px; cursor: pointer;
+    border: 1px solid rgba(62, 38, 0, .35); background: #fbf8f2; color: var(--ink); font: 400 1rem "EB Garamond", serif;
+  }
+  .chip .box { width: 16px; height: 16px; border-radius: 50%; border: 1px solid currentColor; display: inline-grid; place-items: center; font-size: 11px; line-height: 1; }
+  .chip[aria-pressed="true"] { background: var(--wine); border-color: var(--wine); color: #f6efe3; }
+  .chip[aria-pressed="true"] .box::after { content: "\2713"; }
+  .act.film .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .err { color: var(--wine); font-style: italic; margin: .6rem 0 0; min-height: 1.4em; }
+  .done-list { list-style: none; padding: 0; margin: .4rem 0 1rem; }
+  .done-list li { padding: .45rem 0; border-top: 1px solid var(--line); }
+  .done-list li:first-child { border-top: 0; }
+  .sign { text-align: center; color: var(--cream); font: italic 500 1.6rem "Cormorant Garamond", serif; margin: 34px 0 0; opacity: .9; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 600px) {
+    body { font-size: 17px; }
+    .sheet { padding: 26px 18px; }
+    h2 { font-size: 1.8rem; }
+    .facts, .bring { grid-template-columns: 1fr; }
+    .day { grid-template-columns: 1fr; gap: 4px; }
+    .day .when b { display: inline; margin-right: .4rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hint, .scroll-cue span { animation: none; }
+    main { transition: none; }
+  }
+</style>
+</head>
+<body class="intro">
+
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="intro-ui">
+  <div class="hint" id="hint">Tap the seal to open<small>An invitation for you</small></div>
+  <button class="skip" id="skip" type="button">Skip</button>
+</div>
+
+<main>
+  <section class="hero">
+    <canvas id="card" role="img" aria-label="Thanksgiving dinner invitation"></canvas>
+    <a class="scroll-cue" href="#details">The weekend<span aria-hidden="true">&#8964;</span></a>
+  </section>
+
+  <div class="wrap">
+    <section class="sheet" id="details">
+      <p class="eyebrow">Thanksgiving dinner</p>
+      <h2>Thursday, November 26 at 6:30</h2>
+      <div class="facts">
+        <div class="fact">
+          <h3>Dress code</h3>
+          <p>Semi-formal. If you want to lean into the theme, think dark academia: tweed, wool, knits and velvet in browns, burgundy, forest green and cream. If not, your Sunday best is perfect.</p>
+        </div>
+        <div class="fact">
+          <h3>Where</h3>
+          <p data-k="placeName"></p>
+          <p data-k="address"></p>
+          <div class="btns">
+            <a class="btn" id="gmaps" target="_blank" rel="noopener">Google Maps</a>
+            <a class="btn" id="amaps" target="_blank" rel="noopener">Apple Maps</a>
+          </div>
+        </div>
+      </div>
+      <div class="callout">
+        <h3>We'll be filming</h3>
+        <p>We're filming Thanksgiving dinner (the table, the food and the evening) for some video content. If you'd rather stay off camera, just say so in your RSVP below and we'll keep you out of the shots.</p>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <p class="eyebrow">Wednesday to Sunday</p>
+      <h2>The weekend, roughly</h2>
+      <div class="days">
+        <div class="day">
+          <div class="when"><b>Wed</b><span>Nov 25</span></div>
+          <div><h3>Arrive</h3><ul>
+            <li>Check in from <b data-k="checkIn"></b></li>
+            <li>Smash burgers and hot dogs on the Blackstone</li>
+          </ul></div>
+        </div>
+        <div class="day">
+          <div class="when"><b>Thu</b><span>Nov 26</span></div>
+          <div><h3>Thanksgiving</h3><ul>
+            <li>Quiche and cinnamon rolls at 8:30</li>
+            <li>Football, games and the fire pit all day</li>
+            <li>Appetizers from 3:00</li>
+            <li><b>Dinner at 6:30</b>, dressed up</li>
+          </ul></div>
+        </div>
+        <div class="day">
+          <div class="when"><b>Fri</b><span>Nov 27</span></div>
+          <div><h3>Mammoth Cave and Bowling Green</h3><ul>
+            <li>Breakfast burritos on the Blackstone</li>
+            <li><b>Domes and Dripstones tour at 2:30</b>, $25 per person (leave the cabin about 12:45)</li>
+            <li><b>Dinner at Hickory &amp; Oak</b>, Bowling Green, 6:30</li>
+          </ul></div>
+        </div>
+        <div class="day">
+          <div class="when"><b>Sat</b><span>Nov 28</span></div>
+          <div><h3>Free day</h3><ul>
+            <li>Pancakes, eggs and bacon</li>
+            <li>Fishing, farm walks, naps</li>
+            <li>Fire pit and s'mores</li>
+          </ul></div>
+        </div>
+        <div class="day">
+          <div class="when"><b>Sun</b><span>Nov 29</span></div>
+          <div><h3>Head home</h3><ul>
+            <li>Pack up and check out by <b data-k="checkOut"></b></li>
+          </ul></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <p class="eyebrow">Good to know</p>
+      <h2>Before you pack</h2>
+      <div class="facts">
+        <div class="fact"><h3>Bring a jacket</h3><p>The cave is about 54&deg;F all year, and the evenings by the fire pit get cold.</p></div>
+        <div class="fact"><h3>Gluten-free kitchen</h3><p>Every meal we cook is gluten-free, so Becca can eat everything. Tell us about any other allergies below.</p></div>
+        <div class="fact"><h3>Fishing</h3><p>Anyone 16 or older needs a Kentucky fishing license (fw.ky.gov). Tennessee residents buy the nonresident one.</p></div>
+        <div class="fact"><h3>Also bring</h3><p>Your own drinks, a camp chair and any snacks you can't live without.</p></div>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <p class="eyebrow">Who's bringing what</p>
+      <h2>The table</h2>
+      <div class="bring">
+        <div><h3>Justin &amp; Becca</h3><p>The turkey and gravy, stuffing, green bean casserole, cranberry sauce, gluten-free rolls, the tablescape and games.</p></div>
+        <div><h3>Laura</h3><p>Mashed potatoes, squash, Wednesday's burger and the big roaster.</p></div>
+        <div><h3>Karissa &amp; Charli</h3><p>Thursday's quiche and the appetizers: bacon-wrapped dates, charcuterie and BBQ meatballs.</p></div>
+        <div><h3>Joe</h3><p>The Blackstone griddle.</p></div>
+      </div>
+      <hr class="rule">
+      <p class="muted" style="margin:0">Still up for grabs: the pies (pecan and pumpkin, gluten-free), Wednesday's buns, hot dogs and chips, and Saturday dinner. Want one? Say so in your RSVP.</p>
+    </section>
+
+    <section class="sheet" id="rsvp">
+      <p class="eyebrow">RSVP <span data-k="rsvpBy"></span></p>
+      <h2>Will you join us?</h2>
+
+      <form id="form" novalidate>
+        <div class="names" id="names"></div>
+        <button type="button" class="linkish" id="addPartner">+ Add your partner</button>
+
+        <div class="acts" id="acts"></div>
+
+        <label class="f" for="diet">Allergies or dietary needs</label>
+        <textarea id="diet" maxlength="500"></textarea>
+        <label class="f" for="note" style="margin-top:1rem">Anything else? Want to claim a pie?</label>
+        <textarea id="note" maxlength="1000"></textarea>
+        <div class="hp" aria-hidden="true"><label>Website <input type="text" id="website" tabindex="-1" autocomplete="off"></label></div>
+
+        <div class="btns" style="margin-top:1.2rem">
+          <button class="btn solid" id="send" type="submit">Send RSVP</button>
+        </div>
+        <p class="err" id="err" role="alert"></p>
+      </form>
+
+      <div id="thanks" hidden>
+        <h3 style="font-size:1.6rem;margin-bottom:.4rem">Thank you! We can't wait.</h3>
+        <p class="muted" style="margin-bottom:.2rem">Here's what we have for you:</p>
+        <ul class="done-list" id="doneList"></ul>
+        <div id="venmo"></div>
+        <div class="btns"><button class="btn" type="button" id="change">Change my RSVP</button></div>
+      </div>
+    </section>
+
+    <p class="sign" data-k="signature"></p>
+  </div>
+</main>
+
+<script>
+/* ======================================================================
+   Wording and details. Edit here: the card, the page and the form all
+   read from this one object.
+   ====================================================================== */
+window.INVITE = {
+  event: 'thanksgiving-2026',
+  card: {
+    top: "You're invited to",
+    title: 'Thanksgiving',
+    titleItalic: 'Dinner',
+    dateLine: 'Thursday  |  November 26, 2026  |  6:30 PM',
+    placeLine: 'CMR Hideaway Lodge, Austin, Kentucky',
+    bottom: ['Dress: semi-formal (dark academia)', 'A long table, good food and', 'the people we love most.'],
+    signature: 'Justin & Becca',
+  },
+  placeName: 'CMR Hideaway Lodge',
+  address: '313 R Whitlow Rd, Austin, KY 42123',
+  checkIn: 'TIME TBD',            // from the host
+  checkOut: 'TIME TBD',           // from the host
+  rsvpBy: 'by Sunday, November 16',
+  signature: 'With love, Justin & Becca',
+  venmo: '',                      // Justin's Venmo username, without the @
+  cavePrice: 25,
+};
+</script>
+
+<script>
+/* ======================================================================
+   Card artwork: the lace card (card.webp) with the wording drawn on top.
+   Used twice: as the three.js texture and as the card at the top of the page.
+   Coordinates are in card pixels (900 x 1458).
+   ====================================================================== */
+(() => {
+  const CW = 900, CH = 1458, INK = '#3e2600';
+  const img = new Image();
+  img.src = 'card.webp';
+  const ready = Promise.all([
+    img.decode().catch(() => new Promise((r) => (img.onload = r))),
+    document.fonts.load('600 100px "Cormorant Garamond"'),
+    document.fonts.load('italic 500 100px "Cormorant Garamond"'),
+    document.fonts.load('400 30px "EB Garamond"'),
+    document.fonts.load('italic 400 30px "EB Garamond"'),
+  ]).catch(() => {});
+
+  function fitText(ctx, text, font, size, maxW) {
+    let s = size;
+    do { ctx.font = font.replace('{s}', s); s -= 2; } while (ctx.measureText(text).width > maxW && s > 10);
+  }
+
+  function arcText(ctx, text, cx, cy, r) {
+    const chars = [...text];
+    const widths = chars.map((c) => ctx.measureText(c).width);
+    const total = widths.reduce((a, b) => a + b, 0) + (chars.length - 1) * 1.5;
+    let a = -Math.PI / 2 - total / r / 2;
+    chars.forEach((c, i) => {
+      const w = widths[i];
+      a += w / 2 / r;
+      ctx.save();
+      ctx.translate(cx + r * Math.cos(a), cy + r * Math.sin(a));
+      ctx.rotate(a + Math.PI / 2);
+      ctx.fillText(c, 0, 0);
+      ctx.restore();
+      a += (w / 2 + 1.5) / r;
+    });
+  }
+
+  async function drawCard(canvas, scale) {
+    await ready;
+    const c = window.INVITE.card;
+    canvas.width = Math.round(CW * scale);
+    canvas.height = Math.round(CH * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.clearRect(0, 0, CW, CH);
+    ctx.drawImage(img, 0, 0, CW, CH);
+    ctx.fillStyle = INK;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    const X = CW / 2 + 2;
+
+    ctx.font = 'italic 400 31px "EB Garamond"';
+    arcText(ctx, c.top, X, 415, 238);
+
+    fitText(ctx, c.title, '600 {s}px "Cormorant Garamond"', 118, 560);
+    ctx.fillText(c.title, X, 372);
+    fitText(ctx, c.titleItalic, 'italic 500 {s}px "Cormorant Garamond"', 138, 520);
+    ctx.fillText(c.titleItalic, X, 482);
+
+    fitText(ctx, c.dateLine, '400 {s}px "EB Garamond"', 28, 560);
+    ctx.fillText(c.dateLine, X, 552);
+    fitText(ctx, c.placeLine, 'italic 400 {s}px "EB Garamond"', 27, 540);
+    ctx.fillText(c.placeLine, X, 596);
+
+    fitText(ctx, c.bottom[0], 'italic 400 {s}px "EB Garamond"', 28, 540);
+    ctx.fillText(c.bottom[0], X, 1160);
+    ctx.font = '400 25px "EB Garamond"';
+    c.bottom.slice(1).forEach((line, i) => ctx.fillText(line, X, 1200 + i * 32));
+    ctx.font = 'italic 500 40px "Cormorant Garamond"';
+    ctx.fillText(c.signature, X, 1296);
+    return canvas;
+  }
+
+  window.CardArt = { drawCard, ready, aspect: CW / CH };
+})();
+</script>
+
+<script>
+/* ======================================================================
+   Page: fill in details, draw the card, and the RSVP form.
+   ====================================================================== */
+(() => {
+  const I = window.INVITE;
+  document.querySelectorAll('[data-k]').forEach((el) => { el.textContent = I[el.dataset.k] || ''; });
+  const q = encodeURIComponent(I.address);
+  document.getElementById('gmaps').href = `https://www.google.com/maps/search/?api=1&query=${q}`;
+  document.getElementById('amaps').href = `https://maps.apple.com/?q=${q}`;
+
+  const card = document.getElementById('card');
+  card.setAttribute('aria-label', [I.card.top, I.card.title, I.card.titleItalic, I.card.dateLine, I.card.placeLine, ...I.card.bottom, I.card.signature].join('. '));
+  window.CardArt.drawCard(card, Math.min(2, Math.max(1, (window.devicePixelRatio || 1) * 470 / 900 * 1.3)));
+
+  /* ---------- RSVP ---------- */
+  const ACTS = [
+    { key: 'dinner', title: 'Thanksgiving dinner', sub: 'Thursday, 6:30 PM', def: true },
+    { key: 'cave', title: 'Mammoth Cave: Domes and Dripstones', sub: `Friday, 2:30 PM. $${I.cavePrice} per person, we buy the tickets together.` },
+    { key: 'steakhouse', title: 'Dinner at Hickory & Oak', sub: 'Friday, 6:30 PM in Bowling Green' },
+    { key: 'fishing', title: 'Fishing on Saturday', sub: 'Kentucky license needed if you are 16 or older' },
+    { key: 'no_film', title: 'Filming', sub: 'Tap anyone who would rather stay off camera at dinner.', film: true, label: 'Keep me off camera' },
+  ];
+  const TOKEN_KEY = 'tg2026-rsvp';
+  const blank = () => Object.fromEntries([['name', ''], ...ACTS.map((a) => [a.key, !!a.def])]);
+  let people = [blank()];
+
+  const $ = (id) => document.getElementById(id);
+  const namesEl = $('names'), actsEl = $('acts');
+  const loadedAt = Date.now();
+
+  function store(op, v) { try { return op === 'get' ? localStorage.getItem(TOKEN_KEY) : localStorage.setItem(TOKEN_KEY, v); } catch { return null; } }
+
+  function label(p, i) { return p.name.trim() || (i === 0 ? 'You' : 'Your partner'); }
+
+  function renderNames() {
+    namesEl.innerHTML = '';
+    people.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.innerHTML = `<label class="f" for="n${i}">${i === 0 ? 'Your name' : "Your partner's name"}</label>
+        <div class="name-row"><input type="text" id="n${i}" maxlength="60" autocomplete="${i === 0 ? 'name' : 'off'}">${i ? '<button type="button" class="x" aria-label="Remove">&times;</button>' : ''}</div>`;
+      const input = row.querySelector('input');
+      input.value = p.name;
+      input.addEventListener('input', () => { p.name = input.value; renderActs(); });
+      const x = row.querySelector('.x');
+      if (x) x.addEventListener('click', () => { people.splice(i, 1); renderAll(); });
+      namesEl.appendChild(row);
+    });
+    $('addPartner').hidden = people.length >= 2;
+  }
+
+  function renderActs() {
+    actsEl.innerHTML = '';
+    ACTS.forEach((a) => {
+      const box = document.createElement('div');
+      box.className = 'act' + (a.film ? ' film' : '');
+      box.innerHTML = `<div class="t"><h3></h3></div><p class="sub"></p><div class="chips"></div>`;
+      box.querySelector('h3').textContent = a.title;
+      box.querySelector('.sub').textContent = a.sub;
+      const chips = box.querySelector('.chips');
+      people.forEach((p, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip';
+        b.setAttribute('aria-pressed', p[a.key]);
+        b.innerHTML = '<span class="box" aria-hidden="true"></span><span></span>';
+        b.lastChild.textContent = a.film && people.length === 1 ? a.label : label(p, i);
+        b.addEventListener('click', () => { p[a.key] = !p[a.key]; b.setAttribute('aria-pressed', p[a.key]); });
+        chips.appendChild(b);
+      });
+      actsEl.appendChild(box);
+    });
+  }
+
+  function renderAll() { renderNames(); renderActs(); }
+  $('addPartner').addEventListener('click', () => { people.push(blank()); renderAll(); $('n1').focus(); });
+
+  function showThanks() {
+    const NAMES = { dinner: 'Thanksgiving dinner', cave: 'Mammoth Cave', steakhouse: 'Hickory & Oak', fishing: 'fishing' };
+    $('doneList').innerHTML = '';
+    people.forEach((p) => {
+      const yes = Object.keys(NAMES).filter((k) => p[k]).map((k) => NAMES[k]);
+      const li = document.createElement('li');
+      li.innerHTML = '<b></b>: <span></span>';
+      li.firstChild.textContent = p.name;
+      li.lastChild.textContent = (yes.length ? yes.join(', ') : 'none of the outings') + (p.no_film ? '. Off camera at dinner.' : '');
+      $('doneList').appendChild(li);
+    });
+    const cave = people.filter((p) => p.cave).length;
+    const v = $('venmo');
+    v.innerHTML = '';
+    if (cave) {
+      const amt = cave * I.cavePrice;
+      const p = document.createElement('p');
+      p.textContent = `Cave tickets: $${amt} for ${cave === 1 ? 'one' : cave}. Please Venmo Justin${I.venmo ? '' : ' when you get a chance'}.`;
+      v.appendChild(p);
+      if (I.venmo) {
+        const a = document.createElement('a');
+        a.className = 'btn solid';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.href = `https://venmo.com/u/${encodeURIComponent(I.venmo)}?txn=pay&amount=${amt}&note=${encodeURIComponent('Mammoth Cave tickets')}`;
+        a.textContent = `Venmo Justin $${amt}`;
+        v.appendChild(a);
+      }
+    }
+    $('form').hidden = true;
+    $('thanks').hidden = false;
+  }
+
+  $('change').addEventListener('click', () => { $('thanks').hidden = true; $('form').hidden = false; renderAll(); });
+
+  $('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('err');
+    err.textContent = '';
+    people.forEach((p) => (p.name = p.name.trim()));
+    people = people.filter((p, i) => i === 0 || p.name);
+    if (!people[0].name) { renderAll(); err.textContent = 'Please add your name.'; $('n0').focus(); return; }
+    const send = $('send');
+    send.disabled = true;
+    send.textContent = 'Sending...';
+    try {
+      const r = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          event: I.event, token: store('get') || undefined, people,
+          diet: $('diet').value, note: $('note').value,
+          website: $('website').value, form_loaded_at: loadedAt,
+        }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok || !data.ok) throw new Error(data.error || 'Something went wrong.');
+      store('set', data.token);
+      showThanks();
+    } catch (ex) {
+      err.textContent = `${ex.message} If it keeps happening, just text Justin.`;
+    } finally {
+      send.disabled = false;
+      send.textContent = 'Send RSVP';
+    }
+  });
+
+  renderAll();
+
+  // Coming back on the same phone: show what they sent, with a way to change it.
+  const token = store('get');
+  if (token) {
+    fetch(`/api/rsvp?token=${encodeURIComponent(token)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.ok) return;
+        people = d.rsvp.people.map((p) => ({ ...blank(), ...p }));
+        $('diet').value = d.rsvp.diet || '';
+        $('note').value = d.rsvp.note || '';
+        renderAll();
+        showThanks();
+      })
+      .catch(() => {});
+  }
+})();
+</script>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script>
+/* If three.js never starts (old phone, blocked CDN), open the page anyway. */
+window.__introTimer = setTimeout(() => { if (!window.__introStarted) window.__openPage && window.__openPage(); }, 6000);
+window.__openPage = () => {
+  document.body.classList.remove('intro');
+  document.body.classList.add('opened');
+};
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) window.__openPage();
+</script>
+<script type="module">
+/* ======================================================================
+   The envelope. Tap anywhere: the seal lifts, the flap opens, the card
+   slides out and comes forward, then the page fades in underneath it.
+   Falling leaves keep drifting behind the page afterwards.
+   ====================================================================== */
+import * as THREE from 'three';
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('stage');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+} catch {
+  window.__openPage();
+  throw new Error('no webgl');
+}
+window.__introStarted = true;
+clearTimeout(window.__introTimer);
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+camera.position.set(0, 0, 13);
+
+scene.add(new THREE.AmbientLight(0xfff1dc, 1.1));
+const key = new THREE.DirectionalLight(0xffe2b8, 1.6);
+key.position.set(3, 5, 8);
+scene.add(key);
+const glow = new THREE.PointLight(0xffb060, 18, 14);
+glow.position.set(-2.5, -1, 4);
+scene.add(glow);
+
+const loader = new THREE.TextureLoader();
+const damask = loader.load('envelope.webp');
+damask.colorSpace = THREE.SRGBColorSpace;
+damask.wrapS = damask.wrapT = THREE.RepeatWrapping;
+damask.repeat.set(1.2, 0.9);
+
+/* ---------- envelope ---------- */
+const EW = 3.1, EH = 4.8, V = EH * 0.45, FLAP = EH * 0.55;
+const env = new THREE.Group();
+scene.add(env);
+
+const paper = new THREE.MeshStandardMaterial({ map: damask, color: 0xffffff, roughness: 0.8, side: THREE.FrontSide });
+const liner = new THREE.MeshStandardMaterial({ color: 0xe7e0d3, roughness: 0.95, side: THREE.DoubleSide });
+const gold = new THREE.LineBasicMaterial({ color: 0xb08d57, transparent: true, opacity: 0.9 });
+
+const back = new THREE.Mesh(new THREE.PlaneGeometry(EW, EH), liner);
+env.add(back);
+// soft shadow so the envelope lifts off the dark background
+const shadow = new THREE.Mesh(new THREE.PlaneGeometry(EW * 1.6, EH * 1.4), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas()), transparent: true, depthWrite: false }));
+shadow.position.set(0.15, -0.25, -0.3);
+env.add(shadow);
+
+const frontShape = new THREE.Shape();
+frontShape.moveTo(-EW / 2, -EH / 2);
+frontShape.lineTo(EW / 2, -EH / 2);
+frontShape.lineTo(EW / 2, EH / 2);
+frontShape.lineTo(0, EH / 2 - V);
+frontShape.lineTo(-EW / 2, EH / 2);
+frontShape.closePath();
+const frontGeo = new THREE.ShapeGeometry(frontShape);
+uvFromXY(frontGeo, EW, EH);
+const front = new THREE.Mesh(frontGeo, paper);
+front.position.z = 0.04;
+env.add(front);
+const fold = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+  new THREE.Vector3(-EW / 2, EH / 2, 0.045), new THREE.Vector3(0, EH / 2 - V, 0.045), new THREE.Vector3(EW / 2, EH / 2, 0.045),
+]), gold);
+env.add(fold);
+const lowerFold = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+  new THREE.Vector3(-EW / 2, -EH / 2, 0.045), new THREE.Vector3(0, -EH * 0.08, 0.045), new THREE.Vector3(EW / 2, -EH / 2, 0.045),
+]), new THREE.LineBasicMaterial({ color: 0xb08d57, transparent: true, opacity: 0.45 }));
+env.add(lowerFold);
+
+const flap = new THREE.Group();
+flap.position.set(0, EH / 2, 0.06);
+env.add(flap);
+const flapShape = new THREE.Shape();
+flapShape.moveTo(-EW / 2, 0);
+flapShape.lineTo(EW / 2, 0);
+flapShape.quadraticCurveTo(EW * 0.08, -FLAP * 0.9, 0, -FLAP);
+flapShape.quadraticCurveTo(-EW * 0.08, -FLAP * 0.9, -EW / 2, 0);
+const flapGeo = new THREE.ShapeGeometry(flapShape, 24);
+uvFromXY(flapGeo, EW, EH);
+const flapOut = new THREE.Mesh(flapGeo, paper);
+const flapIn = new THREE.Mesh(flapGeo, new THREE.MeshStandardMaterial({ color: 0xe7e0d3, roughness: 0.95, side: THREE.BackSide }));
+flap.add(flapOut, flapIn);
+const flapEdge = new THREE.Line(new THREE.BufferGeometry().setFromPoints(flapShape.getPoints(24).map((p) => new THREE.Vector3(p.x, p.y, 0.004))), gold);
+flap.add(flapEdge);
+
+/* wax seal */
+const sealTex = new THREE.CanvasTexture(sealCanvas());
+sealTex.colorSpace = THREE.SRGBColorSpace;
+sealTex.center.set(0.5, 0.5);
+sealTex.rotation = Math.PI / 2;  // the cylinder cap maps the canvas sideways
+const seal = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.46, 0.48, 0.09, 48),
+  [new THREE.MeshStandardMaterial({ color: 0x5a1717, roughness: 0.5, metalness: 0.1, transparent: true }),
+   new THREE.MeshStandardMaterial({ map: sealTex, roughness: 0.45, metalness: 0.1, transparent: true }),
+   new THREE.MeshStandardMaterial({ color: 0x5a1717, transparent: true })],
+);
+seal.rotation.x = Math.PI / 2;
+seal.position.set(0, EH / 2 - FLAP + 0.42, 0.12);
+env.add(seal);
+
+/* the card */
+const cardCanvas = document.createElement('canvas');
+const cardTex = new THREE.CanvasTexture(cardCanvas);
+cardTex.colorSpace = THREE.SRGBColorSpace;
+cardTex.anisotropy = 4;
+const CWD = 2.8, CHT = CWD / window.CardArt.aspect;
+const card = new THREE.Mesh(new THREE.PlaneGeometry(CWD, CHT), new THREE.MeshBasicMaterial({ map: cardTex, transparent: true, alphaTest: 0.02 }));
+card.position.set(0, -0.08, 0.02);
+scene.add(card);
+window.CardArt.drawCard(cardCanvas, 1.4).then(() => { cardTex.needsUpdate = true; });
+
+/* ---------- leaves ---------- */
+const LEAVES = reduced ? 0 : 34;
+const leafTex = new THREE.CanvasTexture(leafCanvas());
+leafTex.colorSpace = THREE.SRGBColorSpace;
+const leaves = new THREE.InstancedMesh(
+  new THREE.PlaneGeometry(0.34, 0.34),
+  new THREE.MeshBasicMaterial({ map: leafTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }),
+  Math.max(LEAVES, 1),
+);
+leaves.count = LEAVES;
+const palette = [0x9a3b12, 0xb5651d, 0xc8892f, 0x7a2a12, 0xa64b1a, 0xd09a3a].map((c) => new THREE.Color(c));
+const leafState = [];
+for (let i = 0; i < LEAVES; i++) {
+  leafState.push({
+    x: (Math.random() - 0.5) * 12, y: Math.random() * 14 - 7, z: Math.random() * 5 - 3.5,
+    vy: 0.25 + Math.random() * 0.35, sway: Math.random() * 6.28, sw: 0.4 + Math.random() * 0.6,
+    rx: Math.random() * 6.28, ry: Math.random() * 6.28, sr: 0.4 + Math.random() * 1.2, s: 0.7 + Math.random() * 0.7,
+  });
+  leaves.setColorAt(i, palette[i % palette.length]);
+}
+scene.add(leaves);
+const dummy = new THREE.Object3D();
+
+/* ---------- layout ---------- */
+let aspect = 1;
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h, false);
+  aspect = w / h;
+  camera.aspect = aspect;
+  camera.updateProjectionMatrix();
+  // On narrow phones pull the camera back so the envelope fits the width.
+  const halfW = EW / 2 + 0.35;
+  const needH = Math.max(EH / 2 + 1.2, (halfW / aspect) * 1.12);
+  camera.position.z = needH / Math.tan(THREE.MathUtils.degToRad(17.5));
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* ---------- the opening ---------- */
+let opening = false, t0 = 0, done = false;
+const ease = (t) => (t < 0 ? 0 : t > 1 ? 1 : t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const seg = (t, a, b) => ease((t - a) / (b - a));
+function open() {
+  if (opening) return;
+  opening = true;
+  t0 = performance.now();
+  document.getElementById('hint').style.opacity = 0;
+}
+canvas.addEventListener('pointerdown', open);
+window.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') open(); });
+document.getElementById('skip').addEventListener('click', () => { finish(); });
+
+function finish() {
+  if (done) return;
+  done = true;
+  env.visible = false;
+  card.visible = false;
+  window.__openPage();
+}
+
+// Where the card ends up: centred and as large as the page's own card, so the hand-off is seamless.
+function cardTarget() {
+  const fovHalf = THREE.MathUtils.degToRad(17.5);
+  const vh = window.innerHeight, vw = window.innerWidth;
+  const domW = Math.min(vw * 0.88, 470, (vh * 0.86) * window.CardArt.aspect);
+  const frac = (domW / window.CardArt.aspect) / vh;  // card height as a share of the screen
+  const halfH = CHT / 2 / frac;
+  return { z: camera.position.z - halfH / Math.tan(fovHalf), y: 0 };
+}
+
+let pointerX = 0, pointerY = 0;
+window.addEventListener('pointermove', (e) => { pointerX = e.clientX / innerWidth - 0.5; pointerY = e.clientY / innerHeight - 0.5; });
+
+const clock = new THREE.Clock();
+function frame() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const now = performance.now();
+
+  if (!done) {
+    if (!opening) {
+      const s = now / 1000;
+      env.position.y = Math.sin(s * 1.1) * 0.06;
+      env.rotation.y += (pointerX * 0.35 - env.rotation.y) * 0.06;
+      env.rotation.x += (pointerY * 0.2 - env.rotation.x) * 0.06;
+      card.position.y = env.position.y - 0.08;
+      card.rotation.copy(env.rotation);
+      const p = 1 + Math.sin(s * 3) * 0.03;
+      seal.scale.set(p, 1, p);
+    } else {
+      const t = (now - t0) / 1000;
+      env.rotation.x *= 0.9; env.rotation.y *= 0.9; card.rotation.copy(env.rotation);
+
+      // 1. seal lifts off and fades
+      const s1 = seg(t, 0, 0.55);
+      seal.position.z = 0.12 + s1 * 1.2;
+      seal.rotation.z = s1 * 1.2;
+      seal.material.forEach((m) => (m.opacity = 1 - s1));
+      seal.visible = s1 < 1;
+
+      // 2. flap swings open toward the viewer and folds back behind
+      const s2 = seg(t, 0.35, 1.45);
+      flap.rotation.x = -Math.PI * s2;
+      flap.position.z = s2 > 0.5 ? -0.02 : 0.06;
+
+      // 3. card slides up out of the pocket while the envelope sinks
+      const s3 = seg(t, 1.4, 2.9);
+      env.position.y = -2.6 * s3;
+      card.position.y = -0.08 + 4.95 * s3 - 2.6 * s3;
+
+      // 4. card comes forward to fill the screen; envelope falls away
+      const s4 = seg(t, 2.95, 4.3);
+      if (s4 > 0) {
+        const tg = cardTarget();
+        card.position.z = 0.3 + (tg.z - 0.3) * s4;
+        card.position.y = (2.27) * (1 - s4) + tg.y * s4;
+        env.position.y = -2.6 - 9 * s4;
+      }
+      if (t > 4.35) finish();
+    }
+  }
+
+  for (let i = 0; i < LEAVES; i++) {
+    const L = leafState[i];
+    L.y -= L.vy * dt;
+    L.sway += dt * L.sw;
+    L.rx += dt * L.sr; L.ry += dt * L.sr * 0.7;
+    if (L.y < -8) { L.y = 8; L.x = (Math.random() - 0.5) * 12; }
+    dummy.position.set(L.x + Math.sin(L.sway) * 0.6, L.y, L.z);
+    dummy.rotation.set(L.rx, L.ry, L.sway);
+    dummy.scale.setScalar(L.s);
+    dummy.updateMatrix();
+    leaves.setMatrixAt(i, dummy.matrix);
+  }
+  leaves.instanceMatrix.needsUpdate = true;
+
+  renderer.render(scene, camera);
+  // After the intro only the leaves are left; stop drawing if there are none.
+  if (!done || LEAVES) requestAnimationFrame(frame);
+}
+if (reduced) finish();
+requestAnimationFrame(frame);
+
+/* ---------- helpers ---------- */
+function uvFromXY(geo, w, h) {
+  const pos = geo.attributes.position, uv = [];
+  for (let i = 0; i < pos.count; i++) uv.push(pos.getX(i) / w + 0.5, pos.getY(i) / h + 0.5);
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+}
+
+function sealCanvas() {
+  const c = document.createElement('canvas'), s = 256;
+  c.width = c.height = s;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(s * 0.42, s * 0.38, s * 0.05, s / 2, s / 2, s / 2);
+  grd.addColorStop(0, '#9b2c2c'); grd.addColorStop(0.7, '#6b1d1d'); grd.addColorStop(1, '#3d0f0f');
+  g.fillStyle = grd; g.fillRect(0, 0, s, s);
+  g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 6;
+  g.beginPath(); g.arc(s / 2, s / 2, s * 0.36, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = 'rgba(255,210,170,.25)'; g.lineWidth = 2;
+  g.beginPath(); g.arc(s / 2, s / 2, s * 0.33, 0, Math.PI * 2); g.stroke();
+  g.fillStyle = 'rgba(255,220,190,.55)';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = 'italic 500 70px "Cormorant Garamond", serif';
+  g.fillText('J & B', s / 2, s / 2 + 4);
+  return c;
+}
+
+function shadowCanvas() {
+  const c = document.createElement('canvas'), s = 128;
+  c.width = c.height = s;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(s / 2, s / 2, s * 0.2, s / 2, s / 2, s / 2);
+  grd.addColorStop(0, 'rgba(0,0,0,.7)'); grd.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, s, s);
+  return c;
+}
+
+function leafCanvas() {
+  // A plain pointed leaf (beech or birch shape) with a stem and veins; tinted per leaf.
+  const c = document.createElement('canvas'), s = 128;
+  c.width = c.height = s;
+  const g = c.getContext('2d');
+  g.translate(s / 2, s / 2);
+  g.rotate(-0.5);
+  g.fillStyle = '#ffffff';
+  g.beginPath();
+  g.moveTo(0, -56);
+  g.bezierCurveTo(30, -36, 32, 18, 0, 46);
+  g.bezierCurveTo(-32, 18, -30, -36, 0, -56);
+  g.fill();
+  g.strokeStyle = 'rgba(70,30,5,.45)';
+  g.lineWidth = 2.5;
+  g.beginPath(); g.moveTo(0, -50); g.lineTo(0, 60); g.stroke();
+  g.lineWidth = 1.5;
+  for (let y = -34; y <= 26; y += 12) {
+    g.beginPath(); g.moveTo(0, y + 6); g.lineTo(18 - Math.abs(y) * 0.12, y - 6); g.stroke();
+    g.beginPath(); g.moveTo(0, y + 6); g.lineTo(-18 + Math.abs(y) * 0.12, y - 6); g.stroke();
+  }
+  return c;
+}
+</script>
+</body>
+</html>
