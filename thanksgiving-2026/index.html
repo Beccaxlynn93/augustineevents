@@ -216,7 +216,7 @@
         <div class="day">
           <div class="when"><b>Thu</b><span>Nov 26</span></div>
           <div><h3>Thanksgiving</h3><ul>
-            <li>Quiche and cinnamon rolls at 8:30</li>
+            <li>Quiche, cinnamon rolls and mimosas at 8:30</li>
             <li>Football, games and the fire pit all day</li>
             <li>Appetizers from 3:00</li>
             <li><b>Dinner at 6:30</b>, dressed up</li>
@@ -241,7 +241,7 @@
         <div class="day">
           <div class="when"><b>Sun</b><span>Nov 29</span></div>
           <div><h3>Head home</h3><ul>
-            <li>Pack up and check out by <b data-k="checkOut"></b></li>
+            <li>Pack up and check out before <b data-k="checkOut"></b></li>
           </ul></div>
         </div>
       </div>
@@ -252,7 +252,7 @@
       <h2>Before you pack</h2>
       <div class="facts">
         <div class="fact"><h3>Bring a jacket</h3><p>The cave is about 54&deg;F all year, and the evenings by the fire pit get cold.</p></div>
-        <div class="fact"><h3>Gluten-free kitchen</h3><p>Every meal we cook is gluten-free, so Becca can eat everything. Tell us about any other allergies below.</p></div>
+        <div class="fact"><h3>Times are Central</h3><p>The cabin is on Central time, the same as Nashville. Check in from 4:00 PM Wednesday, check out before 10:00 AM Sunday.</p></div>
         <div class="fact"><h3>Fishing</h3><p>Anyone 16 or older needs a Kentucky fishing license (fw.ky.gov). Tennessee residents buy the nonresident one.</p></div>
         <div class="fact"><h3>Also bring</h3><p>Your own drinks, a camp chair and any snacks you can't live without.</p></div>
       </div>
@@ -261,14 +261,7 @@
     <section class="sheet">
       <p class="eyebrow">Who's bringing what</p>
       <h2>The table</h2>
-      <div class="bring">
-        <div><h3>Justin &amp; Becca</h3><p>The turkey and gravy, stuffing, green bean casserole, cranberry sauce, gluten-free rolls, the tablescape and games.</p></div>
-        <div><h3>Laura</h3><p>Mashed potatoes, squash, Wednesday's burger and the big roaster.</p></div>
-        <div><h3>Karissa &amp; Charli</h3><p>Thursday's quiche and the appetizers: bacon-wrapped dates, charcuterie and BBQ meatballs.</p></div>
-        <div><h3>Joe</h3><p>The Blackstone griddle.</p></div>
-      </div>
-      <hr class="rule">
-      <p class="muted" style="margin:0">Still up for grabs: the pies (pecan and pumpkin, gluten-free), Wednesday's buns, hot dogs and chips, and Saturday dinner. Want one? Say so in your RSVP.</p>
+      <p style="margin:0">We're still working out who brings what, and we'll send the list soon. If there's something you'd love to bring, tell us in your RSVP.</p>
     </section>
 
     <section class="sheet" id="rsvp">
@@ -281,9 +274,7 @@
 
         <div class="acts" id="acts"></div>
 
-        <label class="f" for="diet">Allergies or dietary needs</label>
-        <textarea id="diet" maxlength="500"></textarea>
-        <label class="f" for="note" style="margin-top:1rem">Anything else? Want to claim a pie?</label>
+        <label class="f" for="note">Anything you'd like to bring, or anything else?</label>
         <textarea id="note" maxlength="1000"></textarea>
         <div class="hp" aria-hidden="true"><label>Website <input type="text" id="website" tabindex="-1" autocomplete="off"></label></div>
 
@@ -324,8 +315,8 @@ window.INVITE = {
   },
   placeName: 'CMR Hideaway Lodge',
   address: '313 R Whitlow Rd, Austin, KY 42123',
-  checkIn: 'TIME TBD',            // from the host
-  checkOut: 'TIME TBD',           // from the host
+  checkIn: '4:00 PM',             // Central time (Barren County, KY), same as Nashville
+  checkOut: '10:00 AM',
   rsvpBy: 'by Sunday, November 16',
   signature: 'With love, Justin & Becca',
   venmo: '',                      // Justin's Venmo username, without the @
@@ -341,10 +332,12 @@ window.INVITE = {
    ====================================================================== */
 (() => {
   const CW = 900, CH = 1458, INK = '#3e2600';
+  // Handlers go on before src, so a cached image that loads instantly is never missed.
   const img = new Image();
+  const imgReady = new Promise((res) => { img.onload = res; img.onerror = res; });
   img.src = 'card.webp';
   const ready = Promise.all([
-    img.decode().catch(() => new Promise((r) => (img.onload = r))),
+    img.complete && img.naturalWidth ? Promise.resolve() : imgReady,
     document.fonts.load('600 100px "Cormorant Garamond"'),
     document.fonts.load('italic 500 100px "Cormorant Garamond"'),
     document.fonts.load('400 30px "EB Garamond"'),
@@ -541,7 +534,7 @@ window.INVITE = {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           event: I.event, token: store('get') || undefined, people,
-          diet: $('diet').value, note: $('note').value,
+          note: $('note').value,
           website: $('website').value, form_loaded_at: loadedAt,
         }),
       });
@@ -567,7 +560,6 @@ window.INVITE = {
       .then((d) => {
         if (!d.ok) return;
         people = d.rsvp.people.map((p) => ({ ...blank(), ...p }));
-        $('diet').value = d.rsvp.diet || '';
         $('note').value = d.rsvp.note || '';
         renderAll();
         showThanks();
@@ -582,7 +574,9 @@ window.INVITE = {
 </script>
 <script>
 /* If three.js never starts (old phone, blocked CDN), open the page anyway. */
-window.__introTimer = setTimeout(() => { if (!window.__introStarted) window.__openPage && window.__openPage(); }, 6000);
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+window.__introTimer = setTimeout(() => { if (!window.__introStarted) window.__openPage && window.__openPage(); }, 12000);
 window.__openPage = () => {
   document.body.classList.remove('intro');
   document.body.classList.add('opened');
@@ -606,6 +600,9 @@ try {
   window.__openPage();
   throw new Error('no webgl');
 }
+// If the fallback already opened the page (three.js was slow to arrive), don't
+// start an envelope behind it: just keep the leaves.
+const lateStart = document.body.classList.contains('opened');
 window.__introStarted = true;
 clearTimeout(window.__introTimer);
 
@@ -623,7 +620,9 @@ glow.position.set(-2.5, -1, 4);
 scene.add(glow);
 
 const loader = new THREE.TextureLoader();
-const damask = loader.load('envelope.webp');
+let envReady;
+const envLoaded = new Promise((res) => (envReady = res));
+const damask = loader.load('envelope.webp', envReady, undefined, envReady);
 damask.colorSpace = THREE.SRGBColorSpace;
 damask.wrapS = damask.wrapT = THREE.RepeatWrapping;
 damask.repeat.set(1.2, 0.9);
@@ -698,6 +697,9 @@ env.add(seal);
 
 /* the card */
 const cardCanvas = document.createElement('canvas');
+// Final size before the texture exists: resizing an uploaded texture leaves it blank on some GPUs.
+cardCanvas.width = Math.round(900 * 1.4);
+cardCanvas.height = Math.round(1458 * 1.4);
 const cardTex = new THREE.CanvasTexture(cardCanvas);
 cardTex.colorSpace = THREE.SRGBColorSpace;
 cardTex.anisotropy = 4;
@@ -705,7 +707,7 @@ const CWD = 2.8, CHT = CWD / window.CardArt.aspect;
 const card = new THREE.Mesh(new THREE.PlaneGeometry(CWD, CHT), new THREE.MeshBasicMaterial({ map: cardTex, transparent: true, alphaTest: 0.02 }));
 card.position.set(0, -0.08, 0.02);
 scene.add(card);
-window.CardArt.drawCard(cardCanvas, 1.4).then(() => { cardTex.needsUpdate = true; });
+const cardDrawn = window.CardArt.drawCard(cardCanvas, 1.4).then(() => { cardTex.needsUpdate = true; });
 
 /* ---------- leaves ---------- */
 const LEAVES = reduced ? 0 : 34;
@@ -747,14 +749,25 @@ window.addEventListener('resize', resize);
 resize();
 
 /* ---------- the opening ---------- */
-let opening = false, t0 = 0, done = false;
+let opening = false, tAnim = 0, done = false, ready = false;
 const ease = (t) => (t < 0 ? 0 : t > 1 ? 1 : t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const seg = (t, a, b) => ease((t - a) / (b - a));
+const hint = document.getElementById('hint');
+hint.style.visibility = 'hidden';
+// Nothing can be tapped open until the card, envelope and fonts are ready and the
+// textures are on the GPU. Otherwise the first open stutters or shows a blank card.
+Promise.all([cardDrawn, envLoaded]).then(() => {
+  renderer.initTexture(cardTex);
+  renderer.initTexture(damask);
+  renderer.initTexture(sealTex);
+  renderer.compile(scene, camera);
+  ready = true;
+  hint.style.visibility = 'visible';
+});
 function open() {
-  if (opening) return;
+  if (opening || !ready) return;
   opening = true;
-  t0 = performance.now();
-  document.getElementById('hint').style.opacity = 0;
+  hint.style.opacity = 0;
 }
 canvas.addEventListener('pointerdown', open);
 window.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') open(); });
@@ -797,7 +810,9 @@ function frame() {
       const p = 1 + Math.sin(s * 3) * 0.03;
       seal.scale.set(p, 1, p);
     } else {
-      const t = (now - t0) / 1000;
+      // Advance by frame time, capped, so a slow frame slows the animation instead of skipping it.
+      tAnim += Math.min(dt, 1 / 20);
+      const t = tAnim;
       env.rotation.x *= 0.9; env.rotation.y *= 0.9; card.rotation.copy(env.rotation);
 
       // 1. seal lifts off and fades
@@ -847,7 +862,7 @@ function frame() {
   // After the intro only the leaves are left; stop drawing if there are none.
   if (!done || LEAVES) requestAnimationFrame(frame);
 }
-if (reduced) finish();
+if (reduced || lateStart) finish();
 requestAnimationFrame(frame);
 
 /* ---------- helpers ---------- */
