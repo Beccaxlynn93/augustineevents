@@ -16,30 +16,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="preload" href="card.webp" as="image">
 <style>
+  /* Dark academia: candlelit library. Umber and ink, aged parchment, oxblood, old gold. */
   :root {
-    --ink: #3e2600;
-    --ink-soft: #6b5233;
-    --cream: #e7e0d3;
-    --paper: #f1ebe0;
-    --night: #1c1206;
-    --wine: #6b1d1d;
-    --gold: #b08d57;
-    --line: rgba(62, 38, 0, .16);
+    --ink: #24170c;
+    --ink-soft: #5a4630;
+    --paper: #e4d8c1;
+    --paper-hi: #efe6d4;
+    --night: #0e0904;
+    --oxblood: #4a1515;
+    --forest: #2c3527;
+    --gold: #a8864f;
+    --gold-hi: #c9ab72;
+    --line: rgba(36, 23, 12, .2);
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0; color: var(--ink); background: var(--night);
-    font: 400 18px/1.55 "EB Garamond", Georgia, serif;
+    font: 400 18px/1.6 "EB Garamond", Georgia, serif;
     -webkit-font-smoothing: antialiased;
   }
   body::before {
     content: ""; position: fixed; inset: 0; z-index: -1;
     background:
-      radial-gradient(ellipse at 50% 30%, rgba(28, 18, 6, .35), rgba(12, 7, 2, .9) 75%),
-      url("damask.webp") center / 280px auto repeat;
+      radial-gradient(ellipse 70% 45% at 50% 0%, rgba(150, 95, 35, .22), transparent 70%),
+      radial-gradient(ellipse at 50% 40%, rgba(14, 9, 4, .55), rgba(6, 4, 1, .94) 78%),
+      url("damask.webp") center / 260px auto repeat;
   }
   body.intro { overflow: hidden; }
+  ::selection { background: var(--oxblood); color: var(--paper-hi); }
 
   /* ---------- intro (three.js envelope) ---------- */
   #stage { position: fixed; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
@@ -48,113 +53,129 @@
   body.intro .intro-ui { display: block; }
   .hint {
     position: absolute; left: 0; right: 0; bottom: max(7vh, 40px); text-align: center;
-    color: var(--cream); font: italic 400 1.15rem/1.3 "EB Garamond", serif; letter-spacing: .04em;
-    animation: breathe 2.4s ease-in-out infinite; transition: opacity .4s;
+    color: var(--gold-hi); font: italic 500 1.25rem/1.3 "Cormorant Garamond", serif; letter-spacing: .04em;
+    animation: breathe 2.6s ease-in-out infinite; transition: opacity .4s;
   }
-  .hint small { display: block; font-style: normal; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; opacity: .65; margin-top: .35rem; }
+  .hint small { display: block; font: 400 .74rem "EB Garamond", serif; font-variant: small-caps; letter-spacing: .3em; color: var(--paper); opacity: .55; margin-top: .4rem; }
   .skip {
     position: absolute; top: max(16px, env(safe-area-inset-top)); right: 16px; pointer-events: auto;
-    background: none; border: 1px solid rgba(231, 224, 211, .35); color: var(--cream); border-radius: 999px;
-    font: 500 .75rem/1 "EB Garamond", serif; letter-spacing: .14em; text-transform: uppercase; padding: .55rem .9rem; cursor: pointer;
+    background: none; border: 1px solid rgba(168, 134, 79, .45); color: var(--gold-hi); border-radius: 2px;
+    font: 400 .8rem/1 "EB Garamond", serif; font-variant: small-caps; letter-spacing: .2em; padding: .55rem .9rem; cursor: pointer;
   }
-  @keyframes breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  @keyframes breathe { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
 
   /* ---------- page ---------- */
-  main { position: relative; z-index: 1; opacity: 0; transition: opacity 1s ease; }
+  main { position: relative; z-index: 1; opacity: 0; transition: opacity 1.2s ease; }
   body.opened main { opacity: 1; }
-  .hero { min-height: 100svh; display: grid; place-items: center; padding: 24px 16px 64px; position: relative; }
-  #card { display: block; width: min(88vw, 470px, calc(86svh * 900 / 1458)); height: auto; aspect-ratio: 900 / 1458; filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .55)); }
+  .hero { min-height: 100svh; display: grid; place-items: center; padding: 24px 16px 72px; position: relative; }
+  #card { display: block; width: min(88vw, 470px, calc(84svh * 900 / 1458)); height: auto; aspect-ratio: 900 / 1458; filter: drop-shadow(0 26px 44px rgba(0, 0, 0, .7)); }
   .scroll-cue {
-    position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; color: var(--cream);
-    font-size: .74rem; letter-spacing: .24em; text-transform: uppercase; opacity: .75; text-decoration: none;
+    position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; color: var(--gold-hi);
+    font-size: .85rem; font-variant: small-caps; letter-spacing: .3em; opacity: .8; text-decoration: none;
   }
-  .scroll-cue span { display: block; font-size: 1.1rem; animation: bob 2s ease-in-out infinite; }
+  .scroll-cue span { display: block; font-size: 1.1rem; animation: bob 2.2s ease-in-out infinite; }
   @keyframes bob { 50% { transform: translateY(5px); } }
 
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 72px; }
+  .epigraph { max-width: 520px; margin: 0 auto 40px; padding: 0 16px; text-align: center; color: var(--paper); }
+  .epigraph q { font: italic 500 1.45rem/1.35 "Cormorant Garamond", serif; quotes: "\201C" "\201D"; }
+  .epigraph cite { display: block; margin-top: .5rem; font-style: normal; font-variant: small-caps; letter-spacing: .22em; font-size: .82rem; color: var(--gold); }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 80px; }
   .sheet {
-    background: var(--paper); border-radius: 6px; padding: 32px 28px; margin-bottom: 22px; position: relative;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(176, 141, 87, .35), inset 0 0 0 7px var(--paper), inset 0 0 0 8px rgba(176, 141, 87, .45);
+    position: relative; margin-bottom: 28px; padding: 40px 34px 34px; border-radius: 2px;
+    background:
+      radial-gradient(ellipse at 15% 8%, rgba(255, 250, 235, .55), transparent 55%),
+      radial-gradient(ellipse at 90% 95%, rgba(120, 78, 30, .22), transparent 55%),
+      radial-gradient(ellipse at 50% 50%, var(--paper-hi), var(--paper) 70%);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, .6), inset 0 0 60px rgba(110, 70, 25, .28), inset 0 0 0 1px rgba(90, 60, 25, .35);
   }
-  .eyebrow { font-size: .72rem; letter-spacing: .26em; text-transform: uppercase; color: var(--wine); font-weight: 500; margin: 0 0 .3rem; }
-  h2 { font: 600 2.1rem/1.1 "Cormorant Garamond", serif; margin: 0 0 1rem; letter-spacing: -.005em; }
+  .sheet::before {
+    content: ""; position: absolute; inset: 10px; pointer-events: none;
+    border: 1px solid rgba(168, 134, 79, .55); outline: 1px solid rgba(168, 134, 79, .3); outline-offset: 3px;
+  }
+  .sheet::after {
+    content: "\2766"; position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--night); color: var(--gold); width: 34px; height: 26px; line-height: 26px; text-align: center; font-size: 15px; border-radius: 2px;
+  }
+  .eyebrow { font-size: .82rem; font-variant: small-caps; letter-spacing: .26em; color: var(--oxblood); margin: 0 0 .25rem; text-align: center; }
+  h2 { font: 600 2.15rem/1.12 "Cormorant Garamond", serif; margin: 0; text-align: center; color: var(--ink); }
+  .sub { text-align: center; font: italic 400 1.05rem "EB Garamond", serif; color: var(--ink-soft); margin: .3rem 0 0; }
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--gold); margin: 18px auto 24px; max-width: 280px; font-size: .8rem; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
   h3 { font: 600 1.3rem/1.2 "Cormorant Garamond", serif; margin: 0; }
+  .sc { font: 500 .86rem "EB Garamond", serif; font-variant: small-caps; letter-spacing: .2em; color: var(--oxblood); margin: 0 0 .3rem; }
   p { margin: 0 0 .8rem; }
   .muted { color: var(--ink-soft); }
   .rule { height: 1px; background: var(--line); margin: 1.2rem 0; border: 0; }
-  .orn { text-align: center; color: var(--gold); letter-spacing: .5em; margin: -6px 0 18px; font-size: .9rem; }
+  .drop::first-letter { float: left; font: 600 3.4rem/.8 "Cormorant Garamond", serif; color: var(--oxblood); margin: .35rem .45rem 0 0; }
 
-  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 26px; }
-  .fact h3 { margin-bottom: .25rem; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 30px; }
   .fact p { font-size: 1rem; margin: 0; }
-  .callout { border-left: 2px solid var(--wine); padding: .2rem 0 .2rem 1rem; margin-top: 1.1rem; }
-  .callout h3 { margin-bottom: .2rem; }
+  .callout { margin-top: 1.5rem; padding: 1rem 1.1rem; border: 1px solid rgba(74, 21, 21, .3); background: rgba(74, 21, 21, .06); }
   .callout p { margin: 0; font-size: 1rem; }
 
-  .days { display: grid; gap: 0; }
-  .day { display: grid; grid-template-columns: 7.2rem 1fr; gap: 18px; padding: 16px 0; border-top: 1px solid var(--line); }
-  .day:first-child { border-top: 0; padding-top: 4px; }
-  .day .when b { display: block; font: 600 1.35rem/1.1 "Cormorant Garamond", serif; }
-  .day .when span { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
-  .day h3 { margin-bottom: .2rem; }
+  .days { display: grid; }
+  .day { display: grid; grid-template-columns: 4.2rem 1fr; gap: 18px; padding: 18px 0; border-top: 1px solid var(--line); }
+  .day:first-child { border-top: 0; padding-top: 0; }
+  .day .num { font: 600 2.2rem/1 "Cormorant Garamond", serif; color: var(--oxblood); text-align: center; padding-top: .1rem; }
+  .day .date { font-size: .82rem; font-variant: small-caps; letter-spacing: .2em; color: var(--ink-soft); }
+  .day h3 { margin: .05rem 0 .3rem; }
   .day ul { margin: 0; padding: 0; list-style: none; font-size: 1rem; }
-  .day li { padding-left: 1rem; position: relative; }
-  .day li::before { content: ""; position: absolute; left: 0; top: .7em; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  .day li { padding-left: 1.1rem; position: relative; }
+  .day li::before { content: "\2022"; position: absolute; left: .1rem; color: var(--gold); }
   .day li b { font-weight: 500; }
 
-  .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: .7rem; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: .8rem; }
   .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 999px; padding: .65rem 1.2rem;
-    font: 500 .9rem/1 "EB Garamond", serif; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; cursor: pointer;
-    border: 1px solid var(--ink); color: var(--ink); background: transparent;
+    display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 2px; padding: .7rem 1.25rem;
+    font: 500 .95rem/1 "EB Garamond", serif; font-variant: small-caps; letter-spacing: .16em; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--ink); color: var(--ink); background: transparent; transition: background .2s, color .2s;
   }
-  .btn.solid { background: var(--wine); border-color: var(--wine); color: #f6efe3; }
+  .btn:hover { background: var(--ink); color: var(--paper-hi); }
+  .btn.solid { background: var(--oxblood); border-color: var(--oxblood); color: var(--gold-hi); box-shadow: inset 0 0 0 3px var(--oxblood), inset 0 0 0 4px rgba(201, 171, 114, .55); }
+  .btn.solid:hover { background: #5c1c1c; }
   .btn:disabled { opacity: .55; cursor: default; }
 
-  .bring { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 26px; }
-  .bring h3 { margin-bottom: .2rem; }
-  .bring p { font-size: 1rem; margin: 0; }
-
   /* ---------- RSVP ---------- */
-  label.f { display: block; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 .35rem; }
+  label.f { display: block; font-size: .86rem; font-variant: small-caps; letter-spacing: .2em; color: var(--ink-soft); margin: 0 0 .2rem; }
   input[type=text], textarea {
-    width: 100%; font: 400 1.05rem/1.4 "EB Garamond", serif; color: var(--ink); background: #fbf8f2;
-    border: 1px solid rgba(62, 38, 0, .28); border-radius: 4px; padding: .65rem .8rem;
+    width: 100%; font: 400 1.15rem/1.4 "EB Garamond", serif; color: var(--ink); background: transparent;
+    border: 0; border-bottom: 1px solid rgba(36, 23, 12, .45); border-radius: 0; padding: .4rem .1rem;
   }
-  input[type=text]:focus, textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
-  textarea { min-height: 76px; resize: vertical; }
-  .names { display: grid; gap: 10px; margin-bottom: .6rem; }
-  .name-row { display: flex; gap: 8px; }
-  .x { flex: none; width: 44px; border: 1px solid rgba(62, 38, 0, .28); background: none; border-radius: 4px; color: var(--ink-soft); font-size: 1.2rem; cursor: pointer; }
-  .linkish { background: none; border: 0; padding: 0; color: var(--wine); font: italic 400 1rem "EB Garamond", serif; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-  .acts { display: grid; gap: 12px; margin: 1.4rem 0; }
-  .act { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; background: rgba(255, 255, 255, .35); }
-  .act .t { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-  .act .sub { font-size: .92rem; color: var(--ink-soft); margin: .15rem 0 .6rem; }
+  textarea { min-height: 84px; resize: vertical; border: 1px solid rgba(36, 23, 12, .3); padding: .6rem .7rem; background: rgba(255, 252, 244, .35);
+    background-image: repeating-linear-gradient(transparent 0 31px, rgba(36, 23, 12, .12) 31px 32px); line-height: 32px; }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--oxblood); box-shadow: 0 1px 0 var(--oxblood); }
+  .names { display: grid; gap: 14px; margin-bottom: .6rem; }
+  .name-row { display: flex; gap: 8px; align-items: end; }
+  .x { flex: none; width: 40px; height: 40px; border: 1px solid rgba(36, 23, 12, .3); background: none; border-radius: 2px; color: var(--ink-soft); font-size: 1.2rem; cursor: pointer; }
+  .linkish { background: none; border: 0; padding: 0; color: var(--oxblood); font: italic 400 1.05rem "EB Garamond", serif; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .acts { display: grid; gap: 12px; margin: 1.6rem 0; }
+  .act { border: 1px solid rgba(90, 60, 25, .3); padding: 14px 16px; background: rgba(255, 252, 244, .3); }
+  .act .sub { text-align: left; font-size: .95rem; margin: .1rem 0 .65rem; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip {
-    display: inline-flex; align-items: center; gap: .45rem; min-height: 40px; padding: .45rem .95rem; border-radius: 999px; cursor: pointer;
-    border: 1px solid rgba(62, 38, 0, .35); background: #fbf8f2; color: var(--ink); font: 400 1rem "EB Garamond", serif;
+    display: inline-flex; align-items: center; gap: .5rem; min-height: 40px; padding: .45rem 1rem; border-radius: 2px; cursor: pointer;
+    border: 1px solid rgba(36, 23, 12, .4); background: rgba(255, 252, 244, .5); color: var(--ink); font: 400 1.02rem "EB Garamond", serif;
   }
-  .chip .box { width: 16px; height: 16px; border-radius: 50%; border: 1px solid currentColor; display: inline-grid; place-items: center; font-size: 11px; line-height: 1; }
-  .chip[aria-pressed="true"] { background: var(--wine); border-color: var(--wine); color: #f6efe3; }
+  .chip .box { width: 15px; height: 15px; border: 1px solid currentColor; display: inline-grid; place-items: center; font-size: 11px; line-height: 1; }
+  .chip[aria-pressed="true"] { background: var(--oxblood); border-color: var(--oxblood); color: var(--gold-hi); }
   .chip[aria-pressed="true"] .box::after { content: "\2713"; }
-  .act.film .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); }
+  .act.film .chip[aria-pressed="true"] { background: var(--forest); border-color: var(--forest); }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  .err { color: var(--wine); font-style: italic; margin: .6rem 0 0; min-height: 1.4em; }
+  .err { color: var(--oxblood); font-style: italic; margin: .6rem 0 0; min-height: 1.4em; }
   .done-list { list-style: none; padding: 0; margin: .4rem 0 1rem; }
-  .done-list li { padding: .45rem 0; border-top: 1px solid var(--line); }
+  .done-list li { padding: .5rem 0; border-top: 1px solid var(--line); }
   .done-list li:first-child { border-top: 0; }
-  .sign { text-align: center; color: var(--cream); font: italic 500 1.6rem "Cormorant Garamond", serif; margin: 34px 0 0; opacity: .9; }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .sign { text-align: center; color: var(--gold-hi); font: italic 500 1.7rem "Cormorant Garamond", serif; margin: 40px 0 0; }
+  .sign::before { content: "\2766"; display: block; font-size: 1rem; color: var(--gold); margin-bottom: .6rem; font-style: normal; }
 
   @media (max-width: 600px) {
     body { font-size: 17px; }
-    .sheet { padding: 26px 18px; }
-    h2 { font-size: 1.8rem; }
-    .facts, .bring { grid-template-columns: 1fr; }
-    .day { grid-template-columns: 1fr; gap: 4px; }
-    .day .when b { display: inline; margin-right: .4rem; }
+    .sheet { padding: 36px 22px 28px; }
+    h2 { font-size: 1.85rem; }
+    .facts { grid-template-columns: 1fr; }
+    .day { grid-template-columns: 2.6rem 1fr; gap: 12px; }
+    .day .num { font-size: 1.8rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -174,21 +195,28 @@
 <main>
   <section class="hero">
     <canvas id="card" role="img" aria-label="Thanksgiving dinner invitation"></canvas>
-    <a class="scroll-cue" href="#details">The weekend<span aria-hidden="true">&#8964;</span></a>
+    <a class="scroll-cue" href="#details">the weekend<span aria-hidden="true">&#8964;</span></a>
   </section>
+
+  <div class="epigraph">
+    <q>Gratitude is the memory of the heart.</q>
+    <cite>Jean Baptiste Massieu</cite>
+  </div>
 
   <div class="wrap">
     <section class="sheet" id="details">
-      <p class="eyebrow">Thanksgiving dinner</p>
-      <h2>Thursday, November 26 at 6:30</h2>
+      <p class="eyebrow">Chapter I &middot; The Dinner</p>
+      <h2>Thursday, the twenty-sixth of November</h2>
+      <p class="sub">Half past six in the evening</p>
+      <div class="divider">&#10086;</div>
       <div class="facts">
         <div class="fact">
-          <h3>Dress code</h3>
-          <p>Semi-formal. If you want to lean into the theme, think dark academia: tweed, wool, knits and velvet in browns, burgundy, forest green and cream. If not, your Sunday best is perfect.</p>
+          <p class="sc">Dress code</p>
+          <p class="drop">Semi-formal. If you'd like to lean into the theme, think dark academia: tweed, wool, knits and velvet in browns, burgundy, forest green and cream. If not, your Sunday best is perfect.</p>
         </div>
         <div class="fact">
-          <h3>Where</h3>
-          <p data-k="placeName"></p>
+          <p class="sc">Where</p>
+          <p data-k="placeName" style="font-weight:500"></p>
           <p data-k="address"></p>
           <div class="btns">
             <a class="btn" id="gmaps" target="_blank" rel="noopener">Google Maps</a>
@@ -197,25 +225,26 @@
         </div>
       </div>
       <div class="callout">
-        <h3>We'll be filming</h3>
+        <p class="sc">We'll be filming</p>
         <p>We're filming Thanksgiving dinner (the table, the food and the evening) for some video content. If you'd rather stay off camera, just say so in your RSVP below and we'll keep you out of the shots.</p>
       </div>
     </section>
 
     <section class="sheet">
-      <p class="eyebrow">Wednesday to Sunday</p>
-      <h2>The weekend, roughly</h2>
+      <p class="eyebrow">Chapter II &middot; The Weekend</p>
+      <h2>Five days at the lodge</h2>
+      <div class="divider">&#10086;</div>
       <div class="days">
         <div class="day">
-          <div class="when"><b>Wed</b><span>Nov 25</span></div>
-          <div><h3>Arrive</h3><ul>
+          <div class="num">I</div>
+          <div><span class="date">Wednesday, Nov 25</span><h3>Arrival</h3><ul>
             <li>Check in from <b data-k="checkIn"></b></li>
             <li>Smash burgers and hot dogs on the Blackstone</li>
           </ul></div>
         </div>
         <div class="day">
-          <div class="when"><b>Thu</b><span>Nov 26</span></div>
-          <div><h3>Thanksgiving</h3><ul>
+          <div class="num">II</div>
+          <div><span class="date">Thursday, Nov 26</span><h3>Thanksgiving</h3><ul>
             <li>Quiche, cinnamon rolls and mimosas at 8:30</li>
             <li>Football, games and the fire pit all day</li>
             <li>Appetizers from 3:00</li>
@@ -223,24 +252,24 @@
           </ul></div>
         </div>
         <div class="day">
-          <div class="when"><b>Fri</b><span>Nov 27</span></div>
-          <div><h3>Mammoth Cave and Bowling Green</h3><ul>
+          <div class="num">III</div>
+          <div><span class="date">Friday, Nov 27</span><h3>The cave and the city</h3><ul>
             <li>Breakfast burritos on the Blackstone</li>
-            <li><b>Domes and Dripstones tour at 2:30</b>, $25 per person (leave the cabin about 12:45)</li>
+            <li><b>Mammoth Cave, Domes and Dripstones tour at 2:30</b>, $25 per person (we leave the cabin about 12:45)</li>
             <li><b>Dinner at Hickory &amp; Oak</b>, Bowling Green, 6:30</li>
           </ul></div>
         </div>
         <div class="day">
-          <div class="when"><b>Sat</b><span>Nov 28</span></div>
-          <div><h3>Free day</h3><ul>
+          <div class="num">IV</div>
+          <div><span class="date">Saturday, Nov 28</span><h3>A free day</h3><ul>
             <li>Pancakes, eggs and bacon</li>
-            <li>Fishing, farm walks, naps</li>
+            <li>Fishing, farm walks, long naps</li>
             <li>Fire pit and s'mores</li>
           </ul></div>
         </div>
         <div class="day">
-          <div class="when"><b>Sun</b><span>Nov 29</span></div>
-          <div><h3>Head home</h3><ul>
+          <div class="num">V</div>
+          <div><span class="date">Sunday, Nov 29</span><h3>Homeward</h3><ul>
             <li>Pack up and check out before <b data-k="checkOut"></b></li>
           </ul></div>
         </div>
@@ -248,25 +277,28 @@
     </section>
 
     <section class="sheet">
-      <p class="eyebrow">Good to know</p>
+      <p class="eyebrow">Chapter III &middot; Practical Matters</p>
       <h2>Before you pack</h2>
+      <div class="divider">&#10086;</div>
       <div class="facts">
-        <div class="fact"><h3>Bring a jacket</h3><p>The cave is about 54&deg;F all year, and the evenings by the fire pit get cold.</p></div>
-        <div class="fact"><h3>Times are Central</h3><p>The cabin is on Central time, the same as Nashville. Check in from 4:00 PM Wednesday, check out before 10:00 AM Sunday.</p></div>
-        <div class="fact"><h3>Fishing</h3><p>Anyone 16 or older needs a Kentucky fishing license (fw.ky.gov). Tennessee residents buy the nonresident one.</p></div>
-        <div class="fact"><h3>Also bring</h3><p>Your own drinks, a camp chair and any snacks you can't live without.</p></div>
+        <div class="fact"><p class="sc">Bring a jacket</p><p>The cave is about 54&deg;F all year, and the evenings by the fire pit get cold.</p></div>
+        <div class="fact"><p class="sc">Times are Central</p><p>The cabin is on Central time, the same as Nashville. Check in from 4:00 PM Wednesday, check out before 10:00 AM Sunday.</p></div>
+        <div class="fact"><p class="sc">Fishing</p><p>Anyone 16 or older needs a Kentucky fishing license (fw.ky.gov). Tennessee residents buy the nonresident one.</p></div>
+        <div class="fact"><p class="sc">Also bring</p><p>Your own drinks, a camp chair and any snacks you can't live without.</p></div>
       </div>
     </section>
 
     <section class="sheet">
-      <p class="eyebrow">Who's bringing what</p>
-      <h2>The table</h2>
-      <p style="margin:0">We're still working out who brings what, and we'll send the list soon. If there's something you'd love to bring, tell us in your RSVP.</p>
+      <p class="eyebrow">Chapter IV &middot; The Larder</p>
+      <h2>Bringing something?</h2>
+      <div class="divider">&#10086;</div>
+      <p style="text-align:center;margin:0 auto;max-width:34rem">Thanksgiving dinner is entirely on us, so please don't bring anything for Thursday. If you'd like to bring something for Friday or Saturday, tell us in your RSVP.</p>
     </section>
 
     <section class="sheet" id="rsvp">
-      <p class="eyebrow">RSVP <span data-k="rsvpBy"></span></p>
+      <p class="eyebrow">Chapter V &middot; Your Reply</p>
       <h2>Will you join us?</h2>
+      <div class="divider">&#10086;</div>
 
       <form id="form" novalidate>
         <div class="names" id="names"></div>
@@ -274,22 +306,22 @@
 
         <div class="acts" id="acts"></div>
 
-        <label class="f" for="note">Anything you'd like to bring, or anything else?</label>
+        <label class="f" for="note">Bringing something for Friday or Saturday? Anything else?</label>
         <textarea id="note" maxlength="1000"></textarea>
         <div class="hp" aria-hidden="true"><label>Website <input type="text" id="website" tabindex="-1" autocomplete="off"></label></div>
 
-        <div class="btns" style="margin-top:1.2rem">
-          <button class="btn solid" id="send" type="submit">Send RSVP</button>
+        <div class="btns" style="margin-top:1.4rem;justify-content:center">
+          <button class="btn solid" id="send" type="submit">Send my reply</button>
         </div>
-        <p class="err" id="err" role="alert"></p>
+        <p class="err" id="err" role="alert" style="text-align:center"></p>
       </form>
 
       <div id="thanks" hidden>
-        <h3 style="font-size:1.6rem;margin-bottom:.4rem">Thank you! We can't wait.</h3>
+        <h3 style="font-size:1.7rem;margin-bottom:.4rem;text-align:center">Thank you. We can't wait.</h3>
         <p class="muted" style="margin-bottom:.2rem">Here's what we have for you:</p>
         <ul class="done-list" id="doneList"></ul>
         <div id="venmo"></div>
-        <div class="btns"><button class="btn" type="button" id="change">Change my RSVP</button></div>
+        <div class="btns"><button class="btn" type="button" id="change">Change my reply</button></div>
       </div>
     </section>
 
@@ -317,9 +349,8 @@ window.INVITE = {
   address: '313 R Whitlow Rd, Austin, KY 42123',
   checkIn: '4:00 PM',             // Central time (Barren County, KY), same as Nashville
   checkOut: '10:00 AM',
-  rsvpBy: 'by Sunday, November 16',
   signature: 'With love, Justin & Becca',
-  venmo: '',                      // Justin's Venmo username, without the @
+  venmo: 'Justinben2335',         // Justin's Venmo username, without the @
   cavePrice: 25,
 };
 </script>
@@ -546,7 +577,7 @@ window.INVITE = {
       err.textContent = `${ex.message} If it keeps happening, just text Justin.`;
     } finally {
       send.disabled = false;
-      send.textContent = 'Send RSVP';
+      send.textContent = 'Send my reply';
     }
   });
 
@@ -687,9 +718,9 @@ sealTex.center.set(0.5, 0.5);
 sealTex.rotation = Math.PI / 2;  // the cylinder cap maps the canvas sideways
 const seal = new THREE.Mesh(
   new THREE.CylinderGeometry(0.46, 0.48, 0.09, 48),
-  [new THREE.MeshStandardMaterial({ color: 0x5a1717, roughness: 0.5, metalness: 0.1, transparent: true }),
+  [new THREE.MeshStandardMaterial({ color: 0x2a0b09, roughness: 0.35, metalness: 0.15, transparent: true }),
    new THREE.MeshStandardMaterial({ map: sealTex, roughness: 0.45, metalness: 0.1, transparent: true }),
-   new THREE.MeshStandardMaterial({ color: 0x5a1717, transparent: true })],
+   new THREE.MeshStandardMaterial({ color: 0x2a0b09, transparent: true })],
 );
 seal.rotation.x = Math.PI / 2;
 seal.position.set(0, EH / 2 - FLAP + 0.42, 0.12);
@@ -719,7 +750,7 @@ const leaves = new THREE.InstancedMesh(
   Math.max(LEAVES, 1),
 );
 leaves.count = LEAVES;
-const palette = [0x9a3b12, 0xb5651d, 0xc8892f, 0x7a2a12, 0xa64b1a, 0xd09a3a].map((c) => new THREE.Color(c));
+const palette = [0x6e3414, 0x8a5524, 0x9c7a3c, 0x5a1c12, 0x7a4a1e, 0x4f3a1c].map((c) => new THREE.Color(c));
 const leafState = [];
 for (let i = 0; i < LEAVES; i++) {
   leafState.push({
@@ -877,13 +908,13 @@ function sealCanvas() {
   c.width = c.height = s;
   const g = c.getContext('2d');
   const grd = g.createRadialGradient(s * 0.42, s * 0.38, s * 0.05, s / 2, s / 2, s / 2);
-  grd.addColorStop(0, '#9b2c2c'); grd.addColorStop(0.7, '#6b1d1d'); grd.addColorStop(1, '#3d0f0f');
+  grd.addColorStop(0, '#4f1a17'); grd.addColorStop(0.65, '#2e0d0b'); grd.addColorStop(1, '#170605');
   g.fillStyle = grd; g.fillRect(0, 0, s, s);
   g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 6;
   g.beginPath(); g.arc(s / 2, s / 2, s * 0.36, 0, Math.PI * 2); g.stroke();
-  g.strokeStyle = 'rgba(255,210,170,.25)'; g.lineWidth = 2;
+  g.strokeStyle = 'rgba(201,171,114,.45)'; g.lineWidth = 2;
   g.beginPath(); g.arc(s / 2, s / 2, s * 0.33, 0, Math.PI * 2); g.stroke();
-  g.fillStyle = 'rgba(255,220,190,.55)';
+  g.fillStyle = 'rgba(201,171,114,.85)';
   g.textAlign = 'center'; g.textBaseline = 'middle';
   g.font = 'italic 500 70px "Cormorant Garamond", serif';
   g.fillText('J & B', s / 2, s / 2 + 4);
