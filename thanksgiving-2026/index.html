@@ -48,7 +48,11 @@
       radial-gradient(ellipse at 50% 40%, rgba(14, 9, 4, .55), rgba(6, 4, 1, .94) 78%),
       url("damask.webp") center / 260px auto repeat;
   }
-  body.intro { overflow: hidden; }
+  /* During the intro the page underneath isn't rendered at all: iPhone Safari ignores
+     overflow:hidden on body, so a swipe during the animation used to scroll the hidden page. */
+  html.intro, body.intro { overflow: hidden; height: 100%; }
+  body.intro main { display: none; }
+  #stage, #envph { touch-action: none; }
   ::selection { background: var(--oxblood); color: var(--paper-hi); }
 
   /* ---------- intro (three.js envelope) ---------- */
@@ -86,8 +90,10 @@
   #card { display: block; width: min(88vw, 470px, calc(84svh * 900 / 1458)); height: auto; aspect-ratio: 900 / 1458; filter: drop-shadow(0 26px 44px rgba(0, 0, 0, .7)); }
   .scroll-cue {
     position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; color: var(--gold-hi);
-    font-size: .85rem; font-variant: small-caps; letter-spacing: .3em; opacity: .8; text-decoration: none;
+    font-size: .85rem; font-variant: small-caps; letter-spacing: .3em; opacity: 0; text-decoration: none;
+    transition: opacity 1.2s ease 3s;  /* give them time to read the card first */
   }
+  body.opened .scroll-cue { opacity: .8; }
   .scroll-cue span { display: block; font-size: 1.1rem; animation: bob 2.2s ease-in-out infinite; }
   @keyframes bob { 50% { transform: translateY(5px); } }
 
@@ -641,9 +647,14 @@ window.INVITE = {
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 window.__introTimer = setTimeout(() => { if (!window.__introStarted) window.__openPage && window.__openPage(); }, 12000);
+document.documentElement.classList.add('intro');
 window.__openPage = () => {
+  document.documentElement.classList.remove('intro');
   document.body.classList.remove('intro');
-  document.body.classList.add('opened');
+  const main = document.querySelector('main');
+  void main.offsetWidth;   // render it at opacity 0 first so the fade-in runs
+  window.scrollTo(0, 0);
+  requestAnimationFrame(() => document.body.classList.add('opened'));
 };
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) window.__openPage();
 </script>
@@ -666,7 +677,7 @@ try {
 }
 // If the fallback already opened the page (three.js was slow to arrive), don't
 // start an envelope behind it: just keep the leaves.
-const lateStart = document.body.classList.contains('opened');
+const lateStart = !document.body.classList.contains('intro');
 window.__introStarted = true;
 clearTimeout(window.__introTimer);
 
@@ -842,18 +853,19 @@ function finish() {
   if (done) return;
   done = true;
   env.visible = false;
-  card.visible = false;
   window.__openPage();
 }
 
 // Where the card ends up: centred and as large as the page's own card, so the hand-off is seamless.
 function cardTarget() {
+  // Mirrors the page's #card CSS: width min(88vw, 470px, 84svh x aspect), centred in a hero
+  // with 24px top and 72px bottom padding, so its centre sits 24px above the screen's centre.
   const fovHalf = THREE.MathUtils.degToRad(17.5);
   const vh = window.innerHeight, vw = window.innerWidth;
-  const domW = Math.min(vw * 0.88, 470, (vh * 0.86) * window.CardArt.aspect);
+  const domW = Math.min(vw * 0.88, 470, (vh * 0.84) * window.CardArt.aspect);
   const frac = (domW / window.CardArt.aspect) / vh;  // card height as a share of the screen
-  const halfH = CHT / 2 / frac;
-  return { z: camera.position.z - halfH / Math.tan(fovHalf), y: 0 };
+  const halfH = CHT / 2 / frac;                       // half the visible height, in world units
+  return { z: camera.position.z - halfH / Math.tan(fovHalf), y: (24 / vh) * 2 * halfH };
 }
 
 let pointerX = 0, pointerY = 0;
@@ -909,6 +921,12 @@ function frame() {
     }
   }
 
+  // Hand-off: the page's card fades in on top while this one fades out, so the card never blinks.
+  if (done && card.visible) {
+    card.material.opacity = Math.max(0, card.material.opacity - dt / 1.4);
+    if (card.material.opacity === 0) card.visible = false;
+  }
+
   for (let i = 0; i < LEAVES; i++) {
     const L = leafState[i];
     L.y -= L.vy * dt;
@@ -925,9 +943,9 @@ function frame() {
 
   renderer.render(scene, camera);
   // After the intro only the leaves are left; stop drawing if there are none.
-  if (!done || LEAVES) requestAnimationFrame(frame);
+  if (!done || LEAVES || card.visible) requestAnimationFrame(frame);
 }
-if (reduced || lateStart) finish();
+if (reduced || lateStart) { finish(); card.visible = false; }
 requestAnimationFrame(frame);
 
 /* ---------- helpers ---------- */
