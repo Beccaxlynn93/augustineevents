@@ -491,7 +491,6 @@ window.INVITE = {
     { key: 'cave', title: 'Mammoth Cave: Domes and Dripstones', sub: `Optional. Friday, 2:30 PM. $${I.cavePrice} per person, we buy the tickets together.` },
     // key stays 'steakhouse' so saved replies keep working; the restaurant is now Mellow Mushroom.
     { key: 'steakhouse', title: 'Dinner at Mellow Mushroom', sub: 'Optional. Friday, 6:30 PM in Bowling Green' },
-    { key: 'fishing', title: 'Fishing on Saturday', sub: 'You will need a Kentucky fishing license' },
     { key: 'no_film', title: 'Filming', sub: 'Tap anyone who would rather stay off camera at dinner.', film: true, label: 'Keep me off camera' },
   ];
   const TOKEN_KEY = 'tg2026-rsvp';
@@ -549,7 +548,7 @@ window.INVITE = {
   $('addPartner').addEventListener('click', () => { people.push(blank()); renderAll(); $('n1').focus(); });
 
   function showThanks() {
-    const NAMES = { dinner: 'Thanksgiving dinner', cave: 'Mammoth Cave', steakhouse: 'Mellow Mushroom', fishing: 'fishing' };
+    const NAMES = { dinner: 'Thanksgiving dinner', cave: 'Mammoth Cave', steakhouse: 'Mellow Mushroom' };
     $('doneList').innerHTML = '';
     people.forEach((p) => {
       const yes = Object.keys(NAMES).filter((k) => p[k]).map((k) => NAMES[k]);
