@@ -14,6 +14,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "./three.module.min.js" } }
+</script>
+<link rel="modulepreload" href="three.module.min.js">
+<link rel="preload" href="envelope.webp" as="image">
 <link rel="preload" href="card.webp" as="image">
 <style>
   /* Dark academia: candlelit library. Umber and ink, aged parchment, oxblood, old gold. */
@@ -48,7 +53,17 @@
 
   /* ---------- intro (three.js envelope) ---------- */
   #stage { position: fixed; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
-  body.intro #stage { z-index: 20; pointer-events: auto; cursor: pointer; }
+  body.intro #stage { z-index: 19; pointer-events: auto; cursor: pointer; }
+  /* Flat stand-in envelope, shown the instant the page loads; the 3D one fades in over it. */
+  #envph { position: fixed; inset: 0; z-index: 20; display: none; place-items: center; pointer-events: none; transition: opacity .5s ease; }
+  body.intro #envph { display: grid; }
+  #envph.gone { opacity: 0; }
+  .ph-env { position: relative; width: 62vw; aspect-ratio: 310 / 480; background: #2a150a url("envelope.webp") left bottom / 83.33% 111.1% repeat; box-shadow: 0 30px 60px rgba(0, 0, 0, .65); filter: brightness(.92); }
+  .ph-env svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ph-seal { position: absolute; left: 50%; top: 46.25%; width: 29.7%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+    background: radial-gradient(circle at 42% 38%, #3a1311, #220a08 65%, #120404); box-shadow: 0 3px 8px rgba(0, 0, 0, .5), inset 0 0 0 4px rgba(0, 0, 0, .25);
+    display: grid; place-items: center; color: rgba(201, 171, 114, .85); font: italic 500 clamp(18px, 5.5vw, 30px) "Cormorant Garamond", serif; }
+  .ph-seal::after { content: ""; position: absolute; inset: 15%; border-radius: 50%; border: 1px solid rgba(201, 171, 114, .45); }
   .intro-ui { position: fixed; inset: 0; z-index: 21; pointer-events: none; display: none; }
   body.intro .intro-ui { display: block; }
   .hint {
@@ -187,6 +202,25 @@
 <body class="intro">
 
 <canvas id="stage" aria-hidden="true"></canvas>
+<div id="envph" aria-hidden="true">
+  <div class="ph-env">
+    <svg viewBox="0 0 310 480" preserveAspectRatio="none">
+      <path d="M0 480 L155 278 L310 480" fill="none" stroke="rgba(176,141,87,.45)" stroke-width="1"/>
+      <path d="M0 0 L310 0 Q179.8 237.6 155 264 Q130.2 237.6 0 0 Z" fill="rgba(0,0,0,.08)" stroke="rgba(176,141,87,.9)" stroke-width="1"/>
+    </svg>
+    <div class="ph-seal">J &amp; B</div>
+  </div>
+</div>
+<script>
+/* Size the stand-in exactly like the 3D envelope (same camera fit as resize() below). */
+(() => {
+  const a = innerWidth / innerHeight;
+  const needH = Math.max(2.4 + 1.2, ((1.55 + 0.35) / a) * 1.12);
+  const h = (innerHeight * 2.4) / needH;
+  const e = document.querySelector('.ph-env');
+  e.style.width = (h * 310) / 480 + 'px';
+})();
+</script>
 <div class="intro-ui">
   <div class="hint" id="hint">Tap the seal to open<small>An invitation for you</small></div>
   <button class="skip" id="skip" type="button">Skip</button>
@@ -212,7 +246,7 @@
       <div class="facts">
         <div class="fact">
           <p class="sc">Dress code</p>
-          <p class="drop">Semi-formal. If you'd like to lean into the theme, think dark academia: tweed, wool, knits and velvet in browns, burgundy, forest green and cream. If not, your Sunday best is perfect.</p>
+          <p class="drop">Semi-formal. If you'd like to lean into the theme, think dark academia: tweed, wool, plaid, knits and velvet in browns, burgundy, forest green and cream. If not, your Sunday best is perfect.</p>
         </div>
         <div class="fact">
           <p class="sc">Where</p>
@@ -600,9 +634,6 @@ window.INVITE = {
 })();
 </script>
 
-<script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
-</script>
 <script>
 /* If three.js never starts (old phone, blocked CDN), open the page anyway. */
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -787,6 +818,7 @@ const hint = document.getElementById('hint');
 hint.style.visibility = 'hidden';
 // Nothing can be tapped open until the card, envelope and fonts are ready and the
 // textures are on the GPU. Otherwise the first open stutters or shows a blank card.
+envLoaded.then(() => requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById('envph').classList.add('gone'))));
 Promise.all([cardDrawn, envLoaded]).then(() => {
   renderer.initTexture(cardTex);
   renderer.initTexture(damask);
