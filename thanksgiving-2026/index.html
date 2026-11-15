@@ -290,7 +290,8 @@
           <div><span class="date">Friday, Nov 27</span><h3>The cave and the city</h3><ul>
             <li>Breakfast burritos on the Blackstone</li>
             <li><b>Mammoth Cave, Domes and Dripstones tour at 2:30</b>, $25 per person (we leave the cabin about 12:45)</li>
-            <li><b>Dinner at Hickory &amp; Oak</b>, Bowling Green, 6:30</li>
+            <li><b>Dinner at Mellow Mushroom</b>, Bowling Green, 6:30</li>
+            <li><i>Both are optional. Join us for either, both or neither.</i></li>
           </ul></div>
         </div>
         <div class="day">
@@ -489,8 +490,9 @@ window.INVITE = {
   /* ---------- RSVP ---------- */
   const ACTS = [
     { key: 'dinner', title: 'Thanksgiving dinner', sub: 'Thursday, 6:30 PM', def: true },
-    { key: 'cave', title: 'Mammoth Cave: Domes and Dripstones', sub: `Friday, 2:30 PM. $${I.cavePrice} per person, we buy the tickets together.` },
-    { key: 'steakhouse', title: 'Dinner at Hickory & Oak', sub: 'Friday, 6:30 PM in Bowling Green' },
+    { key: 'cave', title: 'Mammoth Cave: Domes and Dripstones', sub: `Optional. Friday, 2:30 PM. $${I.cavePrice} per person, we buy the tickets together.` },
+    // key stays 'steakhouse' so saved replies keep working; the restaurant is now Mellow Mushroom.
+    { key: 'steakhouse', title: 'Dinner at Mellow Mushroom', sub: 'Optional. Friday, 6:30 PM in Bowling Green' },
     { key: 'fishing', title: 'Fishing on Saturday', sub: 'Kentucky license needed if you are 16 or older' },
     { key: 'no_film', title: 'Filming', sub: 'Tap anyone who would rather stay off camera at dinner.', film: true, label: 'Keep me off camera' },
   ];
@@ -549,7 +551,7 @@ window.INVITE = {
   $('addPartner').addEventListener('click', () => { people.push(blank()); renderAll(); $('n1').focus(); });
 
   function showThanks() {
-    const NAMES = { dinner: 'Thanksgiving dinner', cave: 'Mammoth Cave', steakhouse: 'Hickory & Oak', fishing: 'fishing' };
+    const NAMES = { dinner: 'Thanksgiving dinner', cave: 'Mammoth Cave', steakhouse: 'Mellow Mushroom', fishing: 'fishing' };
     $('doneList').innerHTML = '';
     people.forEach((p) => {
       const yes = Object.keys(NAMES).filter((k) => p[k]).map((k) => NAMES[k]);
